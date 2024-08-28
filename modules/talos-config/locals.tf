@@ -57,14 +57,14 @@ locals {
             validSubnets = local.machine_subnets
           }
         }
-        network = {
-          extraHostEntries = [
-            {
-              ip      = "127.0.0.1"
-              aliases = [var.endpoint]
-            },
-          ]
-        }
+        # network = {
+        #   extraHostEntries = [
+        #     {
+        #       ip      = "127.0.0.1"
+        #       aliases = [var.endpoint]
+        #     },
+        #   ]
+        # }
         sysctls = {
           "net.core.somaxconn"          = 65535
           "net.core.netdev_max_backlog" = 4096
