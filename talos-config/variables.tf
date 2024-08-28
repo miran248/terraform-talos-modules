@@ -22,6 +22,7 @@ variable "layout" {
   type = object({
     masks4 = object({ machines = string })
     cidrs4 = object({ machines = string, services = string, pods = string })
+    ips4   = object({ cluster_dns = string })
   })
   description = "network layout module outputs"
 }

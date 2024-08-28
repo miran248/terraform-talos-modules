@@ -49,8 +49,16 @@ locals {
   USER_DATA
 
   patches_hcloud  = <<-EOF
+    cluster:
+      network:
+        cni:
+          name: none
     machine:
       network:
+        kubespan:
+          enabled: true
+          advertiseKubernetesNetworks: false
+          mtu: 1370 # Hcloud has a MTU of 1450 (KubeSpanMTU = UnderlyingMTU - 80)
         interfaces:
           - interface: eth0
             dhcp: true

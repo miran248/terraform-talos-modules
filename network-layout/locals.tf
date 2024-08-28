@@ -55,5 +55,6 @@ locals {
       services = cidrhost(local.cidrs4.services, 1) # 10.16.0.1
       pods     = cidrhost(local.cidrs4.pods, 1)     # 10.32.0.1
     }
+    cluster_dns = cidrhost(local.cidrs4.services, 10) # 10.16.0.10
   }
 }

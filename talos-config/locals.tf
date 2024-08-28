@@ -24,7 +24,6 @@ locals {
           dnsDomain      = "cluster.local"
           podSubnets     = local.pod_subnets
           serviceSubnets = local.service_subnets
-          cni            = { name = "none" }
         }
       }
       machine = {
@@ -49,6 +48,7 @@ locals {
         #   ]
         # }
         kubelet = {
+          clusterDNS = [var.layout.ips4.cluster_dns]
           extraArgs = {
             cloud-provider             = "external"
             rotate-server-certificates = false
@@ -58,13 +58,12 @@ locals {
           }
         }
         network = {
-          # extraHostEntries = [
-          #   {
-          #     ip      = "127.0.0.1"
-          #     aliases = [var.endpoint]
-          #   },
-          # ]
-          kubespan = { enabled = true }
+          extraHostEntries = [
+            {
+              ip      = "127.0.0.1"
+              aliases = [var.endpoint]
+            },
+          ]
         }
         sysctls = {
           "net.core.somaxconn"          = 65535
@@ -93,8 +92,7 @@ locals {
         controllerManager = {
           extraArgs = {
             bind-address             = "127.0.0.1"
-            # node-cidr-mask-size-ipv4 = var.layout.masks4.machines
-            node-cidr-mask-size-ipv4 = 24
+            node-cidr-mask-size-ipv4 = var.layout.masks4.machines
             cloud-provider           = "external"
           }
         }
