@@ -92,7 +92,7 @@ locals {
         controllerManager = {
           extraArgs = {
             bind-address             = "127.0.0.1"
-            node-cidr-mask-size-ipv4 = var.layout.masks4.machines
+            node-cidr-mask-size-ipv4 = 24
             cloud-provider           = "external"
           }
         }
