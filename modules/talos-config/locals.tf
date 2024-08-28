@@ -91,13 +91,16 @@ locals {
         }
         controllerManager = {
           extraArgs = {
-            bind-address             = "127.0.0.1"
+            bind-address             = "0.0.0.0"
             node-cidr-mask-size-ipv4 = 24
             cloud-provider           = "external"
           }
         }
         etcd = {
           advertisedSubnets = local.machine_subnets
+          extraArgs = {
+            "listen-metrics-urls" = "http://0.0.0.0:2381"
+          }
         }
         externalCloudProvider = {
           enabled = true
@@ -110,7 +113,7 @@ locals {
         }
         scheduler = {
           extraArgs = {
-            bind-address = "127.0.0.1"
+            bind-address = "0.0.0.0"
           }
         }
       }
