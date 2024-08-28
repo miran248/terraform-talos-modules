@@ -124,12 +124,12 @@ locals {
 }
 
 module "layout" {
-  source = "github.com/miran248/terraform-talos-modules//network-layout"
+  source = "github.com/miran248/terraform-talos-modules//modules/network-layout"
 }
 
 module "zones_nuremberg" {
   count  = length(local.nodes_nuremberg)
-  source = "github.com/miran248/terraform-talos-modules//network-zone"
+  source = "github.com/miran248/terraform-talos-modules//modules/network-zone"
 
   cloud  = 1
   region = 1
@@ -137,7 +137,7 @@ module "zones_nuremberg" {
 }
 module "zones_falkenstein" {
   count  = length(local.nodes_falkenstein)
-  source = "github.com/miran248/terraform-talos-modules//network-zone"
+  source = "github.com/miran248/terraform-talos-modules//modules/network-zone"
 
   cloud  = 1
   region = 2
@@ -146,7 +146,7 @@ module "zones_falkenstein" {
 
 module "pools_nuremberg" {
   count  = length(local.nodes_nuremberg)
-  source = "github.com/miran248/terraform-talos-modules//node-pool"
+  source = "github.com/miran248/terraform-talos-modules//modules/node-pool"
 
   prefix = "nuremberg"
   zone   = module.zones_nuremberg[count.index]
@@ -159,7 +159,7 @@ module "pools_nuremberg" {
 }
 module "pools_falkenstein" {
   count  = length(local.nodes_falkenstein)
-  source = "github.com/miran248/terraform-talos-modules//node-pool"
+  source = "github.com/miran248/terraform-talos-modules//modules/node-pool"
 
   prefix = "falkenstein"
   zone   = module.zones_falkenstein[count.index]
@@ -172,7 +172,7 @@ module "pools_falkenstein" {
 }
 
 module "talos_config" {
-  source = "github.com/miran248/terraform-talos-modules//talos-config"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-config"
 
   layout = module.layout
   pools = flatten([
@@ -189,7 +189,7 @@ module "talos_config" {
 
 module "nuremberg" {
   count  = length(module.pools_nuremberg)
-  source = "github.com/miran248/terraform-talos-modules//hcloud"
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud"
 
   layout = module.layout
   zone   = module.zones_nuremberg[count.index]
@@ -210,7 +210,7 @@ module "nuremberg" {
 }
 module "falkenstein" {
   count  = length(module.pools_falkenstein)
-  source = "github.com/miran248/terraform-talos-modules//hcloud"
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud"
 
   layout = module.layout
   zone   = module.zones_falkenstein[count.index]
@@ -248,7 +248,7 @@ resource "google_dns_record_set" "talos_ipv4" {
 }
 
 module "talos_apply" {
-  source = "github.com/miran248/terraform-talos-modules//talos-apply"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply"
 
   config = module.talos_config
 

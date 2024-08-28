@@ -2,12 +2,12 @@
 This repository contains a collection of opinionated terraform modules for running [talos](https://www.talos.dev) on [hetzner](https://www.hetzner.com).
 
 ## modules
-1. [network-layout](network-layout) manages global cidrs and private ips
-2. [network-zone](network-zone) manages regional / zonal cidrs and private ips
-3. [node-pool](node-pool) manages control planes and workers
-4. [talos-config](talos-config) manages talos configs for all machines
-5. [hcloud](hcloud) manages hcloud networks, servers, load balancers, firewalls, routers
-6. [talos-apply](talos-apply) bootstraps cluster and applies configs to running machines
+1. [network-layout](modules/network-layout) manages global cidrs and private ips
+2. [network-zone](modules/network-zone) manages regional / zonal cidrs and private ips
+3. [node-pool](modules/node-pool) manages control planes and workers
+4. [talos-config](modules/talos-config) manages talos configs for all machines
+5. [hcloud](modules/hcloud) manages hcloud networks, servers, load balancers, firewalls, routers
+6. [talos-apply](modules/talos-apply) bootstraps cluster and applies configs to running machines
 
 ## examples
 See [examples](examples) folder.
