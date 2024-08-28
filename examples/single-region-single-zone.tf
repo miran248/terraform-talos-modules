@@ -102,6 +102,8 @@ module "zones_nuremberg" {
   count  = length(local.nodes_nuremberg)
   source = "github.com/miran248/terraform-talos-modules//modules/network-zone"
 
+  layout = module.layout
+
   cloud  = 1
   region = 1
   zone   = 1 + count.index
