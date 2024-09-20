@@ -1,0 +1,122 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+helmCharts:
+  - name: cilium
+    repo: https://helm.cilium.io
+    version: 1.16.1
+    releaseName: cilium
+    namespace: kube-system
+    includeCRDs: true
+    apiVersions:
+      - gateway.networking.k8s.io/v1/GatewayClass
+      # - monitoring.coreos.com/v1
+    valuesInline:
+      # TODO: switch to host routing once netkit arrives
+      routingMode: tunnel
+
+      externalIPs:
+        enabled: true
+
+      k8sServiceHost: "localhost"
+      k8sServicePort: 7445
+
+      ipam:
+        mode: kubernetes
+
+      kubeProxyReplacement: true
+
+      ipv6:
+        enabled: true
+      ipv4:
+        enabled: true
+
+      k8s:
+        requireIPv6PodCIDR: true
+        requireIPv4PodCIDR: true
+
+      ipv6NativeRoutingCIDR: "fc00::10:0/108"
+      ipv4NativeRoutingCIDR: "10.16.0.0/12"
+
+      enableIPv6Masquerade: true
+      enableIPv4Masquerade: true
+
+      gatewayAPI:
+        enabled: true
+
+      rollOutCiliumPods: true
+
+      operator:
+        replicas: 1
+        rollOutPods: true
+        prometheus:
+          enabled: true
+          serviceMonitor:
+            enabled: false
+            interval: 60s
+
+      hubble:
+        enabled: false
+        enableOpenMetrics: true
+        metrics:
+          enabled:
+            - dns
+            - drop
+            - tcp
+            - flow
+            - icmp
+            - port-distribution
+            - http
+          serviceMonitor:
+            enabled: false
+            interval: 60s
+        relay:
+          enabled: false
+          rollOutPods: true
+          prometheus:
+            serviceMonitor:
+              enabled: false
+              interval: 60s
+        ui:
+          enabled: false
+          rollOutPods: true
+          service:
+            annotations:
+              omni-kube-service-exposer.sidero.dev/port: "50080"
+              omni-kube-service-exposer.sidero.dev/label: Hubble
+      envoy:
+        rollOutPods: true
+        prometheus:
+          serviceMonitor:
+            enabled: false
+            interval: 60s
+      prometheus:
+        enabled: true
+        serviceMonitor:
+          enabled: false
+          interval: 60s
+
+      securityContext:
+        privileged: true
+        capabilities:
+          ciliumAgent:
+            - CHOWN
+            - KILL
+            - NET_ADMIN
+            - NET_RAW
+            - IPC_LOCK
+            - SYS_ADMIN
+            - SYS_RESOURCE
+            - DAC_OVERRIDE
+            - FOWNER
+            - SETGID
+            - SETUID
+          cleanCiliumState:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - SYS_RESOURCE
+      cgroup:
+        autoMount:
+          enabled: false
+        hostRoot: /sys/fs/cgroup

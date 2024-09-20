@@ -1,5 +1,7 @@
 @build:
   just build-helm talos-cloud-controller-manager
+  just build-helm cilium-ip6
+  just build-helm cilium-ip4
 
 build-helm NAME:
   kustomize build --enable-helm {{ NAME }} > {{ NAME }}.yaml
