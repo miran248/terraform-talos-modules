@@ -1,22 +1,32 @@
-variable "prefix" {
-  type        = string
-  description = "prefixes resource names"
-}
-
-variable "zone" {
+variable "cluster" {
   type = object({
-    ips4 = object({
-      load_balancer  = string
-      router         = string
-      router_client  = string
+    name = string
+    patches = object({
       control_planes = list(string)
       workers        = list(string)
     })
-    cloud  = number
-    region = number
-    zone   = number
   })
-  description = "network zone module outputs"
+  description = "cluster config module outputs"
+}
+
+variable "zone" {
+  type        = number
+  description = "defines third octet, 192.168.zzz._"
+
+  validation {
+    condition     = var.zone >= 1 && var.zone <= 255
+    error_message = "must be between 1 and 255, inclusive"
+  }
+}
+
+variable "patches" {
+  type = object({
+    common         = optional(list(string), [])
+    control_planes = optional(list(string), [])
+    workers        = optional(list(string), [])
+  })
+  description = "node pool config patches"
+  default     = {}
 }
 
 variable "nodes" {
@@ -24,33 +34,18 @@ variable "nodes" {
     control_planes = optional(list(object({
       server_type = string
       patches     = optional(list(string), [])
-      node_labels = optional(map(any), {})
       removed     = optional(bool, false)
     })), [])
     workers = optional(list(object({
       server_type = string
       patches     = optional(list(string), [])
-      node_labels = optional(map(any), {})
       removed     = optional(bool, false)
     })), [])
   })
-  description = "control planes and workers with machine specific configs"
-}
+  description = "control planes and workers with node specific configs"
 
-variable "patches" {
-  type = object({
-    control_planes = optional(list(string), [])
-    workers        = optional(list(string), [])
-  })
-  description = "common config patches"
-  default     = {}
-}
-
-variable "node_labels" {
-  type = object({
-    control_planes = optional(map(any), { role = "control-plane" })
-    workers        = optional(map(any), { role = "worker" })
-  })
-  description = "common node labels"
-  default     = {}
+  validation {
+    condition     = length(var.nodes.control_planes) <= 9 && length(var.nodes.workers) <= 229
+    error_message = "max 9 control planes and 229 workers per node pool"
+  }
 }

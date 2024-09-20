@@ -1,14 +1,22 @@
+variable "cluster" {
+  type = object({
+    endpoint = string
+  })
+  description = "cluster config module outputs"
+}
 variable "config" {
   type = object({
-    cluster_name = string
-    endpoint     = string
-
     machine_secrets = object({
       client_configuration = object({ ca_certificate = string, client_certificate = string, client_key = string })
     })
-
-    control_planes = map(object({ machine_configuration = string, patches = list(string) }))
-    workers        = map(object({ machine_configuration = string, patches = list(string) }))
+    private_ips4 = object({
+      control_planes = list(string)
+      workers        = list(string)
+    })
+    nodes = map(object({
+      name = string
+      data = string
+    }))
   })
   description = "talos config module outputs"
 }

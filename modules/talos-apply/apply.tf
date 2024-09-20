@@ -1,25 +1,12 @@
-resource "talos_machine_configuration_apply" "control_planes" {
-  for_each                    = var.config.control_planes
+resource "talos_machine_configuration_apply" "this" {
+  for_each                    = var.config.nodes
   client_configuration        = var.config.machine_secrets.client_configuration
-  config_patches              = each.value.patches
-  endpoint                    = var.config.endpoint
-  machine_configuration_input = each.value.machine_configuration
-  node                        = each.key
+  endpoint                    = var.cluster.endpoint
+  machine_configuration_input = each.value.data
+  # node                        = each.key
+  node = each.value.name # node might be in a different network from control planes
 
   depends_on = [
     talos_machine_bootstrap.this,
-  ]
-}
-
-resource "talos_machine_configuration_apply" "workers" {
-  for_each                    = var.config.workers
-  client_configuration        = var.config.machine_secrets.client_configuration
-  config_patches              = each.value.patches
-  endpoint                    = var.config.endpoint
-  machine_configuration_input = each.value.machine_configuration
-  node                        = each.key
-
-  depends_on = [
-    talos_machine_configuration_apply.control_planes,
   ]
 }

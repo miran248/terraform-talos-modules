@@ -2,13 +2,10 @@ output "prefix" {
   value = local.prefix
 }
 
-output "names" {
-  value = local.names
+output "cidrs4" {
+  value = local.cidrs4
 }
 
-output "control_planes" {
-  value = local.control_planes
-}
-output "workers" {
-  value = local.workers
+output "nodes" {
+  value = local.nodes
 }

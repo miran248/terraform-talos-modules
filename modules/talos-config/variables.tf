@@ -1,48 +1,35 @@
-variable "debug" {
-  type        = bool
-  description = "controls talos debug flag"
-  default     = false
-}
-
-variable "cluster_name" {
-  type        = string
-  description = "cluster name"
-}
-variable "endpoint" {
-  type        = string
-  description = "cluster endpoint"
-
-  validation {
-    condition     = startswith(var.endpoint, "http") == false && endswith(var.endpoint, "6443") == false
-    error_message = "must not contain protocol or port"
-  }
-}
-
-variable "layout" {
+variable "cluster" {
   type = object({
-    masks4 = object({ machines = string })
-    cidrs4 = object({ machines = string, services = string, pods = string })
-    ips4   = object({ cluster_dns = string })
+    name             = string
+    endpoint         = string
+    cluster_endpoint = string
   })
-  description = "network layout module outputs"
+  description = "cluster config module outputs"
 }
-
-variable "pools" {
+variable "networks" {
   type = list(object({
-    control_planes = map(object({
-      name        = string
-      server_type = string
-      patches     = list(string)
-      node_labels = map(any)
-    }))
-    workers = map(object({
-      name        = string
-      server_type = string
-      patches     = list(string)
-      node_labels = map(any)
+    nodes = map(object({
+      name                   = string
+      server_type            = string
+      private_ip4_network_24 = string
+      private_ip4_gateway_32 = string
+      private_ip4_gateway_24 = string
+      private_ip4_gateway    = string
+      private_ip4_32         = string
+      private_ip4_24         = string
+      private_ip4            = string
+      public_ip6_network_128 = optional(string, null)
+      public_ip6_network_64  = optional(string, null)
+      public_ip6_128         = optional(string, null)
+      public_ip6_64          = optional(string, null)
+      public_ip6             = optional(string, null)
+      public_ip4_32          = optional(string, null)
+      public_ip4             = optional(string, null)
+      talos                  = object({ machine_type = string })
+      patches                = list(string)
     }))
   }))
-  description = "list of node pool module outputs"
+  description = "list of network module outputs"
 }
 
 variable "talos_version" {
