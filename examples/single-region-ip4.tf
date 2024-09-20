@@ -57,6 +57,9 @@ module "single4_nuremberg_pool_1" {
 
   nodes = {
     control_planes = [
+      # mark node as `removed` instead of deleting it, otherwise it will shift and recreate all subsequent nodes!
+      # can be useful in case it receives a blacklisted ip
+      { removed = true, server_type = "cx22" },
       { server_type = "cx22" },
       { server_type = "cx22" },
       { server_type = "cx22" },
