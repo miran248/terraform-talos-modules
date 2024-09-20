@@ -2,6 +2,7 @@
   just build-helm talos-cloud-controller-manager
   just build-helm cilium-ip6
   just build-helm cilium-ip4
+  just build-helm hcloud-csi
   just build-helm iperf
 
 build-helm NAME:
