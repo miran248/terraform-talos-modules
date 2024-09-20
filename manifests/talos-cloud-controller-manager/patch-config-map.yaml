@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: talos-cloud-controller-manager
+  namespace: kube-system
+data:
+  ccm-config.yaml: |
+    global:
+      preferIPv6: true
