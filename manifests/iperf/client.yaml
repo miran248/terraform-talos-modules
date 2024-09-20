@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: iperf-client
+spec:
+  containers:
+    - name: iperf
+      image: cagedata/iperf3
+      command: ["sleep", "30000"]
