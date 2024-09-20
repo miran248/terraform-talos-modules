@@ -28,12 +28,12 @@ The following [mermaid](https://github.com/mermaid-js/mermaid) flowchart outline
 flowchart TD
     talos-cluster --> node-pool-nuremberg-1
     talos-cluster --> node-pool-helsinki-1
-    node-pool-nuremberg-1[node-pool nuremberg 1] --> hcloud-network-nuremberg-1
-    node-pool-helsinki-1[node-pool helsinki 1] --> hcloud-network-helsinki-1
-    hcloud-network-nuremberg-1[hcloud-network nuremberg 1] --> talos-config
-    hcloud-network-helsinki-1[hcloud-network helsinki 1] --> talos-config
+    node-pool-nuremberg-1[node-pool nbg 1] --> hcloud-network-nuremberg-1
+    node-pool-helsinki-1[node-pool hel 1] --> hcloud-network-helsinki-1
+    hcloud-network-nuremberg-1[hcloud-network nbg 1] --> talos-config
+    hcloud-network-helsinki-1[hcloud-network hel 1] --> talos-config
     talos-config --> hcloud-servers-nuremberg-1
     talos-config --> hcloud-servers-helsinki-1
-    hcloud-servers-nuremberg-1[hcloud-servers nuremberg 1] --> talos-apply
-    hcloud-servers-helsinki-1[hcloud-servers helsinki 1] --> talos-apply
+    hcloud-servers-nuremberg-1[hcloud-servers nbg 1] --> talos-apply
+    hcloud-servers-helsinki-1[hcloud-servers hel 1] --> talos-apply
 ```
