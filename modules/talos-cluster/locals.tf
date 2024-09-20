@@ -2,14 +2,12 @@ locals {
   cluster_endpoint = "https://${var.endpoint}:6443"
 
   cidrs6 = {
-
     # 108 is the largest supported 128b range
     pods     = "fc00::10:0/108"
     services = "fc00::0:0/108"
   }
 
   cidrs4 = {
-
     # 12 is the largest supported 32b range
     pods     = "10.16.0.0/12"
     services = "10.0.0.0/12"
@@ -26,14 +24,34 @@ locals {
       cluster = {
         network = {
           dnsDomain = "cluster.local"
-          podSubnets = [
-            local.cidrs6.pods,
-            local.cidrs4.pods,
-          ]
-          serviceSubnets = [
-            local.cidrs6.services,
-            local.cidrs4.services,
-          ]
+          cni = {
+            name = "custom"
+            urls = (var.features.ip6
+              # sets ipv6.enabled: true
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/f42d7ff18c89b5c423761a96b3e0e5a340b3304d/manifests/cilium-ip6.yaml"]
+              # sets ipv6.enabled: false
+              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/f42d7ff18c89b5c423761a96b3e0e5a340b3304d/manifests/cilium-ip4.yaml"]
+            )
+          }
+          # order matters!
+          podSubnets = (var.features.ip6
+            ? [
+              local.cidrs6.pods,
+              local.cidrs4.pods,
+            ]
+            : [
+              local.cidrs4.pods,
+              local.cidrs6.pods,
+          ])
+          serviceSubnets = (var.features.ip6
+            ? [
+              local.cidrs6.services,
+              local.cidrs4.services,
+            ]
+            : [
+              local.cidrs4.services,
+              local.cidrs6.services,
+          ])
         }
       }
       machine = {
@@ -53,14 +71,30 @@ locals {
           }
         }
         kubelet = {
-          clusterDNS = [
-            cidrhost(local.cidrs6.services, 10),
-            cidrhost(local.cidrs4.services, 10),
-          ]
+          # order matters!
+          clusterDNS = (var.features.ip6
+            ? [
+              cidrhost(local.cidrs6.services, 10),
+              cidrhost(local.cidrs4.services, 10),
+            ]
+            : [
+              cidrhost(local.cidrs4.services, 10),
+              cidrhost(local.cidrs6.services, 10),
+          ])
           extraArgs = {
             cloud-provider             = "external"
             rotate-server-certificates = true
           }
+        }
+        network = {
+          kubespan = {
+            enabled                     = true
+            advertiseKubernetesNetworks = false
+          }
+        }
+        sysctls = {
+          "net.core.somaxconn"          = 65535
+          "net.core.netdev_max_backlog" = 4096
         }
       }
     }),
@@ -72,6 +106,9 @@ locals {
       local.patches_common,
       yamlencode({
         cluster = {
+          proxy = {
+            disabled = true
+          }
           discovery = {
             enabled = true
             registries = {
@@ -82,21 +119,25 @@ locals {
           apiServer = {
             certSANs = local.cert_sans
             extraArgs = {
+              # forces apiserver to use external ip family
               advertise-address = "0.0.0.0"
             }
           }
           controllerManager = {
             extraArgs = {
               cloud-provider           = "external"
-              node-cidr-mask-size-ipv4 = 24
               node-cidr-mask-size-ipv6 = 120
+              node-cidr-mask-size-ipv4 = 24
             }
           }
           externalCloudProvider = {
             enabled = true
-            manifests = [
-              "https://raw.githubusercontent.com/miran248/terraform-talos-modules/fb8b095d3ef016c920c15d837c447e40f77a4a9a/manifests/talos-cloud-controller-manager.yaml",
-            ]
+            manifests = (var.features.ip6
+              # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/fb8b095d3ef016c920c15d837c447e40f77a4a9a/manifests/talos-cloud-controller-manager.yaml"]
+              # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
+              : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.6.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
+            )
           }
         }
         machine = {

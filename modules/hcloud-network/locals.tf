@@ -43,6 +43,9 @@ locals {
           yamlencode({
             machine = {
               network = {
+                kubespan = {
+                  mtu = 1370 # Hcloud has a MTU of 1450 (KubeSpanMTU = UnderlyingMTU - 80)
+                }
                 nameservers = flatten([
                   var.cluster.features.ip6 == false ? [] : [
                     "2a01:4ff:ff00::add:2", # hetzner
