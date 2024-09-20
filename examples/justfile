@@ -1,0 +1,10 @@
+# > just single
+run PREFIX:
+  terraform init -upgrade
+  terraform apply -auto-approve
+  terraform output --raw "{{ PREFIX }}6_talos_config" > "{{ PREFIX }}6_talos_config"
+  talosctl config merge "{{ PREFIX }}6_talos_config"
+  talosctl -n 192.168.1.11 kubeconfig --force
+  terraform output --raw "{{ PREFIX }}4_talos_config" > "{{ PREFIX }}4_talos_config"
+  talosctl config merge "{{ PREFIX }}4_talos_config"
+  talosctl -n 192.168.1.11 kubeconfig --force
