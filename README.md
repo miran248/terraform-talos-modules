@@ -26,14 +26,14 @@ The following [mermaid](https://github.com/mermaid-js/mermaid) flowchart outline
 ```mermaid
 %%{init: {'theme': 'neutral' } }%%
 flowchart TD
-    talos-cluster --> node-pool-nuremberg-1(hetzner nuremberg region)
-    talos-cluster --> node-pool-helsinki-1(hetzner helsinki region)
-    node-pool-nuremberg-1[node-pool 1] --> hcloud-network-nuremberg-1
-    node-pool-helsinki-1[node-pool 1] --> hcloud-network-helsinki-1
-    hcloud-network-nuremberg-1[hcloud-network 1] --> talos-config
-    hcloud-network-helsinki-1[hcloud-network 1] --> talos-config
-    talos-config --> hcloud-servers-nuremberg-1(hetzner nuremberg region)
-    talos-config --> hcloud-servers-helsinki-1(hetzner helsinki region)
-    hcloud-servers-nuremberg-1[hcloud-servers 1] --> talos-apply
-    hcloud-servers-helsinki-1[hcloud-servers 1] --> talos-apply
+    talos-cluster --> node-pool-nuremberg-1
+    talos-cluster --> node-pool-helsinki-1
+    node-pool-nuremberg-1[node-pool nuremberg 1] --> hcloud-network-nuremberg-1
+    node-pool-helsinki-1[node-pool helsinki 1] --> hcloud-network-helsinki-1
+    hcloud-network-nuremberg-1[hcloud-network nuremberg 1] --> talos-config
+    hcloud-network-helsinki-1[hcloud-network helsinki 1] --> talos-config
+    talos-config --> hcloud-servers-nuremberg-1
+    talos-config --> hcloud-servers-helsinki-1
+    hcloud-servers-nuremberg-1[hcloud-servers nuremberg 1] --> talos-apply
+    hcloud-servers-helsinki-1[hcloud-servers helsinki 1] --> talos-apply
 ```
