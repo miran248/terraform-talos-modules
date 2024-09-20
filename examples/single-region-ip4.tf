@@ -24,7 +24,7 @@ locals {
 }
 
 module "single4_talos_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v1.0.0"
 
   name     = "single4"
   endpoint = "single4.example.com"
@@ -49,7 +49,7 @@ module "single4_talos_cluster" {
 }
 
 module "single4_nuremberg_pool_1" {
-  source = "github.com/miran248/terraform-talos-modules//modules/node-pool"
+  source = "github.com/miran248/terraform-talos-modules//modules/node-pool?ref=v1.0.0"
 
   cluster = module.single4_talos_cluster
 
@@ -72,7 +72,7 @@ module "single4_nuremberg_pool_1" {
   }
 }
 # module "single4_helsinki_pool_1" {
-#   source = "github.com/miran248/terraform-talos-modules//modules/node-pool"
+#   source = "github.com/miran248/terraform-talos-modules//modules/node-pool?ref=v1.0.0"
 
 #   cluster = module.single4_talos_cluster
 
@@ -86,7 +86,7 @@ module "single4_nuremberg_pool_1" {
 # }
 
 module "single4_nuremberg_network_1" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-network"
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-network?ref=v1.0.0"
 
   datacenter = data.hcloud_datacenter.single4_nuremberg
   location   = data.hcloud_location.single4_nuremberg
@@ -95,7 +95,7 @@ module "single4_nuremberg_network_1" {
   pool    = module.single4_nuremberg_pool_1
 }
 # module "single4_helsinki_network_1" {
-#   source = "github.com/miran248/terraform-talos-modules//modules/hcloud-network"
+#   source = "github.com/miran248/terraform-talos-modules//modules/hcloud-network?ref=v1.0.0"
 
 #   datacenter = data.hcloud_datacenter.single4_helsinki
 #   location   = data.hcloud_location.single4_helsinki
@@ -105,7 +105,7 @@ module "single4_nuremberg_network_1" {
 # }
 
 module "single4_talos_config" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-config"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-config?ref=v1.0.0"
 
   cluster = module.single4_talos_cluster
   networks = [
@@ -118,7 +118,7 @@ module "single4_talos_config" {
 }
 
 module "single4_nuremberg_1" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-servers"
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-servers?ref=v1.0.0"
 
   datacenter = data.hcloud_datacenter.single4_nuremberg
   location   = data.hcloud_location.single4_nuremberg
@@ -135,7 +135,7 @@ module "single4_nuremberg_1" {
   ]
 }
 # module "single4_helsinki_1" {
-#   source = "github.com/miran248/terraform-talos-modules//modules/hcloud-servers"
+#   source = "github.com/miran248/terraform-talos-modules//modules/hcloud-servers?ref=v1.0.0"
 
 #   datacenter = data.hcloud_datacenter.single4_helsinki
 #   location   = data.hcloud_location.single4_helsinki
@@ -180,7 +180,7 @@ resource "google_dns_record_set" "single4_talos_ipv4" {
 }
 
 module "single4_talos_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v1.0.0"
 
   cluster = module.single4_talos_cluster
   config  = module.single4_talos_config

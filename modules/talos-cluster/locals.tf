@@ -28,9 +28,9 @@ locals {
             name = "custom"
             urls = (var.features.ip6
               # sets ipv6.enabled: true
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/f42d7ff18c89b5c423761a96b3e0e5a340b3304d/manifests/cilium-ip6.yaml"]
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/cilium-ip6.yaml"]
               # sets ipv6.enabled: false
-              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/f42d7ff18c89b5c423761a96b3e0e5a340b3304d/manifests/cilium-ip4.yaml"]
+              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/cilium-ip4.yaml"]
             )
           }
           # order matters!
@@ -134,7 +134,7 @@ locals {
             enabled = true
             manifests = (var.features.ip6
               # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/fb8b095d3ef016c920c15d837c447e40f77a4a9a/manifests/talos-cloud-controller-manager.yaml"]
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/talos-cloud-controller-manager.yaml"]
               # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
               : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.6.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
             )
