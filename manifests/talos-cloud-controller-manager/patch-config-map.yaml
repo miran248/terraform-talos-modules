@@ -6,4 +6,5 @@ metadata:
 data:
   ccm-config.yaml: |
     global:
+      approveNodeCSR: true
       preferIPv6: true

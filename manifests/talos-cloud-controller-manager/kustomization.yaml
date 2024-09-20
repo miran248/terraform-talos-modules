@@ -10,6 +10,8 @@ helmCharts:
   valuesInline:
     useDaemonSet: true
     # features:
+    #   approveNodeCSR: true
+    #   # required when using ipv6 stack, otherwise ccm picks hetzner's cgnat ip address..
     #   preferIPv6: true
 patches:
   - path: patch-config-map.yaml
