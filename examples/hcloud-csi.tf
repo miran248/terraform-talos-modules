@@ -1,5 +1,5 @@
 locals {
-  single6_patches_hcloud_cni = yamlencode({
+  single6_patches_hcloud_csi = yamlencode({
     cluster = {
       extraManifests = [
         "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/hcloud-csi.yaml",
@@ -30,7 +30,7 @@ module "single6_talos_cluster" {
 
   patches = {
     common = [
-      local.single6_patches_hcloud_cni,
+      local.single6_patches_hcloud_csi,
       # ...
     ]
   }
