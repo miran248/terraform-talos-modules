@@ -5,8 +5,8 @@ metadata:
     app.kubernetes.io/instance: talos-cloud-controller-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: talos-cloud-controller-manager
-    app.kubernetes.io/version: v1.6.0
-    helm.sh/chart: talos-cloud-controller-manager-0.4.1
+    app.kubernetes.io/version: v1.8.0
+    helm.sh/chart: talos-cloud-controller-manager-0.4.2
   name: talos-cloud-controller-manager-talos-secrets
   namespace: kube-system
 spec:
@@ -20,8 +20,8 @@ metadata:
     app.kubernetes.io/instance: talos-cloud-controller-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: talos-cloud-controller-manager
-    app.kubernetes.io/version: v1.6.0
-    helm.sh/chart: talos-cloud-controller-manager-0.4.1
+    app.kubernetes.io/version: v1.8.0
+    helm.sh/chart: talos-cloud-controller-manager-0.4.2
   name: talos-cloud-controller-manager
   namespace: kube-system
 ---
@@ -32,8 +32,8 @@ metadata:
     app.kubernetes.io/instance: talos-cloud-controller-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: talos-cloud-controller-manager
-    app.kubernetes.io/version: v1.6.0
-    helm.sh/chart: talos-cloud-controller-manager-0.4.1
+    app.kubernetes.io/version: v1.8.0
+    helm.sh/chart: talos-cloud-controller-manager-0.4.2
   name: system:talos-cloud-controller-manager
 rules:
 - apiGroups:
@@ -132,9 +132,8 @@ subjects:
 ---
 apiVersion: v1
 data:
-  ccm-config.yaml: |-
+  ccm-config.yaml: |
     global:
-      approveNodeCSR: true
       preferIPv6: true
 kind: ConfigMap
 metadata:
@@ -142,8 +141,8 @@ metadata:
     app.kubernetes.io/instance: talos-cloud-controller-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: talos-cloud-controller-manager
-    app.kubernetes.io/version: v1.6.0
-    helm.sh/chart: talos-cloud-controller-manager-0.4.1
+    app.kubernetes.io/version: v1.8.0
+    helm.sh/chart: talos-cloud-controller-manager-0.4.2
   name: talos-cloud-controller-manager
   namespace: kube-system
 ---
@@ -154,8 +153,8 @@ metadata:
     app.kubernetes.io/instance: talos-cloud-controller-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: talos-cloud-controller-manager
-    app.kubernetes.io/version: v1.6.0
-    helm.sh/chart: talos-cloud-controller-manager-0.4.1
+    app.kubernetes.io/version: v1.8.0
+    helm.sh/chart: talos-cloud-controller-manager-0.4.2
   name: talos-cloud-controller-manager
   namespace: kube-system
 spec:
@@ -177,8 +176,8 @@ metadata:
     app.kubernetes.io/instance: talos-cloud-controller-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: talos-cloud-controller-manager
-    app.kubernetes.io/version: v1.6.0
-    helm.sh/chart: talos-cloud-controller-manager-0.4.1
+    app.kubernetes.io/version: v1.8.0
+    helm.sh/chart: talos-cloud-controller-manager-0.4.2
   name: talos-cloud-controller-manager
   namespace: kube-system
 spec:
@@ -197,7 +196,7 @@ spec:
         - --v=2
         - --cloud-provider=talos
         - --cloud-config=/etc/talos/ccm-config.yaml
-        - --controllers=cloud-node
+        - --controllers=cloud-node,node-csr-approval
         - --leader-elect-resource-name=cloud-controller-manager-talos
         - --use-service-account-credentials
         - --secure-port=50258
@@ -215,7 +214,7 @@ spec:
               fieldPath: status.podIP
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
-        image: ghcr.io/siderolabs/talos-cloud-controller-manager:v1.6.0
+        image: ghcr.io/siderolabs/talos-cloud-controller-manager:v1.8.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:

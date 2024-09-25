@@ -3,14 +3,13 @@ kind: Kustomization
 helmCharts:
   - name: talos-cloud-controller-manager
     repo: oci://ghcr.io/siderolabs/charts
-    version: 0.4.1
+    version: 0.4.2
     releaseName: talos-cloud-controller-manager
     namespace: kube-system
     includeCRDs: true
     valuesInline:
       useDaemonSet: true
       # features:
-      #   approveNodeCSR: true
       #   # required when using ipv6 stack, otherwise ccm picks hetzner's cgnat ip address..
       #   preferIPv6: true
 patches:
