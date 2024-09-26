@@ -1,5 +1,5 @@
-data "hcloud_image" "single6_v1_7_6_amd64" {
-  with_selector = "name=talos,version=v1.7.6,arch=amd64"
+data "hcloud_image" "single6_v1_8_0_amd64" {
+  with_selector = "name=talos,version=v1.8.0,arch=amd64"
 }
 
 data "hcloud_datacenter" "single6_nuremberg" {
@@ -120,8 +120,8 @@ module "single6_talos_config" {
     # module.single6_helsinki_network_1,
   ]
 
-  talos_version      = "v1.7.6"
-  kubernetes_version = "v1.30.3"
+  talos_version      = "v1.8.0"
+  kubernetes_version = "v1.31.1"
 }
 
 module "single6_nuremberg_1" {
@@ -129,7 +129,7 @@ module "single6_nuremberg_1" {
 
   datacenter = data.hcloud_datacenter.single6_nuremberg
   location   = data.hcloud_location.single6_nuremberg
-  image_id   = data.hcloud_image.single6_v1_7_6_amd64.id
+  image_id   = data.hcloud_image.single6_v1_8_0_amd64.id
 
   cluster = module.single6_talos_cluster
   pool    = module.single6_nuremberg_pool_1
@@ -146,7 +146,7 @@ module "single6_nuremberg_1" {
 
 #   datacenter = data.hcloud_datacenter.single6_helsinki
 #   location   = data.hcloud_location.single6_helsinki
-#   image_id   = data.hcloud_image.single6_v1_7_6_amd64.id
+#   image_id   = data.hcloud_image.single6_v1_8_0_amd64.id
 
 #   cluster = module.single6_talos_cluster
 #   pool    = module.single6_helsinki_pool_1
