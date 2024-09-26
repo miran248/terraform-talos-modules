@@ -24,15 +24,6 @@ locals {
       cluster = {
         network = {
           dnsDomain = "cluster.local"
-          cni = {
-            name = "custom"
-            urls = (var.features.ip6
-              # sets ipv6.enabled: true
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/cilium-ip6.yaml"]
-              # sets ipv6.enabled: false
-              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/cilium-ip4.yaml"]
-            )
-          }
           # order matters!
           podSubnets = (var.features.ip6
             ? [
@@ -81,15 +72,22 @@ locals {
               cidrhost(local.cidrs4.services, 10),
               cidrhost(local.cidrs6.services, 10),
           ])
-          extraArgs = {
-            cloud-provider             = "external"
-            rotate-server-certificates = true
-          }
         }
         network = {
           kubespan = {
             enabled                     = true
             advertiseKubernetesNetworks = false
+            # allowDownPeerBypass         = true
+            # harvestExtraEndpoints       = true
+            # filters = {
+            #   endpoints = [
+            #     "!100.64.0.0/16",
+            #     # "!192.168.1.0/24",
+            #     # "!192.168.2.0/24",
+            #     "::/0",
+            #     "0.0.0.0/0",
+            #   ]
+            # }
           }
         }
         sysctls = {
@@ -125,31 +123,9 @@ locals {
           }
           controllerManager = {
             extraArgs = {
-              cloud-provider           = "external"
+              # cloud-provider           = "external"
               node-cidr-mask-size-ipv6 = 120
               node-cidr-mask-size-ipv4 = 24
-            }
-          }
-          externalCloudProvider = {
-            enabled = true
-            manifests = (var.features.ip6
-              # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/talos-cloud-controller-manager.yaml"]
-              # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
-              : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.6.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
-            )
-          }
-        }
-        machine = {
-          features = {
-            kubernetesTalosAPIAccess = {
-              enabled = true
-              allowedRoles = [
-                "os:reader",
-              ]
-              allowedKubernetesNamespaces = [
-                "kube-system",
-              ]
             }
           }
         }

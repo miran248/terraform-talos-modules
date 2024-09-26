@@ -36,13 +36,13 @@ resource "hcloud_firewall" "this" {
     ]
   }
 
-  # rule {
-  #   description = "allows pings"
-  #   direction = "in"
-  #   protocol  = "icmp"
-  #   source_ips = [
-  #     "::/0",
-  #     "0.0.0.0/0",
-  #   ]
-  # }
+  rule {
+    description = "allows pings"
+    direction   = "in"
+    protocol    = "icmp"
+    source_ips = [
+      "::/0",
+      "0.0.0.0/0",
+    ]
+  }
 }

@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+  # - bgp-config.yaml
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
@@ -15,6 +16,7 @@ helmCharts:
     valuesInline:
       # TODO: switch to host routing once netkit arrives
       routingMode: tunnel
+      # routingMode: native
 
       externalIPs:
         enabled: true
@@ -47,6 +49,58 @@ helmCharts:
 
       rollOutCiliumPods: true
 
+      debug:
+        enabled: true
+
+      # enableIPv6BIGTCP: true
+      # enableIPv4BIGTCP: true
+
+      bpf:
+        datapathMode: veth
+        hostLegacyRouting: true
+        masquerade: true
+        tproxy: true
+
+      egressGateway:
+        enabled: true
+
+      endpointRoutes:
+        enabled: false
+
+      nodePort:
+        enabled: true
+
+      hostPort:
+        enabled: true
+
+      nodeInit:
+        enabled: true
+
+      bgp:
+        enabled: false
+        announce:
+          loadbalancerIP: true
+          podCIDR: true
+
+      bgpControlPlane:
+        enabled: false
+
+      l2NeighDiscovery:
+        enabled: false
+
+      l2announcements:
+        enabled: false
+
+      l2podAnnouncements:
+        enabled: false
+
+      nat46x64Gateway:
+        enabled: true
+
+      bandwidthManager:
+        enabled: true
+        # bbr: true
+
       operator:
         replicas: 1
         rollOutPods: true
@@ -57,8 +111,9 @@ helmCharts:
             interval: 60s
 
       hubble:
-        enabled: false
+        enabled: true
         enableOpenMetrics: true
+        preferIpv6: true
         metrics:
           enabled:
             - dns

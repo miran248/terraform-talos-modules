@@ -1,33 +1,33 @@
-data "hcloud_image" "nbg16_v1_7_6_amd64" {
-  with_selector = "name=talos,version=v1.7.6,arch=amd64"
+data "hcloud_image" "dev76_v1_8_0_amd64" {
+  with_selector = "name=talos,version=v1.8.0,arch=amd64"
 }
 
-data "hcloud_datacenter" "nbg16_nuremberg" {
+data "hcloud_datacenter" "dev76_nuremberg" {
   name = "nbg1-dc3"
 }
-data "hcloud_location" "nbg16_nuremberg" {
+data "hcloud_location" "dev76_nuremberg" {
   name = "nbg1"
 }
-# data "hcloud_datacenter" "nbg16_helsinki" {
-#   name = "hel1-dc2"
-# }
-# data "hcloud_location" "nbg16_helsinki" {
-#   name = "hel1"
-# }
+data "hcloud_datacenter" "dev76_helsinki" {
+  name = "hel1-dc2"
+}
+data "hcloud_location" "dev76_helsinki" {
+  name = "hel1"
+}
 
 locals {
-  nbg16_patches_zitadel = <<-EOF
+  dev76_patches_zitadel = <<-EOF
     machine:
       nodeLabels:
         app: zitadel
   EOF
 }
 
-module "nbg16_talos_cluster" {
+module "dev76_talos_cluster" {
   source = "../modules/talos-cluster"
 
-  name     = "nbg16"
-  endpoint = "nbg16.dev.248.sh"
+  name     = "dev76"
+  endpoint = "dev76.dev.248.sh"
 
   features = {
     ip6 = true
@@ -37,6 +37,22 @@ module "nbg16_talos_cluster" {
     common = [
       yamlencode({
         cluster = {
+          externalCloudProvider = {
+            enabled = true
+            manifests = [
+              "https://raw.githubusercontent.com/miran248/terraform-talos-modules/refs/heads/main/manifests/talos-cloud-controller-manager.yaml",
+              # "https://raw.githubusercontent.com/miran248/terraform-talos-modules/refs/tags/v1.0.0/manifests/talos-cloud-controller-manager.yaml",
+            ]
+          }
+          # allowSchedulingOnControlPlanes = true
+          network = {
+            cni = {
+              name = "custom"
+              urls = [
+                "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/cilium-ip6.yaml",
+              ]
+            }
+          }
           extraManifests = [
             "https://raw.githubusercontent.com/miran248/terraform-talos-modules/refs/tags/v1.0.0/manifests/hcloud-csi.yaml",
           ]
@@ -57,6 +73,13 @@ module "nbg16_talos_cluster" {
           ]
         }
         machine = {
+          kubelet = {
+            # talos-ccm
+            extraArgs = {
+              cloud-provider             = "external"
+              rotate-server-certificates = true
+            }
+          }
           network = {
             nameservers = [
               "2a00:1098:2b::1",      # https://nat64.net
@@ -72,13 +95,31 @@ module "nbg16_talos_cluster" {
         }
       }),
     ]
+    control_planes = [
+      yamlencode({
+        machine = {
+          features = {
+            # talos ccm
+            kubernetesTalosAPIAccess = {
+              enabled = true
+              allowedRoles = [
+                "os:reader",
+              ]
+              allowedKubernetesNamespaces = [
+                "kube-system",
+              ]
+            }
+          }
+        }
+      })
+    ]
   }
 }
 
-module "nbg16_nuremberg_pool_1" {
+module "dev76_nuremberg_pool_1" {
   source = "../modules/node-pool"
 
-  cluster = module.nbg16_talos_cluster
+  cluster = module.dev76_talos_cluster
 
   zone = 1
 
@@ -89,123 +130,127 @@ module "nbg16_nuremberg_pool_1" {
       { server_type = "cx22" },
     ]
     workers = [
-      { server_type = "cx22", patches = [local.nbg16_patches_zitadel] },
-      { server_type = "cx22", patches = [local.nbg16_patches_zitadel] },
-      # { server_type = "cx22", patches = [local.nbg16_patches_zitadel] },
+      { server_type = "cx22", patches = [local.dev76_patches_zitadel] },
+      { server_type = "cx22", patches = [local.dev76_patches_zitadel] },
+      # { server_type = "cx22", patches = [local.dev76_patches_zitadel] },
     ]
   }
 }
-# module "nbg16_helsinki_pool_1" {
-#   source = "../modules/node-pool"
+module "dev76_helsinki_pool_1" {
+  source = "../modules/node-pool"
 
-#   cluster = module.nbg16_talos_cluster
+  cluster = module.dev76_talos_cluster
 
-#   zone = 2
+  zone = 2
 
-#   nodes = {
-#     control_planes = [
-#       { server_type = "cx22" },
-#     ]
-#     workers = [
-#       { server_type = "cx22" },
-#     ]
-#   }
-# }
+  nodes = {
+    # control_planes = [
+    #   { server_type = "cx22" },
+    # ]
+    workers = [
+      { server_type = "cx22" },
+    ]
+  }
+}
 
-module "nbg16_nuremberg_network_1" {
+module "dev76_nuremberg_network_1" {
   source = "../modules/hcloud-network"
 
-  datacenter = data.hcloud_datacenter.nbg16_nuremberg
-  location   = data.hcloud_location.nbg16_nuremberg
+  datacenter = data.hcloud_datacenter.dev76_nuremberg
+  location   = data.hcloud_location.dev76_nuremberg
 
-  cluster = module.nbg16_talos_cluster
-  pool    = module.nbg16_nuremberg_pool_1
+  cluster = module.dev76_talos_cluster
+  pool    = module.dev76_nuremberg_pool_1
 }
-# module "nbg16_helsinki_network_1" {
-#   source = "../modules/hcloud-network"
+module "dev76_helsinki_network_1" {
+  source = "../modules/hcloud-network"
 
-#   datacenter = data.hcloud_datacenter.nbg16_helsinki
-#   location   = data.hcloud_location.nbg16_helsinki
+  datacenter = data.hcloud_datacenter.dev76_helsinki
+  location   = data.hcloud_location.dev76_helsinki
 
-#   cluster = module.nbg16_talos_cluster
-#   pool    = module.nbg16_helsinki_pool_1
-# }
+  cluster = module.dev76_talos_cluster
+  pool    = module.dev76_helsinki_pool_1
+}
 
-module "nbg16_talos_config" {
+module "dev76_talos_config" {
   source = "../modules/talos-config"
 
-  cluster = module.nbg16_talos_cluster
+  cluster = module.dev76_talos_cluster
   networks = [
-    module.nbg16_nuremberg_network_1,
-    # module.nbg16_helsinki_network_1,
+    module.dev76_nuremberg_network_1,
+    module.dev76_helsinki_network_1,
   ]
 
-  talos_version      = "v1.7.6"
-  kubernetes_version = "v1.30.3"
+  talos_version      = "v1.8.0"
+  kubernetes_version = "v1.31.1"
 }
 
-module "nbg16_nuremberg_1" {
+module "dev76_nuremberg_1" {
   source = "../modules/hcloud-servers"
 
-  datacenter = data.hcloud_datacenter.nbg16_nuremberg
-  location   = data.hcloud_location.nbg16_nuremberg
-  image_id   = data.hcloud_image.nbg16_v1_7_6_amd64.id
+  datacenter = data.hcloud_datacenter.dev76_nuremberg
+  location   = data.hcloud_location.dev76_nuremberg
+  image_id   = data.hcloud_image.dev76_v1_8_0_amd64.id
 
-  cluster = module.nbg16_talos_cluster
-  pool    = module.nbg16_nuremberg_pool_1
-  network = module.nbg16_nuremberg_network_1
-  config  = module.nbg16_talos_config
+  cluster = module.dev76_talos_cluster
+  pool    = module.dev76_nuremberg_pool_1
+  network = module.dev76_nuremberg_network_1
+  config  = module.dev76_talos_config
 
   depends_on = [
-    module.nbg16_nuremberg_network_1,
-    module.nbg16_talos_config,
+    module.dev76_nuremberg_network_1,
+    module.dev76_talos_config,
   ]
 }
-# module "nbg16_helsinki_1" {
-#   source = "../modules/hcloud-servers"
+module "dev76_helsinki_1" {
+  source = "../modules/hcloud-servers"
 
-#   datacenter = data.hcloud_datacenter.nbg16_helsinki
-#   location   = data.hcloud_location.nbg16_helsinki
-#   image_id   = data.hcloud_image.nbg16_v1_7_6_amd64.id
+  datacenter = data.hcloud_datacenter.dev76_helsinki
+  location   = data.hcloud_location.dev76_helsinki
+  image_id   = data.hcloud_image.dev76_v1_8_0_amd64.id
 
-#   cluster = module.nbg16_talos_cluster
-#   pool    = module.nbg16_helsinki_pool_1
-#   network = module.nbg16_helsinki_network_1
-#   config  = module.nbg16_talos_config
+  cluster = module.dev76_talos_cluster
+  pool    = module.dev76_helsinki_pool_1
+  network = module.dev76_helsinki_network_1
+  config  = module.dev76_talos_config
 
-#   depends_on = [
-#     module.nbg16_helsinki_network_1,
-#     module.nbg16_talos_config,
-#   ]
-# }
+  depends_on = [
+    module.dev76_helsinki_network_1,
+    module.dev76_talos_config,
+  ]
+}
 
-resource "google_dns_record_set" "nbg16_talos_ipv6" {
-  name         = "${module.nbg16_talos_cluster.name}.${data.google_dns_managed_zone.this.dns_name}"
+resource "google_dns_record_set" "dev76_talos_ipv6" {
+  name         = "${module.dev76_talos_cluster.name}.${data.google_dns_managed_zone.this.dns_name}"
   managed_zone = data.google_dns_managed_zone.this.name
   type         = "AAAA"
   ttl          = 300
 
-  rrdatas = module.nbg16_talos_config.public_ips6.control_planes
+  rrdatas = module.dev76_talos_config.public_ips6.control_planes
 
   depends_on = [
-    module.nbg16_nuremberg_network_1,
+    module.dev76_nuremberg_network_1,
   ]
 }
 
-module "nbg16_talos_apply" {
+module "dev76_talos_apply" {
   source = "../modules/talos-apply"
 
-  cluster = module.nbg16_talos_cluster
-  config  = module.nbg16_talos_config
+  cluster = module.dev76_talos_cluster
+  config  = module.dev76_talos_config
 
   depends_on = [
-    module.nbg16_nuremberg_1,
-    # module.nbg16_helsinki_1,
+    module.dev76_nuremberg_1,
+    module.dev76_helsinki_1,
   ]
 }
 
 # outputs
-output "nbg16_talos_config" {
-  value     = module.nbg16_talos_config.talos_config
+output "dev76_talos_config" {
+  value     = module.dev76_talos_config.talos_config
+  sensitive = true
+}
+output "dev76_talos_config_raw" {
+  value     = module.dev76_talos_config
   sensitive = true
 }
