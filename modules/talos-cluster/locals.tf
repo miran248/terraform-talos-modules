@@ -134,9 +134,9 @@ locals {
             enabled = true
             manifests = (var.features.ip6
               # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/talos-cloud-controller-manager.yaml"]
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.1.0/manifests/talos-cloud-controller-manager.yaml"]
               # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
-              : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.6.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
+              : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.8.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
             )
           }
         }
