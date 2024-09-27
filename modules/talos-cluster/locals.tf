@@ -77,17 +77,8 @@ locals {
           kubespan = {
             enabled                     = true
             advertiseKubernetesNetworks = false
-            # allowDownPeerBypass         = true
+            allowDownPeerBypass         = true
             # harvestExtraEndpoints       = true
-            # filters = {
-            #   endpoints = [
-            #     "!100.64.0.0/16",
-            #     # "!192.168.1.0/24",
-            #     # "!192.168.2.0/24",
-            #     "::/0",
-            #     "0.0.0.0/0",
-            #   ]
-            # }
           }
         }
         sysctls = {

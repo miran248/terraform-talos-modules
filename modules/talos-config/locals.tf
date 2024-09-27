@@ -20,17 +20,15 @@ locals {
           certSANs = local.cert_sans
         }
         etcd = {
-          advertisedSubnets = distinct([for key, node in local.network_nodes1 : node.private_ip4_network_24])
-          # advertisedSubnets = distinct(flatten(
-          #   [for key, node in local.network_nodes1 : node.talos.machine_type == "controlplane"
-          #     ? compact([
-          #       node.public_ip6_128,
-          #       node.public_ip4_32,
-          #       node.private_ip4_network_24,
-          #     ])
-          #     : []
-          #   ]
-          # ))
+          # advertisedSubnets = distinct([for key, node in local.network_nodes1 : node.private_ip4_network_24])
+          advertisedSubnets = distinct(flatten(
+            # [for key, node in local.network_nodes1 : node.talos.machine_type == "controlplane"
+            [for key, node in local.network_nodes1 : compact([
+              node.public_ip6_128,
+              node.public_ip4_32,
+              # node.private_ip4_network_24,
+            ])]
+          ))
         }
       }
     }),
@@ -51,11 +49,27 @@ locals {
               kubelet = {
                 nodeIP = {
                   validSubnets = compact([
-                    "!100.64.0.0/16",
-                    # node.public_ip6_128,
-                    # node.public_ip4_32,
-                    node.private_ip4_network_24,
+                    "!100.64.0.0/10",
+                    "!${node.private_ip4_network_24}",
+                    node.public_ip6_128,
+                    node.public_ip4_32,
+                    # node.private_ip4_network_24,
                   ])
+                }
+              }
+              network = {
+                kubespan = {
+                  filters = {
+                    endpoints = flatten([
+                      "!100.64.0.0/10",
+                      "!${node.private_ip4_network_24}",
+                      [for key, node in local.network_nodes1 : compact([
+                        node.public_ip6_128,
+                        node.public_ip4_32,
+                        # node.private_ip4_network_24,
+                      ])]
+                    ])
+                  }
                 }
               }
             }
