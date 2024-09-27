@@ -10,10 +10,10 @@ resource "hcloud_server" "this" {
   delete_protection        = false
   shutdown_before_deletion = true
 
-  ignore_remote_firewall_ids = true
-  firewall_ids = [
-    var.network.ids.firewall_deny_all,
-  ]
+  # ignore_remote_firewall_ids = true
+  # firewall_ids = [
+  #   var.network.ids.firewall_deny_all,
+  # ]
 
   public_net {
     ipv6_enabled = var.cluster.features.ip6
@@ -36,7 +36,7 @@ resource "hcloud_server" "this" {
   }
 }
 
-resource "hcloud_firewall_attachment" "this" {
-  firewall_id = var.network.ids.firewall
-  server_ids  = [for key, server in hcloud_server.this : server.id]
-}
+# resource "hcloud_firewall_attachment" "this" {
+#   firewall_id = var.network.ids.firewall
+#   server_ids  = [for key, server in hcloud_server.this : server.id]
+# }
