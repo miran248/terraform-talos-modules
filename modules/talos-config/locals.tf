@@ -21,14 +21,11 @@ locals {
         }
         etcd = {
           # advertisedSubnets = distinct([for key, node in local.network_nodes1 : node.private_ip4_network_24])
-          advertisedSubnets = distinct(flatten(
-            # [for key, node in local.network_nodes1 : node.talos.machine_type == "controlplane"
-            [for key, node in local.network_nodes1 : compact([
-              node.public_ip6_128,
-              node.public_ip4_32,
-              # node.private_ip4_network_24,
-            ])]
-          ))
+          advertisedSubnets = flatten([for key, node in local.network_nodes1 : compact([
+            node.public_ip6_128,
+            node.public_ip4_32,
+            # node.private_ip4_network_24,
+          ])])
         }
       }
     }),
@@ -44,44 +41,48 @@ locals {
           local.patches_common,
           node.talos.machine_type == "controlplane" ? local.patches_control_planes : [],
           node.talos.machine_type == "worker" ? local.patches_workers : [],
-          yamlencode({
-            machine = {
-              kubelet = {
-                nodeIP = {
-                  validSubnets = compact([
-                    "!100.64.0.0/10",
-                    "!${node.private_ip4_network_24}",
-                    node.public_ip6_128,
-                    node.public_ip4_32,
-                    # node.private_ip4_network_24,
-                  ])
-                }
-              }
-              network = {
-                kubespan = {
-                  filters = {
-                    endpoints = flatten([
-                      "!100.64.0.0/10",
-                      "!${node.private_ip4_network_24}",
-                      [for key, node in local.network_nodes1 : compact([
-                        node.public_ip6_128,
-                        node.public_ip4_32,
-                        # node.private_ip4_network_24,
-                      ])]
-                    ])
-                  }
-                }
-              }
-            }
-          }),
+          # yamlencode({
+          #   machine = {
+          #     # kubelet = {
+          #     #   nodeIP = {
+          #     #     validSubnets = compact([
+          #     #       "!100.64.0.0/10",
+          #     #       # node.private_ip4_network_24,
+          #     #       node.public_ip6_128,
+          #     #       node.public_ip4_32,
+          #     #     ])
+          #     #   }
+          #     # }
+          #     network = {
+          #       kubespan = {
+          #         filters = {
+          #           endpoints = flatten([
+          #             "!100.64.0.0/10",
+          #             # node.private_ip4_network_24,
+          #             # "!${node.private_ip4_network_24}",
+          #             [for key, node in local.network_nodes1 : compact([
+          #               node.public_ip6_128,
+          #               node.public_ip4_32,
+          #               # node.private_ip4_network_24,
+          #             ])]
+          #           ])
+          #         }
+          #       }
+          #     }
+          #   }
+          # }),
         ])
       },
     )
   }]...)
 
+  # private_ips4 = {
+  #   control_planes = flatten([for key, node in local.network_nodes1 : node.talos.machine_type == "controlplane" ? [node.private_ip4] : []])
+  #   workers        = flatten([for key, node in local.network_nodes1 : node.talos.machine_type == "worker" ? [node.private_ip4] : []])
+  # }
   private_ips4 = {
-    control_planes = flatten([for key, node in local.network_nodes1 : node.talos.machine_type == "controlplane" ? [node.private_ip4] : []])
-    workers        = flatten([for key, node in local.network_nodes1 : node.talos.machine_type == "worker" ? [node.private_ip4] : []])
+    control_planes = flatten([for key, node in local.network_nodes1 : node.talos.machine_type == "controlplane" ? [node.public_ip6] : []])
+    workers        = flatten([for key, node in local.network_nodes1 : node.talos.machine_type == "worker" ? [node.public_ip6] : []])
   }
   public_ips6 = {
     control_planes = flatten([for key, node in local.network_nodes1 : node.talos.machine_type == "controlplane" ? [node.public_ip6] : []])

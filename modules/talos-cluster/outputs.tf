@@ -14,9 +14,9 @@ output "cluster_endpoint" {
 output "cidrs6" {
   value = local.cidrs6
 }
-output "cidrs4" {
-  value = local.cidrs4
-}
+# output "cidrs4" {
+#   value = local.cidrs4
+# }
 
 output "patches" {
   value = local.patches

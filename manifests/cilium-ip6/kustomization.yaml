@@ -6,7 +6,7 @@ resources:
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: 1.16.1
+    version: 1.16.2
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -32,17 +32,17 @@ helmCharts:
       ipv6:
         enabled: true
       ipv4:
-        enabled: true
+        enabled: false
 
       k8s:
         requireIPv6PodCIDR: true
-        requireIPv4PodCIDR: true
+        requireIPv4PodCIDR: false
 
       ipv6NativeRoutingCIDR: "fc00::10:0/108"
-      ipv4NativeRoutingCIDR: "10.16.0.0/12"
+      # ipv4NativeRoutingCIDR: "10.16.0.0/12"
 
-      enableIPv6Masquerade: true
-      enableIPv4Masquerade: true
+      enableIPv6Masquerade: false
+      enableIPv4Masquerade: false
 
       gatewayAPI:
         enabled: true
@@ -58,11 +58,11 @@ helmCharts:
       bpf:
         datapathMode: veth
         hostLegacyRouting: true
-        masquerade: true
+        masquerade: false
         tproxy: true
 
       egressGateway:
-        enabled: true
+        enabled: false
 
       endpointRoutes:
         enabled: false
@@ -95,7 +95,7 @@ helmCharts:
         enabled: false
 
       nat46x64Gateway:
-        enabled: true
+        enabled: false
 
       bandwidthManager:
         enabled: true
@@ -111,7 +111,7 @@ helmCharts:
             interval: 60s
 
       hubble:
-        enabled: true
+        enabled: false
         enableOpenMetrics: true
         preferIpv6: true
         metrics:

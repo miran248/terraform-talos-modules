@@ -7,11 +7,11 @@ locals {
     services = "fc00::0:0/108"
   }
 
-  cidrs4 = {
-    # 12 is the largest supported 32b range
-    pods     = "10.16.0.0/12"
-    services = "10.0.0.0/12"
-  }
+  # cidrs4 = {
+  #   # 12 is the largest supported 32b range
+  #   pods     = "10.16.0.0/12"
+  #   services = "10.0.0.0/12"
+  # }
 
   cert_sans = [
     var.endpoint,
@@ -25,24 +25,30 @@ locals {
         network = {
           dnsDomain = "cluster.local"
           # order matters!
-          podSubnets = (var.features.ip6
-            ? [
-              local.cidrs6.pods,
-              local.cidrs4.pods,
-            ]
-            : [
-              local.cidrs4.pods,
-              local.cidrs6.pods,
-          ])
-          serviceSubnets = (var.features.ip6
-            ? [
-              local.cidrs6.services,
-              local.cidrs4.services,
-            ]
-            : [
-              local.cidrs4.services,
-              local.cidrs6.services,
-          ])
+          # podSubnets = (var.features.ip6
+          #   ? [
+          #     local.cidrs6.pods,
+          #     local.cidrs4.pods,
+          #   ]
+          #   : [
+          #     local.cidrs4.pods,
+          #     local.cidrs6.pods,
+          # ])
+          # serviceSubnets = (var.features.ip6
+          #   ? [
+          #     local.cidrs6.services,
+          #     local.cidrs4.services,
+          #   ]
+          #   : [
+          #     local.cidrs4.services,
+          #     local.cidrs6.services,
+          # ])
+          podSubnets = [
+            local.cidrs6.pods,
+          ]
+          serviceSubnets = [
+            local.cidrs6.services,
+          ]
         }
       }
       machine = {
@@ -63,15 +69,18 @@ locals {
         }
         kubelet = {
           # order matters!
-          clusterDNS = (var.features.ip6
-            ? [
-              cidrhost(local.cidrs6.services, 10),
-              cidrhost(local.cidrs4.services, 10),
-            ]
-            : [
-              cidrhost(local.cidrs4.services, 10),
-              cidrhost(local.cidrs6.services, 10),
-          ])
+          # clusterDNS = (var.features.ip6
+          #   ? [
+          #     cidrhost(local.cidrs6.services, 10),
+          #     cidrhost(local.cidrs4.services, 10),
+          #   ]
+          #   : [
+          #     cidrhost(local.cidrs4.services, 10),
+          #     cidrhost(local.cidrs6.services, 10),
+          # ])
+          clusterDNS = [
+            cidrhost(local.cidrs6.services, 10),
+          ]
         }
         network = {
           kubespan = {
@@ -116,7 +125,7 @@ locals {
             extraArgs = {
               # cloud-provider           = "external"
               node-cidr-mask-size-ipv6 = 120
-              node-cidr-mask-size-ipv4 = 24
+              # node-cidr-mask-size-ipv4 = 24
             }
           }
         }

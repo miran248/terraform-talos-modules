@@ -18804,7 +18804,7 @@ data:
   enable-bandwidth-manager: "true"
   enable-bbr: "false"
   enable-bpf-clock-probe: "false"
-  enable-bpf-masquerade: "true"
+  enable-bpf-masquerade: "false"
   enable-bpf-tproxy: "true"
   enable-endpoint-health-checking: "true"
   enable-envoy-config: "true"
@@ -18817,15 +18817,12 @@ data:
   enable-health-check-nodeport: "true"
   enable-health-checking: "true"
   enable-host-legacy-routing: "true"
-  enable-hubble: "true"
-  enable-hubble-open-metrics: "false"
-  enable-ipv4: "true"
+  enable-ipv4: "false"
   enable-ipv4-big-tcp: "false"
-  enable-ipv4-egress-gateway: "true"
-  enable-ipv4-masquerade: "true"
+  enable-ipv4-masquerade: "false"
   enable-ipv6: "true"
   enable-ipv6-big-tcp: "false"
-  enable-ipv6-masquerade: "true"
+  enable-ipv6-masquerade: "false"
   enable-k8s-networkpolicy: "true"
   enable-k8s-terminating-endpoint: "true"
   enable-l2-neigh-discovery: "false"
@@ -18833,7 +18830,6 @@ data:
   enable-local-redirect-policy: "false"
   enable-masquerade-to-route-source: "false"
   enable-metrics: "true"
-  enable-nat46x64-gateway: "true"
   enable-node-selector-labels: "false"
   enable-policy: default
   enable-runtime-device-detection: "true"
@@ -18852,29 +18848,16 @@ data:
   gateway-api-secrets-namespace: cilium-secrets
   gateway-api-service-externaltrafficpolicy: Cluster
   gateway-api-xff-num-trusted-hops: "0"
-  hubble-disable-tls: "false"
-  hubble-export-file-max-backups: "5"
-  hubble-export-file-max-size-mb: "10"
-  hubble-listen-address: :4244
-  hubble-metrics: dns drop tcp flow icmp port-distribution http
-  hubble-metrics-server: :9965
-  hubble-metrics-server-enable-tls: "false"
-  hubble-prefer-ipv6: "true"
-  hubble-socket-path: /var/run/cilium/hubble.sock
-  hubble-tls-cert-file: /var/lib/cilium/tls/hubble/server.crt
-  hubble-tls-client-ca-files: /var/lib/cilium/tls/hubble/client-ca.crt
-  hubble-tls-key-file: /var/lib/cilium/tls/hubble/server.key
   identity-allocation-mode: crd
   identity-gc-interval: 15m0s
   identity-heartbeat-timeout: 30m0s
   install-no-conntrack-iptables-rules: "false"
   ipam: kubernetes
   ipam-cilium-node-update-rate: 15s
-  ipv4-native-routing-cidr: 10.16.0.0/12
   ipv6-native-routing-cidr: fc00::10:0/108
   k8s-client-burst: "20"
   k8s-client-qps: "10"
-  k8s-require-ipv4-pod-cidr: "true"
+  k8s-require-ipv4-pod-cidr: "false"
   k8s-require-ipv6-pod-cidr: "true"
   kube-proxy-replacement: "true"
   kube-proxy-replacement-healthz-bind-address: ""
@@ -18890,7 +18873,7 @@ data:
   nat-map-stats-interval: 30s
   node-port-bind-protection: "true"
   nodes-gc-interval: 5m0s
-  operator-api-serve-addr: 127.0.0.1:9234
+  operator-api-serve-addr: '[::1]:9234'
   operator-prometheus-serve-addr: :9963
   policy-cidr-match-mode: ""
   preallocate-bpf-maps: "false"
@@ -18991,20 +18974,10 @@ data:
             "name": "envoy-health-listener",
             "address": {
               "socket_address": {
-                "address": "127.0.0.1",
+                "address": "::1",
                 "port_value": 9878
               }
             },
-            "additional_addresses": [
-              {
-                "address": {
-                  "socket_address": {
-                    "address": "::1",
-                    "port_value": 9878
-                  }
-                }
-              }
-            ],
             "filter_chains": [
               {
                 "filters": [
@@ -19260,66 +19233,28 @@ metadata:
   namespace: kube-system
 ---
 apiVersion: v1
-data:
-  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURGRENDQWZ5Z0F3SUJBZ0lSQUwybm5KRldWNllrTU9MUm85c3o5VHN3RFFZSktvWklodmNOQVFFTEJRQXcKRkRFU01CQUdBMVVFQXhNSlEybHNhWFZ0SUVOQk1CNFhEVEkwTURreU5USXhNREV3T0ZvWERUSTNNRGt5TlRJeApNREV3T0Zvd0ZERVNNQkFHQTFVRUF4TUpRMmxzYVhWdElFTkJNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DCkFROEFNSUlCQ2dLQ0FRRUE2d04vdzU4aDBkTFZtQ3VQYVNHQTJJeldJd3FUZyswNWFwUWlENVhrUGFCWjN1elUKcTFDWTgwQ1NVcVVHcnVQaXdYNFJxVG1Eajh6cU1JNnlGVG9yc01nd0ZGNGh6MjZIUWFnQ3R3RTVKSWFoOXFTaAp6WW50R2hKcTBSSXIzZFFEU2xITWYydlo3eTBaMWtlS1lsTkxWRC9HZVEwb3p5WGp5UUcxRFhQQUNhVDFSbGlZCnd4ZTgrbG9Yc0Frck45Nm5YTCtQQ2k0NHJ3OUw3YVZMQnZqK0Q3QktKbTJtOEpPbnY1ZmRETFNET0xLUDlPS1IKbmV6bHpDSUgwak85RkFkMkwvTnBSSVdlOTdCQ2NuWEZ6WDRUVGxxN09zYzBEenA4ZFQ1MVNCSzNhbkZSOU5nMwpmUFgyLzZacVUxL0VTRnQrQisxYjBJRU9xTU5mSXJ0MHFZdCtQUUlEQVFBQm8yRXdYekFPQmdOVkhROEJBZjhFCkJBTUNBcVF3SFFZRFZSMGxCQll3RkFZSUt3WUJCUVVIQXdFR0NDc0dBUVVGQndNQ01BOEdBMVVkRXdFQi93UUYKTUFNQkFmOHdIUVlEVlIwT0JCWUVGT1ZlYVd6QlVCVjVLZjRQM2pkNFFIaTZuZDVsTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQm9CanBjdlBxMVVWelFrZjJQdVd4K21jNjRuOGovYkwraDVLRnZ5a1F5SDg5OEwya0RQZGt4CklQTCtzWjVXMkVTL0tyUmFwcWtJeks5TlJnQmN4Nitxa3FBb1V0YVRXYTFQMVZldWR2M3B4SUp6MGJiTlVTa0kKdjdFbmdiZ2hIWFE2L1RNMG4xcmJIWDU3VktQQ0ZWa3pTdStoNzBOMmpHRDdrZW9aVEhlRThVNWJXemZjMEJ0VwpmYWdzTGMxRkRjOWhQUjJiT2pvckNXNFppV21wdzNNSkJxL3R1Um90ajZXVGVqMFpSUTYyWlE0M0FRZ1hRZ0NzCjRRa202aHlUOEhqZFFhdE9aOTVsbktnTnRvdFBxbnFZSWx6RE1RWmp6L0hkUEF2TDU1a3ZFWjlJMk1Ja0FmUjMKU2N6QUFQdStkd3BDZmU4bkptcEJlNUFjZjhISnViVWsKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-  ca.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBNndOL3c1OGgwZExWbUN1UGFTR0EySXpXSXdxVGcrMDVhcFFpRDVYa1BhQlozdXpVCnExQ1k4MENTVXFVR3J1UGl3WDRScVRtRGo4enFNSTZ5RlRvcnNNZ3dGRjRoejI2SFFhZ0N0d0U1SklhaDlxU2gKelludEdoSnEwUklyM2RRRFNsSE1mMnZaN3kwWjFrZUtZbE5MVkQvR2VRMG96eVhqeVFHMURYUEFDYVQxUmxpWQp3eGU4K2xvWHNBa3JOOTZuWEwrUENpNDRydzlMN2FWTEJ2aitEN0JLSm0ybThKT252NWZkRExTRE9MS1A5T0tSCm5lemx6Q0lIMGpPOUZBZDJML05wUklXZTk3QkNjblhGelg0VFRscTdPc2MwRHpwOGRUNTFTQkszYW5GUjlOZzMKZlBYMi82WnFVMS9FU0Z0K0IrMWIwSUVPcU1OZklydDBxWXQrUFFJREFRQUJBb0lCQVFDN2Rjc1FDM3M2bDJaeApQeTNodWl2QWtIYXU5TnkrT3hlMWYvdTdXdUQ0bDFPWWtta0JUZ1R5NCtyVHFYY3ZRZSs2VUFsZVp0WWVlbUhECjRjOERSNmRhR0JUaDZrUWw1aEJWdXVLUGY1WkpJR3RKQmdGYXBrNU9vYW82b3JnQzlmNjU1WTJ0aGlZTXRua0oKaDM5Rzl4SDdYZk8rMDFSZUIrY3Vpd0lVZk9RTnk5UERDRlRTbXlxK0lrd3ROTTF3ZEI2TjRqcUgrVnNQTWhhbAp0OURtT1hGWVBwb2NGQVlhODdxeGQ1aWpYa3FPK3VUejNJTVRuaEFmcjhSS0FHQmtpQlpNaXJqMk83eVA3aFdMCnpITmRKdW44aFhGK1lvTndtLzhiV1F3U3JjMis1VlE5YlM0TExyY3JZNmpvNFh4VDlhK2ZCbzFDS3ZYbW9ackYKUTRIWUlNWUJBb0dCQU8vMWUybEtiSVdlMnpaV0lFcWZIWmE3NzV2RUlXY01FU3N1ZkJ3NHpqMmtZKzZkTXBWWgpXaEZHWFJvTEtlank5Zm1tVDhIbnczeUVrclBxQnFXZWNiUGFUbUlCUGVIOWpPVDU1L0dONjVBYVpKcWhQSEtYCkNSMDNsTWE1d1lCb1hJQkVlUklVaHEvMC9MT1FBRnFqYXY3ME5QWkNKWWVrVlZlYnZiSWduRjhoQW9HQkFQcTUKWXcySHJHeVNrcXc2NVlQSDcxRmduaE9MWDY2ck50Tys4L0xRMjlVVG1mNkVldHQwSFJrcFBUZzFSNHJVb0dGWQpuWGorVE04RFJvU2RUbVpSU1JPVmVtQ1B0ZU9xYTVTQlF0UldvdDk4aFBtb3RBOEJJMEFQTjlaWFY5cHVJcGdMCjY2enJGYzVZKzV4K0dMdG1JUjNnVDFMT2VCWTlUQk54UzduUjQwZWRBb0dCQU9RaDYvRy9hd3RpYXlEdW93YXUKM2UrbnYzYkU4Y2pKaFMwYnBhMGpLSmtjU0ZIY0svSW5uK1Nhay9zbHIvT2p3YzFXbTY5TFMrUi9HZ1pvc1djVwpDeDJscUMydTVvbUxpRDlOaElGM253UkN3M0RyWjgrOTNsRmp2Vk50MlJUZW8wcmpUb09zOWh3bGUzYXZxbGFCCjFVQ05KaWtWM0I1b1V5YldqM1BoWXlsaEFvR0FIYmJRNVc2WjRiZ3hSOVluRTBvanM3cEdvYnhYMTZTVTk5MWUKbmYxZ3dFejFhRE9kTjlyNEE5NWVVZ1lHZDQ2aGYwZjRTYm1oc3JzSnBYZmJMY2NlYVFMRElTU0hBdmRVanFJUApJSWt2L2xxTWkrWVJpT0d5b3NucTdTMG16VTFXTGp6amJuZmgrcldUQkVYeGVtd3RLcFJGOG1OajJnYmp1RDRxCklsaWNuZ1VDZ1lCQ0twaVlOMUtXVXRjLy9IWlFUUXdqblMzbGJKcXdSRDdSR1JER3hwN2FENnRaRE1TR2xmWkMKdDJ1Zk1WcjJjQ0Fmd2NLUnBBVXdncWhRcklsV3FIUUVvWlovUkhCMFR0VitSM3B3b0NqTTFySjBMcDBKbHNNbQorWk5sMmEyNWJDTnMwT25XUEdXNkdreU1kTm1la1U1Q3I2c1RLUzUycEZ1SCtxdUVKaXJ0U1E9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
-kind: Secret
-metadata:
-  name: cilium-ca
-  namespace: kube-system
----
-apiVersion: v1
-data:
-  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURGRENDQWZ5Z0F3SUJBZ0lSQUwybm5KRldWNllrTU9MUm85c3o5VHN3RFFZSktvWklodmNOQVFFTEJRQXcKRkRFU01CQUdBMVVFQXhNSlEybHNhWFZ0SUVOQk1CNFhEVEkwTURreU5USXhNREV3T0ZvWERUSTNNRGt5TlRJeApNREV3T0Zvd0ZERVNNQkFHQTFVRUF4TUpRMmxzYVhWdElFTkJNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DCkFROEFNSUlCQ2dLQ0FRRUE2d04vdzU4aDBkTFZtQ3VQYVNHQTJJeldJd3FUZyswNWFwUWlENVhrUGFCWjN1elUKcTFDWTgwQ1NVcVVHcnVQaXdYNFJxVG1Eajh6cU1JNnlGVG9yc01nd0ZGNGh6MjZIUWFnQ3R3RTVKSWFoOXFTaAp6WW50R2hKcTBSSXIzZFFEU2xITWYydlo3eTBaMWtlS1lsTkxWRC9HZVEwb3p5WGp5UUcxRFhQQUNhVDFSbGlZCnd4ZTgrbG9Yc0Frck45Nm5YTCtQQ2k0NHJ3OUw3YVZMQnZqK0Q3QktKbTJtOEpPbnY1ZmRETFNET0xLUDlPS1IKbmV6bHpDSUgwak85RkFkMkwvTnBSSVdlOTdCQ2NuWEZ6WDRUVGxxN09zYzBEenA4ZFQ1MVNCSzNhbkZSOU5nMwpmUFgyLzZacVUxL0VTRnQrQisxYjBJRU9xTU5mSXJ0MHFZdCtQUUlEQVFBQm8yRXdYekFPQmdOVkhROEJBZjhFCkJBTUNBcVF3SFFZRFZSMGxCQll3RkFZSUt3WUJCUVVIQXdFR0NDc0dBUVVGQndNQ01BOEdBMVVkRXdFQi93UUYKTUFNQkFmOHdIUVlEVlIwT0JCWUVGT1ZlYVd6QlVCVjVLZjRQM2pkNFFIaTZuZDVsTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQm9CanBjdlBxMVVWelFrZjJQdVd4K21jNjRuOGovYkwraDVLRnZ5a1F5SDg5OEwya0RQZGt4CklQTCtzWjVXMkVTL0tyUmFwcWtJeks5TlJnQmN4Nitxa3FBb1V0YVRXYTFQMVZldWR2M3B4SUp6MGJiTlVTa0kKdjdFbmdiZ2hIWFE2L1RNMG4xcmJIWDU3VktQQ0ZWa3pTdStoNzBOMmpHRDdrZW9aVEhlRThVNWJXemZjMEJ0VwpmYWdzTGMxRkRjOWhQUjJiT2pvckNXNFppV21wdzNNSkJxL3R1Um90ajZXVGVqMFpSUTYyWlE0M0FRZ1hRZ0NzCjRRa202aHlUOEhqZFFhdE9aOTVsbktnTnRvdFBxbnFZSWx6RE1RWmp6L0hkUEF2TDU1a3ZFWjlJMk1Ja0FmUjMKU2N6QUFQdStkd3BDZmU4bkptcEJlNUFjZjhISnViVWsKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURWekNDQWorZ0F3SUJBZ0lSQUxHaFplM3htMUpkK2VqZ050d0F1MjR3RFFZSktvWklodmNOQVFFTEJRQXcKRkRFU01CQUdBMVVFQXhNSlEybHNhWFZ0SUVOQk1CNFhEVEkwTURreU5USXhNREV3T0ZvWERUSTNNRGt5TlRJeApNREV3T0Zvd0tqRW9NQ1lHQTFVRUF3d2ZLaTVrWldaaGRXeDBMbWgxWW1Kc1pTMW5jbkJqTG1OcGJHbDFiUzVwCmJ6Q0NBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQU5IQ0lNd0JJU2MwVXFVbUpUeUcKU1grTnNaWEMyMkR2VjhmNXQ2V05wRHdzU0ZoaEtiOEVISUZsaGVjUXNMdjhRYmpMNjZGNFVkMlZtR0ZobGpqdQpYUTkzNXNHWHljUlE5d3FkMGRZcmIySFgya2svcUJGblAzaTNaU0IzM2pZeDd6THdjc1E0YVdzSDBEQ1RRUS90CmNKZ3g0TVl4Z2hQejRFTFgvUm12NEdVcFJFRjI4bFBqQ2dWei94SnlibkdQTGVNWjZlV3d4KzZsa0xpUCt4T3oKUllYcFRoMjVINS83VlVYQlZIdmxTMHpMaG5hNHdvSFpmR1FTUklhM1pkTUdZZGVZSEltZEFGdUxnbkxZWW0wRAowd05LY09Ld2xzYTVFbndjY3NIVzFldVNlaVFwT0paOW5ZWm9nbTYyMmZONHFoSGFQRmpjdmFkTWJ1QjhJSDZsCkNNa0NBd0VBQWFPQmpUQ0JpakFPQmdOVkhROEJBZjhFQkFNQ0JhQXdIUVlEVlIwbEJCWXdGQVlJS3dZQkJRVUgKQXdFR0NDc0dBUVVGQndNQ01Bd0dBMVVkRXdFQi93UUNNQUF3SHdZRFZSMGpCQmd3Rm9BVTVWNXBiTUZRRlhrcAovZy9lTjNoQWVMcWQzbVV3S2dZRFZSMFJCQ013SVlJZktpNWtaV1poZFd4MExtaDFZbUpzWlMxbmNuQmpMbU5wCmJHbDFiUzVwYnpBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQXdBRGQ0NExPaS84b1BSNzlVZFVsNzhkeUFuRGYKSzZrU3lyYUJRcnE0YXM4SFBMbWN5S3hyZHo4WGlKaFVONzQ5b1dSendXOW0venJMZG1xR0ZqTCtqZjBETUIvQQozLzY5RjNXUjZYK1JzdkJEZ1dYMHhyU1EwK25DQ21WTUVZWFFScUZjWUw0cTFKdXNEc0NGZThkMXVDYjNPMUR0ClFQY0lQWitnUUxKQitUbXhlcksxZHVjNFdNMS9GTkdjeW1QTE5QQjhHV3B2eGZVaFZpdm45c2Z6S1BXT3F4WE8KR3ZLangweVdZRk01WE41Q3F3VFNHN21QVFRqTXFGbU4xY2l5RTdmcVJnOThKeW1SUU11L3RlRlVUTTIzR3YwUwpsckJXRHdrVC9pdmlyazVzV1VIRHZySmh6VmFURkdHa2JQbkUwU3NzaGQxZ1JwUzF2ekNmY05wU0ZBPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBMGNJZ3pBRWhKelJTcFNZbFBJWkpmNDJ4bGNMYllPOVh4L20zcFkya1BDeElXR0VwCnZ3UWNnV1dGNXhDd3UveEJ1TXZyb1hoUjNaV1lZV0dXT081ZEQzZm13WmZKeEZEM0NwM1IxaXR2WWRmYVNUK28KRVdjL2VMZGxJSGZlTmpIdk12Qnl4RGhwYXdmUU1KTkJEKzF3bURIZ3hqR0NFL1BnUXRmOUdhL2daU2xFUVhieQpVK01LQlhQL0VuSnVjWTh0NHhucDViREg3cVdRdUkvN0U3TkZoZWxPSGJrZm4vdFZSY0ZVZStWTFRNdUdkcmpDCmdkbDhaQkpFaHJkbDB3WmgxNWdjaVowQVc0dUNjdGhpYlFQVEEwcHc0ckNXeHJrU2ZCeHl3ZGJWNjVKNkpDazQKbG4yZGhtaUNicmJaODNpcUVkbzhXTnk5cDB4dTRId2dmcVVJeVFJREFRQUJBb0lCQUY1TDNSNlk2MlNLZXhUUApQeklrVkdwSk1xcFd2UFNvNUZkOEJYa2hZZEhEUG9xc3MyMngxWGErUXlJTE9NaHBzTW40c21jV2hnY05OMEdmCjh6Nkl1Y0U0Yjc1Y0ZGSnk2M3dVVXI3cks5bGFoa0Vqb3RTZ0M4S2kvNDFIRmRoYlBtTXlBUVlCTGpMMWdqdzAKRnEyb1dsT3hLSkV3dEg5dnhVT0hnYnJJZkNJOVNKcU5yK0NaRVdHZ2FWWkZXYitMeVJBWlRtRDhzT0hmVHpKVwoxd1Izb1pKUi81cVRZWjYvS3B5a285dzd6dkhGVXRGNjg5WEloLy94NlRtVTZsYXRnME9rZ1B5NmhJN1NReEwzCmU0bHZ6KzR4QjNENlora2xEdGdrelQ0UGx0OGdTdWlCN3NSRjhlbWdRbjZjZnR4NFlHcGJ5alFqTE5tcUZBQW4KV1lRcmVnRUNnWUVBNU9VQzN4M1Fnd3dDK2ZnS0RmUUhkUDZsTXhwMjdWNTJWaGtZd0dzM3hpellmWW5TUEo1bwpHeHRrakt1aExtY0RocUhXdXROMVAvdHY2a2VvWjJMUE1IMFdSNnpPQ0NvYTdCWDgwaml6ekNFN05CeTVXeVpiCk1CcXVBTWJtbkRpWXI2Z0l6UEhEZTNWUDVvUnY5QUJybFVJYjVtamRaMTBybWsrZG40UW90MmtDZ1lFQTZwai8KT0RDWENYODBSanN0WUpxdGV1TTRCbGxuOWFhd0VBT3JOcGorSVVNYWJQWFI5aWZzRm84WCtiTDRGd0tPc3FvMApLbmRaNmtaUUVzcUVzcXdqSi9XTyt6MlRRNGlyL01NeG1WWmN4VXdYKzF4N0RwN1lyZmw2TnpkMXQ2K0t4eWlkCjFDZW1MbC9WOWs5QTlaM0QwdkQ0RkRhY1pNc014MWJIY2hiaittRUNnWUVBbVN6TU5DVk9rVFBybGY0d05GQTIKNFVzN29DdzRvL2FQK0dRSkZWTnEycHJPTVl5V2ZXeUFQSXVqU1NQZDFDQ3AwbUhoUWRzYVhydlRsQk5xRmUyZwp1MUVxSk1MMmlhNHJvQXZDeWFlYVlxTm1iQ1JBd2tlenhFaEdZMHkzckptUFRCV0Y5aWhmNmZHQ2k3L2E3NDJNCmNURHhYTXFXUjRLcEdEWHBSSU43ZitrQ2dZRUFuWDRiRU1EbUZOVVY1ZlJDY1hGRjk1TGxBTFl5NmFKKzNqRm8KVnQzODlaMlQ5d1JNY1dHNXlDZEdaRGEzQU5PUnN2WTYwU3VRN0l0SnBHUGJGQXdtQ2VSN21jVnJ3TkhYREhpSwpLclBrMGZ0VXVrWUt3dlQyNkV6c3RIY0NDMC9JN2cwaGI5VXlaajJtYVpZcE9Qc3lCTUlLK1o3ei9XS25jSWVjCm04WXNST0VDZ1lFQWo4S1p6djdzT01wZzRWdmc5ZWUzU21JcHc5RmgvMHVDK21hb1M5MVVEWWpBUnFlVjREVysKbDBqa2dsMnhuNW40Z2tUdURDTWpwdlhrb2pBejdOMEIxSW1aQ0xWUHNJWGZVb1ZXUk5NRkswTGw0K004RWQ0RQpLZzRCMzJneW9pNllCM1YvNWNVRFdqZ0NBMEZvNmFucXFJWmxvSWJpT2NubUZvTkVQTjEyaFA0PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
-kind: Secret
-metadata:
-  name: hubble-server-certs
-  namespace: kube-system
-type: kubernetes.io/tls
----
-apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    prometheus.io/port: "9965"
+    prometheus.io/port: "9964"
     prometheus.io/scrape: "true"
   labels:
-    app.kubernetes.io/name: hubble
+    app.kubernetes.io/name: cilium-envoy
     app.kubernetes.io/part-of: cilium
-    k8s-app: hubble
-  name: hubble-metrics
+    io.cilium/app: proxy
+    k8s-app: cilium-envoy
+  name: cilium-envoy
   namespace: kube-system
 spec:
   clusterIP: None
   ports:
-  - name: hubble-metrics
-    port: 9965
+  - name: envoy-metrics
+    port: 9964
     protocol: TCP
-    targetPort: hubble-metrics
+    targetPort: envoy-metrics
   selector:
-    k8s-app: cilium
+    k8s-app: cilium-envoy
   type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/name: hubble-peer
-    app.kubernetes.io/part-of: cilium
-    k8s-app: cilium
-  name: hubble-peer
-  namespace: kube-system
-spec:
-  internalTrafficPolicy: Local
-  ports:
-  - name: peer-service
-    port: 443
-    protocol: TCP
-    targetPort: 4244
-  selector:
-    k8s-app: cilium
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -19345,7 +19280,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: 31b5fe10363bd3f67cb51836e4fb816357c263bf4834018c2aa02ca28ddcd96d
+        cilium.io/cilium-configmap-checksum: 29aa0c44bab351b18f4732f4c305e470bb600d156b40e5480281538738410950
         prometheus.io/port: "9963"
         prometheus.io/scrape: "true"
       labels:
@@ -19389,11 +19324,11 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/operator-generic:v1.16.1@sha256:3bc7e7a43bc4a4d8989cb7936c5d96675dd2d02c306adf925ce0a7c35aa27dc4
+        image: quay.io/cilium/operator-generic:v1.16.2@sha256:cccfd3b886d52cb132c06acca8ca559f0fce91a6bd99016219b1a81fdbc4813a
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             path: /healthz
             port: 9234
             scheme: HTTP
@@ -19409,7 +19344,7 @@ spec:
         readinessProbe:
           failureThreshold: 5
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             path: /healthz
             port: 9234
             scheme: HTTP
@@ -19450,7 +19385,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: 31b5fe10363bd3f67cb51836e4fb816357c263bf4834018c2aa02ca28ddcd96d
+        cilium.io/cilium-configmap-checksum: 29aa0c44bab351b18f4732f4c305e470bb600d156b40e5480281538738410950
         prometheus.io/port: "9962"
         prometheus.io/scrape: "true"
       labels:
@@ -19493,7 +19428,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:
@@ -19528,7 +19463,7 @@ spec:
         livenessProbe:
           failureThreshold: 10
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             httpHeaders:
             - name: brief
               value: "true"
@@ -19555,7 +19490,7 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             httpHeaders:
             - name: brief
               value: "true"
@@ -19570,7 +19505,7 @@ spec:
         startupProbe:
           failureThreshold: 105
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             httpHeaders:
             - name: brief
               value: "true"
@@ -19602,9 +19537,6 @@ spec:
           readOnly: true
         - mountPath: /run/xtables.lock
           name: xtables-lock
-        - mountPath: /var/lib/cilium/tls/hubble
-          name: hubble-tls
-          readOnly: true
         - mountPath: /tmp
           name: tmp
       hostNetwork: true
@@ -19627,7 +19559,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: config
         terminationMessagePolicy: FallbackToLogsOnError
@@ -19644,7 +19576,7 @@ spec:
         env:
         - name: BIN_PATH
           value: /opt/cni/bin
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: apply-sysctl-overwrites
         securityContext:
@@ -19680,7 +19612,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: clean-cilium-state
         securityContext:
@@ -19696,7 +19628,7 @@ spec:
           name: cilium-run
       - command:
         - /install-plugin.sh
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: install-cni-binaries
         resources:
@@ -19788,20 +19720,6 @@ spec:
                 path: local-etcd-client-ca.crt
               name: clustermesh-apiserver-local-cert
               optional: true
-      - name: hubble-tls
-        projected:
-          defaultMode: 256
-          sources:
-          - secret:
-              items:
-              - key: tls.crt
-                path: server.crt
-              - key: tls.key
-                path: server.key
-              - key: ca.crt
-                path: client-ca.crt
-              name: hubble-server-certs
-              optional: true
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 2
@@ -19824,9 +19742,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-envoy-configmap-checksum: c3c664c4c3f8818ee77a10baa0e04040c2e9d48e3023d7bcba2359e0037f2355
-        prometheus.io/port: "9964"
-        prometheus.io/scrape: "true"
+        cilium.io/cilium-envoy-configmap-checksum: 4d58835472b59756a292a854f16fafac61d2cbf03a1d5b2f17e3eb51ece48b46
       labels:
         app.kubernetes.io/name: cilium-envoy
         app.kubernetes.io/part-of: cilium
@@ -19879,12 +19795,12 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium-envoy:v1.29.7-39a2a56bbd5b3a591f69dbca51d3e30ef97e0e51@sha256:bd5ff8c66716080028f414ec1cb4f7dc66f40d2fb5a009fff187f4a9b90b566b
+        image: quay.io/cilium/cilium-envoy:v1.29.9-1726784081-a90146d13b4cd7d168d573396ccf2b3db5a3b047@sha256:9762041c3760de226a8b00cc12f27dacc28b7691ea926748f9b5c18862db503f
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             path: /healthz
             port: 9878
             scheme: HTTP
@@ -19900,7 +19816,7 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             path: /healthz
             port: 9878
             scheme: HTTP
@@ -19920,7 +19836,7 @@ spec:
         startupProbe:
           failureThreshold: 105
           httpGet:
-            host: 127.0.0.1
+            host: ::1
             path: /healthz
             port: 9878
             scheme: HTTP
