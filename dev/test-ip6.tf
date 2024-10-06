@@ -40,8 +40,7 @@ module "dev106_talos_cluster" {
           externalCloudProvider = {
             enabled = true
             manifests = [
-              "https://raw.githubusercontent.com/miran248/terraform-talos-modules/refs/heads/main/manifests/talos-cloud-controller-manager.yaml",
-              # "https://raw.githubusercontent.com/miran248/terraform-talos-modules/refs/tags/v1.0.0/manifests/talos-cloud-controller-manager.yaml",
+              "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.1.0/manifests/talos-cloud-controller-manager.yaml",
             ]
           }
           # allowSchedulingOnControlPlanes = true

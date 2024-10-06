@@ -2,6 +2,7 @@ resource "hcloud_firewall" "deny_all" {
   name = "${var.pool.prefix}-deny-all"
 }
 
+# TODO: extract from module and open ports required by cilium
 resource "hcloud_firewall" "this" {
   name = var.pool.prefix
 
