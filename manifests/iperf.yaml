@@ -3,23 +3,51 @@ kind: Pod
 metadata:
   name: iperf-client
 spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
   containers:
-  - command:
-    - sleep
-    - "30000"
-    image: cagedata/iperf3
-    name: iperf
+    - command:
+        - sleep
+        - "30000"
+      image: cagedata/iperf3
+      name: iperf
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
 ---
 apiVersion: v1
 kind: Pod
 metadata:
   name: iperf-server
 spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
   containers:
-  - command:
-    - iperf3
-    - -s
-    image: cagedata/iperf3
-    name: iperf
-    ports:
-    - containerPort: 5201
+    - command:
+        - iperf3
+        - -s
+      image: cagedata/iperf3
+      name: iperf
+      ports:
+        - containerPort: 5201
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault

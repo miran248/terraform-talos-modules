@@ -1,4 +1,4 @@
-data "talos_cluster_kubeconfig" "this" {
+resource "talos_cluster_kubeconfig" "this" {
   client_configuration = var.config.machine_secrets.client_configuration
   endpoint             = var.cluster.endpoint
   node                 = var.config.private_ips4.control_planes[0]

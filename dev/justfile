@@ -1,37 +1,13 @@
-apply64 PREFIX:
+apply:
   terraform init -upgrade
   terraform apply -auto-approve
-  terraform output --raw "{{ PREFIX }}6_talos_config" > "{{ PREFIX }}6_talos_config"
-  talosctl config merge "{{ PREFIX }}6_talos_config"
-  talosctl -n 192.168.1.11 kubeconfig --force
-  terraform output --raw "{{ PREFIX }}4_talos_config" > "{{ PREFIX }}4_talos_config"
-  talosctl config merge "{{ PREFIX }}4_talos_config"
-  talosctl -n 192.168.1.11 kubeconfig --force
 
-apply6 PREFIX:
-  terraform init -upgrade
-  terraform apply -auto-approve
-  terraform output --raw "{{ PREFIX }}6_talos_config" > "{{ PREFIX }}6_talos_config"
-  talosctl config merge "{{ PREFIX }}6_talos_config"
-  talosctl -n 192.168.1.11 kubeconfig --force
-
-apply4 PREFIX:
-  terraform init -upgrade
-  terraform apply -auto-approve
-  terraform output --raw "{{ PREFIX }}4_talos_config" > "{{ PREFIX }}4_talos_config"
-  talosctl config merge "{{ PREFIX }}4_talos_config"
-  talosctl -n 192.168.1.11 kubeconfig --force
-
-destroy PREFIX:
+destroy:
   #!/usr/bin/env bash
-  set +e
-  kubectl config unset current-context
-  kubectl config delete-context "admin@{{ PREFIX }}6"
-  kubectl config delete-context "admin@{{ PREFIX }}4"
-  kubectl config delete-user "admin@{{ PREFIX }}6"
-  kubectl config delete-user "admin@{{ PREFIX }}4"
-  kubectl config delete-cluster "admin@{{ PREFIX }}6"
-  kubectl config delete-cluster "admin@{{ PREFIX }}4"
-  talosctl config remove -y "{{ PREFIX }}6"
-  talosctl config remove -y "{{ PREFIX }}4"
+  rm *talos-config
+  rm *kube-config
   terraform destroy -auto-approve
+
+config PREFIX:
+  terraform output --raw "{{ PREFIX }}_talos_config" > "{{ PREFIX }}-talos-config"
+  TALOSCONFIG="{{ PREFIX }}-talos-config" talosctl -n 192.168.1.11 kubeconfig "{{ PREFIX }}-kube-config"
