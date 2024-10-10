@@ -28,9 +28,9 @@ locals {
             name = "custom"
             urls = (var.features.ip6
               # sets ipv6.enabled: true
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/cilium-ip6.yaml"]
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip6.yaml"]
               # sets ipv6.enabled: false
-              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/cilium-ip4.yaml"]
+              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
             )
           }
           # order matters!
@@ -81,9 +81,14 @@ locals {
               cidrhost(local.cidrs4.services, 10),
               cidrhost(local.cidrs6.services, 10),
           ])
+          # https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
           extraArgs = {
             cloud-provider             = "external"
             rotate-server-certificates = true
+          }
+          extraConfig = {
+            address            = "::"
+            healthzBindAddress = "::"
           }
         }
         network = {
@@ -118,23 +123,38 @@ locals {
           }
           apiServer = {
             certSANs = local.cert_sans
+            # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
             extraArgs = {
-              # forces apiserver to use external ip family
-              advertise-address = "0.0.0.0"
+              advertise-address = "::"
+              bind-address      = "::"
             }
           }
           controllerManager = {
+            # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
             extraArgs = {
+              bind-address             = "::"
               cloud-provider           = "external"
               node-cidr-mask-size-ipv6 = 120
               node-cidr-mask-size-ipv4 = 24
+            }
+          }
+          etcd = {
+            # https://etcd.io/docs/v3.5/op-guide/configuration/
+            extraArgs = {
+              listen-metrics-urls = "http://[::]:2381"
+            }
+          }
+          scheduler = {
+            # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
+            extraArgs = {
+              bind-address = "::"
             }
           }
           externalCloudProvider = {
             enabled = true
             manifests = (var.features.ip6
               # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.1.0/manifests/talos-cloud-controller-manager.yaml"]
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/talos-cloud-controller-manager.yaml"]
               # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
               : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.8.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
             )

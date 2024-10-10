@@ -38,7 +38,7 @@ module "dev26_talos_cluster" {
       yamlencode({
         cluster = {
           extraManifests = [
-            "https://raw.githubusercontent.com/miran248/terraform-talos-modules/refs/tags/v1.1.0/manifests/hcloud-csi.yaml",
+            "https://raw.githubusercontent.com/miran248/terraform-talos-modules/refs/tags/v1.3.0/manifests/hcloud-csi.yaml",
           ]
           inlineManifests = [
             {

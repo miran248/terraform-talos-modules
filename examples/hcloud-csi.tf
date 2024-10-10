@@ -2,7 +2,7 @@ locals {
   single6_patches_hcloud_csi = yamlencode({
     cluster = {
       extraManifests = [
-        "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.0.0/manifests/hcloud-csi.yaml",
+        "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/hcloud-csi.yaml",
       ]
       inlineManifests = [
         {
@@ -24,7 +24,7 @@ locals {
 }
 
 module "single6_talos_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v1.0.0"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v1.3.0"
 
   # ...
 

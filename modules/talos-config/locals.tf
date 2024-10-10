@@ -39,10 +39,23 @@ locals {
           yamlencode({
             machine = {
               kubelet = {
+                # extraArgs = {
+                #   # prefers ipv6 when possible
+                #   node-ip = join(",", compact([
+                #     node.public_ip6,
+                #     node.public_ip4,
+                #     node.private_ip4,
+                #   ]))
+                # }
                 nodeIP = {
-                  validSubnets = [
+                  # all ips are marked as InternalIP by talos-ccm
+                  # public ips must be included, otherwise it always uses ipv4 cidrs!
+                  # TODO: public ips should be ExternalIP!
+                  validSubnets = compact([
+                    node.public_ip6_network_64,
+                    node.public_ip4_32,
                     node.private_ip4_network_24,
-                  ]
+                  ])
                 }
               }
             }
