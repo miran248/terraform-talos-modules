@@ -22,11 +22,17 @@ resource "hcloud_server" "this" {
     ipv4         = var.cluster.features.ip4 ? var.network.ids.ips4[each.key] : null
   }
 
-  network {
-    network_id = var.network.ids.network
-    ip         = var.config.nodes[each.key].private_ip4
-    alias_ips  = []
-  }
+  # network {
+  #   network_id = var.network.ids.network
+  #   ip         = var.config.nodes[each.key].private_ip4
+  #   alias_ips  = []
+  # }
+
+  # network {
+  #   network_id = hcloud_network.this.id
+  #   # ip         = var.config.nodes[each.key].private_ip4
+  #   alias_ips  = []
+  # }
 
   lifecycle {
     ignore_changes = [

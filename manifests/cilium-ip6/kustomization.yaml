@@ -2,10 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+  # - bgp-config.yaml
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: 1.16.1
+    version: 1.16.2
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -13,8 +14,57 @@ helmCharts:
       - gateway.networking.k8s.io/v1/GatewayClass
       # - monitoring.coreos.com/v1
     valuesInline:
-      # TODO: switch to host routing once netkit arrives
-      routingMode: tunnel
+      debug:
+        enabled: true
+
+      routingMode: native
+      autoDirectNodeRoutes: false
+      directRoutingSkipUnreachable: false
+      enableIPv6BIGTCP: true
+      enableIPv4BIGTCP: false
+      # devices: kubespan
+
+      annotateK8sNode: false
+
+      cni:
+        uninstall: true
+
+      socketLB:
+        enabled: false
+      localRedirectPolicy: false
+
+      endpointRoutes:
+        enabled: false
+
+      bgp:
+        enabled: false
+        announce:
+          loadbalancerIP: true
+          podCIDR: true
+      bgpControlPlane:
+        enabled: false
+
+      bpf:
+        datapathMode: veth
+        masquerade: false
+        tproxy: false
+        hostLegacyRouting: false
+
+      bandwidthManager:
+        enabled: true
+        bbr: true
+
+      l2NeighDiscovery:
+        enabled: false
+
+      l2announcements:
+        enabled: false
+
+      l2podAnnouncements:
+        enabled: false
+
+      nat46x64Gateway:
+        enabled: false
 
       externalIPs:
         enabled: true
@@ -24,28 +74,36 @@ helmCharts:
 
       ipam:
         mode: kubernetes
+        # mode: cluster-pool
+
+      # operator:
+      #   extraArgs:
+      #     - ipam: kubernetes
 
       kubeProxyReplacement: true
 
       ipv6:
         enabled: true
       ipv4:
-        enabled: true
+        enabled: false
 
       k8s:
         requireIPv6PodCIDR: true
-        requireIPv4PodCIDR: true
+        requireIPv4PodCIDR: false
 
-      ipv6NativeRoutingCIDR: "fc00::10:0/108"
-      ipv4NativeRoutingCIDR: "10.16.0.0/12"
+      # ipv6NativeRoutingCIDR: "fc00::10:0/108"
+      # ipv4NativeRoutingCIDR: "10.16.0.0/12"
 
-      enableIPv6Masquerade: true
-      enableIPv4Masquerade: true
+      enableIPv6Masquerade: false
+      enableIPv4Masquerade: false
 
       gatewayAPI:
         enabled: true
 
       rollOutCiliumPods: true
+
+      # extraConfig:
+      #   operator-api-serve-addr: "[::1]:9234"
 
       operator:
         replicas: 1
@@ -81,10 +139,10 @@ helmCharts:
         ui:
           enabled: false
           rollOutPods: true
-          service:
-            annotations:
-              omni-kube-service-exposer.sidero.dev/port: "50080"
-              omni-kube-service-exposer.sidero.dev/label: Hubble
+          # service:
+          #   annotations:
+          #     omni-kube-service-exposer.sidero.dev/port: "50080"
+          #     omni-kube-service-exposer.sidero.dev/label: Hubble
       envoy:
         rollOutPods: true
         prometheus:

@@ -25,32 +25,24 @@ locals {
         network = {
           dnsDomain = "cluster.local"
           cni = {
-            name = "custom"
-            urls = (var.features.ip6
-              # sets ipv6.enabled: true
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip6.yaml"]
-              # sets ipv6.enabled: false
-              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
-            )
+            name = "none"
+            # name = "custom"
+            # urls = (var.features.ip6
+            #   # sets ipv6.enabled: true
+            #   ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip6.yaml"]
+            #   # sets ipv6.enabled: false
+            #   : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
+            # )
           }
-          # order matters!
-          podSubnets = (var.features.ip6
-            ? [
-              local.cidrs6.pods,
-              local.cidrs4.pods,
-            ]
-            : [
-              local.cidrs4.pods,
-              local.cidrs6.pods,
+          podSubnets = flatten([
+            var.features.ip6 ? [local.cidrs6.pods] : [],
+            # var.features.ip4 ? [local.cidrs4.pods] : [],
+            # local.cidrs4.pods,
           ])
-          serviceSubnets = (var.features.ip6
-            ? [
-              local.cidrs6.services,
-              local.cidrs4.services,
-            ]
-            : [
-              local.cidrs4.services,
-              local.cidrs6.services,
+          serviceSubnets = flatten([
+            var.features.ip6 ? [local.cidrs6.services] : [],
+            # var.features.ip4 ? [local.cidrs4.services] : [],
+            # local.cidrs4.services,
           ])
         }
       }
@@ -71,16 +63,11 @@ locals {
           }
         }
         kubelet = {
-          # order matters!
-          clusterDNS = (var.features.ip6
-            ? [
-              cidrhost(local.cidrs6.services, 10),
-              cidrhost(local.cidrs4.services, 10),
-            ]
-            : [
-              cidrhost(local.cidrs4.services, 10),
-              cidrhost(local.cidrs6.services, 10),
-          ])
+          clusterDNS = distinct(flatten([
+            var.features.ip6 ? [cidrhost(local.cidrs6.services, 10)] : [],
+            # var.features.ip4 ? [cidrhost(local.cidrs4.services, 10)] : [],
+            # cidrhost(local.cidrs4.services, 10),
+          ]))
           # https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
           extraArgs = {
             cloud-provider             = "external"
@@ -93,13 +80,28 @@ locals {
         }
         network = {
           kubespan = {
-            enabled                     = true
-            advertiseKubernetesNetworks = false
+            enabled = false
+            # advertiseKubernetesNetworks = false
+            # advertiseKubernetesNetworks = true
+            # allowDownPeerBypass         = true
+            # harvestExtraEndpoints       = true
+            # filters = {
+            #   endpoints = [
+            #     "!192.168.0.0/16",
+            #     "!100.64.0.0/10",
+            #     "::/0",
+            #     "0.0.0.0/0",
+            #     "fc00::10:0/108",
+            #   ]
+            # }
           }
         }
         sysctls = {
           "net.core.somaxconn"          = 65535
           "net.core.netdev_max_backlog" = 4096
+
+          "net.ipv6.conf.all.forwarding" = 1
+          "net.ipv4.ip_forward"          = 1
         }
       }
     }),
@@ -131,12 +133,16 @@ locals {
           }
           controllerManager = {
             # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
-            extraArgs = {
-              bind-address             = "::"
-              cloud-provider           = "external"
-              node-cidr-mask-size-ipv6 = 120
-              node-cidr-mask-size-ipv4 = 24
-            }
+            extraArgs = merge(
+              {
+                bind-address   = "::"
+                cloud-provider = "external"
+                # node-cidr-mask-size-ipv4 = 24
+                allocate-node-cidrs = false
+              },
+              var.features.ip6 ? { node-cidr-mask-size-ipv6 = 120 } : {},
+              # var.features.ip4 ? { node-cidr-mask-size-ipv4 = 24 } : {},
+            )
           }
           etcd = {
             # https://etcd.io/docs/v3.5/op-guide/configuration/

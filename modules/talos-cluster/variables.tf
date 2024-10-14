@@ -20,6 +20,11 @@ variable "features" {
   })
   description = "enables public ipv4 / ipv6 on servers"
   default     = {}
+
+  validation {
+    condition     = var.features.ip6 || var.features.ip4
+    error_message = "ip6 and / or ip4 must be true"
+  }
 }
 
 variable "patches" {

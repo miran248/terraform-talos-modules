@@ -9,7 +9,7 @@ variable "config" {
     machine_secrets = object({
       client_configuration = object({ ca_certificate = string, client_certificate = string, client_key = string })
     })
-    private_ips4 = object({
+    names = object({
       control_planes = list(string)
       workers        = list(string)
     })

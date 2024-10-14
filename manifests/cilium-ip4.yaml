@@ -18814,10 +18814,10 @@ data:
   enable-health-checking: "true"
   enable-ipv4: "true"
   enable-ipv4-big-tcp: "false"
-  enable-ipv4-masquerade: "true"
+  enable-ipv4-masquerade: "false"
   enable-ipv6: "false"
   enable-ipv6-big-tcp: "false"
-  enable-ipv6-masquerade: "true"
+  enable-ipv6-masquerade: "false"
   enable-k8s-networkpolicy: "true"
   enable-k8s-terminating-endpoint: "true"
   enable-l2-neigh-discovery: "true"
@@ -18849,12 +18849,10 @@ data:
   install-no-conntrack-iptables-rules: "false"
   ipam: kubernetes
   ipam-cilium-node-update-rate: 15s
-  ipv4-native-routing-cidr: 10.16.0.0/12
-  ipv6-native-routing-cidr: fc00::10:0/108
   k8s-client-burst: "20"
   k8s-client-qps: "10"
   k8s-require-ipv4-pod-cidr: "true"
-  k8s-require-ipv6-pod-cidr: "true"
+  k8s-require-ipv6-pod-cidr: "false"
   kube-proxy-replacement: "true"
   kube-proxy-replacement-healthz-bind-address: ""
   max-connected-clusters: "255"
@@ -19228,6 +19226,30 @@ metadata:
   name: cilium-envoy-config
   namespace: kube-system
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9964"
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/name: cilium-envoy
+    app.kubernetes.io/part-of: cilium
+    io.cilium/app: proxy
+    k8s-app: cilium-envoy
+  name: cilium-envoy
+  namespace: kube-system
+spec:
+  clusterIP: None
+  ports:
+  - name: envoy-metrics
+    port: 9964
+    protocol: TCP
+    targetPort: envoy-metrics
+  selector:
+    k8s-app: cilium-envoy
+  type: ClusterIP
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19252,7 +19274,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: 5316c5859f880a5d0798a7f18a6d3ba97dca6ef0cf227cf506e012f348581bec
+        cilium.io/cilium-configmap-checksum: 3cd986b3ff3b5591b264bc58cc8a8d8959e96a37c699fae331ea4beb9be18520
         prometheus.io/port: "9963"
         prometheus.io/scrape: "true"
       labels:
@@ -19296,7 +19318,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/operator-generic:v1.16.1@sha256:3bc7e7a43bc4a4d8989cb7936c5d96675dd2d02c306adf925ce0a7c35aa27dc4
+        image: quay.io/cilium/operator-generic:v1.16.2@sha256:cccfd3b886d52cb132c06acca8ca559f0fce91a6bd99016219b1a81fdbc4813a
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -19357,7 +19379,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: 5316c5859f880a5d0798a7f18a6d3ba97dca6ef0cf227cf506e012f348581bec
+        cilium.io/cilium-configmap-checksum: 3cd986b3ff3b5591b264bc58cc8a8d8959e96a37c699fae331ea4beb9be18520
         prometheus.io/port: "9962"
         prometheus.io/scrape: "true"
       labels:
@@ -19400,7 +19422,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:
@@ -19531,7 +19553,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: config
         terminationMessagePolicy: FallbackToLogsOnError
@@ -19548,7 +19570,7 @@ spec:
         env:
         - name: BIN_PATH
           value: /opt/cni/bin
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: apply-sysctl-overwrites
         securityContext:
@@ -19584,7 +19606,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: clean-cilium-state
         securityContext:
@@ -19600,7 +19622,7 @@ spec:
           name: cilium-run
       - command:
         - /install-plugin.sh
-        image: quay.io/cilium/cilium:v1.16.1@sha256:0b4a3ab41a4760d86b7fc945b8783747ba27f29dac30dd434d94f2c9e3679f39
+        image: quay.io/cilium/cilium:v1.16.2@sha256:4386a8580d8d86934908eea022b0523f812e6a542f30a86a47edd8bed90d51ea
         imagePullPolicy: IfNotPresent
         name: install-cni-binaries
         resources:
@@ -19715,8 +19737,6 @@ spec:
     metadata:
       annotations:
         cilium.io/cilium-envoy-configmap-checksum: 928f0bb658a2c9023814df35814807a61e1a04574fe311e3771eb3142f09b49d
-        prometheus.io/port: "9964"
-        prometheus.io/scrape: "true"
       labels:
         app.kubernetes.io/name: cilium-envoy
         app.kubernetes.io/part-of: cilium
@@ -19769,7 +19789,7 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
-        image: quay.io/cilium/cilium-envoy:v1.29.7-39a2a56bbd5b3a591f69dbca51d3e30ef97e0e51@sha256:bd5ff8c66716080028f414ec1cb4f7dc66f40d2fb5a009fff187f4a9b90b566b
+        image: quay.io/cilium/cilium-envoy:v1.29.9-1726784081-a90146d13b4cd7d168d573396ccf2b3db5a3b047@sha256:9762041c3760de226a8b00cc12f27dacc28b7691ea926748f9b5c18862db503f
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10

@@ -1,33 +1,33 @@
-data "hcloud_image" "dev26_v1_8_1_amd64" {
+data "hcloud_image" "dev36_v1_8_1_amd64" {
   with_selector = "name=talos,version=v1.8.1,arch=amd64"
 }
 
-data "hcloud_datacenter" "dev26_nuremberg" {
+data "hcloud_datacenter" "dev36_nuremberg" {
   name = "nbg1-dc3"
 }
-data "hcloud_location" "dev26_nuremberg" {
+data "hcloud_location" "dev36_nuremberg" {
   name = "nbg1"
 }
-# data "hcloud_datacenter" "dev26_helsinki" {
+# data "hcloud_datacenter" "dev36_helsinki" {
 #   name = "hel1-dc2"
 # }
-# data "hcloud_location" "dev26_helsinki" {
+# data "hcloud_location" "dev36_helsinki" {
 #   name = "hel1"
 # }
 
 locals {
-  dev26_patches_zitadel = <<-EOF
+  dev36_patches_zitadel = <<-EOF
     machine:
       nodeLabels:
         app: zitadel
   EOF
 }
 
-module "dev26_talos_cluster" {
+module "dev36_talos_cluster" {
   source = "../modules/talos-cluster"
 
-  name     = "dev26"
-  endpoint = "dev26.dev.248.sh"
+  name     = "dev36"
+  endpoint = "dev36.dev.248.sh"
 
   features = {
     ip6 = true
@@ -75,10 +75,10 @@ module "dev26_talos_cluster" {
   }
 }
 
-module "dev26_nuremberg_pool_1" {
+module "dev36_nuremberg_pool_1" {
   source = "../modules/node-pool"
 
-  cluster = module.dev26_talos_cluster
+  cluster = module.dev36_talos_cluster
 
   zone = 1
 
@@ -89,16 +89,16 @@ module "dev26_nuremberg_pool_1" {
       { server_type = "cx22" },
     ]
     workers = [
-      { server_type = "cx22", patches = [local.dev26_patches_zitadel] },
-      { server_type = "cx22", patches = [local.dev26_patches_zitadel] },
-      # { server_type = "cx22", patches = [local.dev26_patches_zitadel] },
+      { server_type = "cx22", patches = [local.dev36_patches_zitadel] },
+      { server_type = "cx22", patches = [local.dev36_patches_zitadel] },
+      # { server_type = "cx22", patches = [local.dev36_patches_zitadel] },
     ]
   }
 }
-# module "dev26_helsinki_pool_1" {
+# module "dev36_helsinki_pool_1" {
 #   source = "../modules/node-pool"
 
-#   cluster = module.dev26_talos_cluster
+#   cluster = module.dev36_talos_cluster
 
 #   zone = 2
 
@@ -112,100 +112,100 @@ module "dev26_nuremberg_pool_1" {
 #   }
 # }
 
-module "dev26_nuremberg_network_1" {
+module "dev36_nuremberg_network_1" {
   source = "../modules/hcloud-network"
 
-  datacenter = data.hcloud_datacenter.dev26_nuremberg
-  location   = data.hcloud_location.dev26_nuremberg
+  datacenter = data.hcloud_datacenter.dev36_nuremberg
+  location   = data.hcloud_location.dev36_nuremberg
 
-  cluster = module.dev26_talos_cluster
-  pool    = module.dev26_nuremberg_pool_1
+  cluster = module.dev36_talos_cluster
+  pool    = module.dev36_nuremberg_pool_1
 }
-# module "dev26_helsinki_network_1" {
+# module "dev36_helsinki_network_1" {
 #   source = "../modules/hcloud-network"
 
-#   datacenter = data.hcloud_datacenter.dev26_helsinki
-#   location   = data.hcloud_location.dev26_helsinki
+#   datacenter = data.hcloud_datacenter.dev36_helsinki
+#   location   = data.hcloud_location.dev36_helsinki
 
-#   cluster = module.dev26_talos_cluster
-#   pool    = module.dev26_helsinki_pool_1
+#   cluster = module.dev36_talos_cluster
+#   pool    = module.dev36_helsinki_pool_1
 # }
 
-module "dev26_talos_config" {
+module "dev36_talos_config" {
   source = "../modules/talos-config"
 
-  cluster = module.dev26_talos_cluster
+  cluster = module.dev36_talos_cluster
   networks = [
-    module.dev26_nuremberg_network_1,
-    # module.dev26_helsinki_network_1,
+    module.dev36_nuremberg_network_1,
+    # module.dev36_helsinki_network_1,
   ]
 
   talos_version      = "v1.8.1"
   kubernetes_version = "v1.31.1"
 }
 
-module "dev26_nuremberg_1" {
+module "dev36_nuremberg_1" {
   source = "../modules/hcloud-servers"
 
-  datacenter = data.hcloud_datacenter.dev26_nuremberg
-  location   = data.hcloud_location.dev26_nuremberg
-  image_id   = data.hcloud_image.dev26_v1_8_1_amd64.id
+  datacenter = data.hcloud_datacenter.dev36_nuremberg
+  location   = data.hcloud_location.dev36_nuremberg
+  image_id   = data.hcloud_image.dev36_v1_8_1_amd64.id
 
-  cluster = module.dev26_talos_cluster
-  pool    = module.dev26_nuremberg_pool_1
-  network = module.dev26_nuremberg_network_1
-  config  = module.dev26_talos_config
+  cluster = module.dev36_talos_cluster
+  pool    = module.dev36_nuremberg_pool_1
+  network = module.dev36_nuremberg_network_1
+  config  = module.dev36_talos_config
 
   depends_on = [
-    module.dev26_nuremberg_network_1,
-    module.dev26_talos_config,
+    module.dev36_nuremberg_network_1,
+    module.dev36_talos_config,
   ]
 }
-# module "dev26_helsinki_1" {
+# module "dev36_helsinki_1" {
 #   source = "../modules/hcloud-servers"
 
-#   datacenter = data.hcloud_datacenter.dev26_helsinki
-#   location   = data.hcloud_location.dev26_helsinki
-#   image_id   = data.hcloud_image.dev26_v1_8_1_amd64.id
+#   datacenter = data.hcloud_datacenter.dev36_helsinki
+#   location   = data.hcloud_location.dev36_helsinki
+#   image_id   = data.hcloud_image.dev36_v1_8_1_amd64.id
 
-#   cluster = module.dev26_talos_cluster
-#   pool    = module.dev26_helsinki_pool_1
-#   network = module.dev26_helsinki_network_1
-#   config  = module.dev26_talos_config
+#   cluster = module.dev36_talos_cluster
+#   pool    = module.dev36_helsinki_pool_1
+#   network = module.dev36_helsinki_network_1
+#   config  = module.dev36_talos_config
 
 #   depends_on = [
-#     module.dev26_helsinki_network_1,
-#     module.dev26_talos_config,
+#     module.dev36_helsinki_network_1,
+#     module.dev36_talos_config,
 #   ]
 # }
 
-resource "google_dns_record_set" "dev26_talos_ipv6" {
-  name         = "${module.dev26_talos_cluster.name}.${data.google_dns_managed_zone.this.dns_name}"
+resource "google_dns_record_set" "dev36_talos_ipv6" {
+  name         = "${module.dev36_talos_cluster.name}.${data.google_dns_managed_zone.this.dns_name}"
   managed_zone = data.google_dns_managed_zone.this.name
   type         = "AAAA"
   ttl          = 300
 
-  rrdatas = module.dev26_talos_config.public_ips6.control_planes
+  rrdatas = module.dev36_talos_config.public_ips6.control_planes
 
   depends_on = [
-    module.dev26_nuremberg_network_1,
+    module.dev36_nuremberg_network_1,
   ]
 }
 
-module "dev26_talos_apply" {
+module "dev36_talos_apply" {
   source = "../modules/talos-apply"
 
-  cluster = module.dev26_talos_cluster
-  config  = module.dev26_talos_config
+  cluster = module.dev36_talos_cluster
+  config  = module.dev36_talos_config
 
   depends_on = [
-    module.dev26_nuremberg_1,
-    # module.dev26_helsinki_1,
+    module.dev36_nuremberg_1,
+    # module.dev36_helsinki_1,
   ]
 }
 
 # outputs
-output "dev26_talos_config" {
-  value     = module.dev26_talos_config.talos_config
+output "dev36_talos_config" {
+  value     = module.dev36_talos_config.talos_config
   sensitive = true
 }

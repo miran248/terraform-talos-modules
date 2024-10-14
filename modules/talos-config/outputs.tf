@@ -6,6 +6,9 @@ output "talos_config" {
   sensitive = true
 }
 
+output "names" {
+  value = local.names
+}
 output "private_ips4" {
   value = local.private_ips4
 }
