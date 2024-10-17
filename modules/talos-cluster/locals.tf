@@ -77,6 +77,8 @@ locals {
             address            = "::"
             healthzBindAddress = "::"
           }
+        }
+        network = {
           kubespan = {
             enabled = false
           }
