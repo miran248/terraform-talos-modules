@@ -196,11 +196,14 @@ spec:
         - --v=2
         - --cloud-provider=talos
         - --cloud-config=/etc/talos/ccm-config.yaml
-        - --controllers=cloud-node,node-csr-approval
+        - --controllers=cloud-node,cloud-node-lifecycle,node-csr-approval,node-ipam-controller
         - --leader-elect-resource-name=cloud-controller-manager-talos
         - --use-service-account-credentials
         - --secure-port=50258
         - --authorization-always-allow-paths=/healthz,/livez,/readyz,/metrics
+        - --allocate-node-cidrs
+        - --cidr-allocator-type=CloudAllocator
+        - --node-cidr-mask-size-ipv6=80
         command:
         - /talos-cloud-controller-manager
         env:

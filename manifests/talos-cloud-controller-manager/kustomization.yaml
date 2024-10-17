@@ -12,5 +12,14 @@ helmCharts:
       # features:
       #   # required when using ipv6 stack, otherwise ccm picks hetzner's cgnat ip address..
       #   preferIPv6: true
+      enabledControllers:
+        - cloud-node
+        - cloud-node-lifecycle
+        - node-csr-approval
+        - node-ipam-controller
+      extraArgs:
+        - --allocate-node-cidrs
+        - --cidr-allocator-type=CloudAllocator
+        - --node-cidr-mask-size-ipv6=80
 patches:
   - path: patch-config-map.yaml

@@ -14,9 +14,6 @@ helmCharts:
       - gateway.networking.k8s.io/v1/GatewayClass
       # - monitoring.coreos.com/v1
     valuesInline:
-      # daemon:
-      #   configSources: "cilium-node-config:kube-system"
-
       debug:
         enabled: true
 
@@ -25,19 +22,16 @@ helmCharts:
       directRoutingSkipUnreachable: false
       enableIPv6BIGTCP: true
       enableIPv4BIGTCP: false
-      # devices: kubespan
-
-      annotateK8sNode: true
 
       cni:
         uninstall: true
 
       socketLB:
-        enabled: false
-      localRedirectPolicy: false
+        enabled: true
+      localRedirectPolicy: true
 
       endpointRoutes:
-        enabled: false
+        enabled: true
 
       bgp:
         enabled: false
@@ -52,6 +46,9 @@ helmCharts:
         masquerade: false
         tproxy: false
         hostLegacyRouting: false
+
+      ipMasqAgent:
+        enabled: false
 
       bandwidthManager:
         enabled: true
@@ -76,12 +73,7 @@ helmCharts:
       k8sServicePort: 7445
 
       ipam:
-        # mode: kubernetes
-        mode: cluster-pool
-
-      # operator:
-      #   extraArgs:
-      #     - ipam: kubernetes
+        mode: kubernetes
 
       kubeProxyReplacement: true
 
@@ -94,9 +86,6 @@ helmCharts:
         requireIPv6PodCIDR: true
         requireIPv4PodCIDR: false
 
-      # ipv6NativeRoutingCIDR: "fc00::10:0/108"
-      # ipv4NativeRoutingCIDR: "10.16.0.0/12"
-
       enableIPv6Masquerade: false
       enableIPv4Masquerade: false
 
@@ -104,9 +93,6 @@ helmCharts:
         enabled: true
 
       rollOutCiliumPods: true
-
-      # extraConfig:
-      #   operator-api-serve-addr: "[::1]:9234"
 
       operator:
         replicas: 1
@@ -118,7 +104,7 @@ helmCharts:
             interval: 60s
 
       hubble:
-        enabled: false
+        enabled: true
         enableOpenMetrics: true
         metrics:
           enabled:
@@ -133,19 +119,19 @@ helmCharts:
             enabled: false
             interval: 60s
         relay:
-          enabled: false
+          enabled: true
           rollOutPods: true
           prometheus:
             serviceMonitor:
               enabled: false
               interval: 60s
         ui:
-          enabled: false
+          enabled: true
           rollOutPods: true
-          # service:
-          #   annotations:
-          #     omni-kube-service-exposer.sidero.dev/port: "50080"
-          #     omni-kube-service-exposer.sidero.dev/label: Hubble
+          service:
+            annotations:
+              omni-kube-service-exposer.sidero.dev/port: "50080"
+              omni-kube-service-exposer.sidero.dev/label: Hubble
       envoy:
         rollOutPods: true
         prometheus:

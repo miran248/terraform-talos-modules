@@ -25,13 +25,14 @@ locals {
         network = {
           dnsDomain = "cluster.local"
           cni = {
-            name = "custom"
-            urls = (var.features.ip6
-              # sets ipv6.enabled: true
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/cilium-ip6.yaml"]
-              # sets ipv6.enabled: false
-              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
-            )
+            name = "none"
+            # name = "custom"
+            # urls = (var.features.ip6
+            #   # sets ipv6.enabled: true
+            #   ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/cilium-ip6.yaml"]
+            #   # sets ipv6.enabled: false
+            #   : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
+            # )
           }
           podSubnets = flatten([
             var.features.ip6 ? [local.cidrs6.pods] : [],
@@ -76,23 +77,8 @@ locals {
             address            = "::"
             healthzBindAddress = "::"
           }
-        }
-        network = {
           kubespan = {
             enabled = false
-            # advertiseKubernetesNetworks = false
-            # advertiseKubernetesNetworks = true
-            # allowDownPeerBypass         = true
-            # harvestExtraEndpoints       = true
-            # filters = {
-            #   endpoints = [
-            #     "!192.168.0.0/16",
-            #     "!100.64.0.0/10",
-            #     "::/0",
-            #     "0.0.0.0/0",
-            #     "fc00::10:0/108",
-            #   ]
-            # }
           }
         }
         sysctls = {
@@ -136,10 +122,11 @@ locals {
               {
                 bind-address   = "::"
                 cloud-provider = "external"
+                controllers    = "*,tokencleaner,-node-ipam-controller"
                 # node-cidr-mask-size-ipv4 = 24
                 allocate-node-cidrs = false
               },
-              var.features.ip6 ? { node-cidr-mask-size-ipv6 = 120 } : {},
+              # var.features.ip6 ? { node-cidr-mask-size-ipv6 = 120 } : {},
               # var.features.ip4 ? { node-cidr-mask-size-ipv4 = 24 } : {},
             )
           }
@@ -157,12 +144,12 @@ locals {
           }
           externalCloudProvider = {
             enabled = true
-            manifests = (var.features.ip6
-              # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
-              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/talos-cloud-controller-manager.yaml"]
-              # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
-              : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.8.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
-            )
+            # manifests = (var.features.ip6
+            #   # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
+            #   ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/talos-cloud-controller-manager.yaml"]
+            #   # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
+            #   : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.8.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
+            # )
           }
         }
         machine = {
