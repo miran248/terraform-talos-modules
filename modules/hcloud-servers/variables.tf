@@ -35,12 +35,10 @@ variable "pool" {
 variable "network" {
   type = object({
     ids = object({
-      network           = number
-      machines          = string
-      firewall_deny_all = number
-      firewall          = number
-      ips6              = map(number)
-      ips4              = map(number)
+      network  = number
+      machines = string
+      ips6     = map(number)
+      ips4     = map(number)
     })
     nodes = map(any)
   })

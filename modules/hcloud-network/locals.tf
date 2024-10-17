@@ -1,11 +1,9 @@
 locals {
   ids = {
-    network           = hcloud_network.this.id
-    machines          = hcloud_network_subnet.machines.id
-    firewall_deny_all = hcloud_firewall.deny_all.id
-    firewall          = hcloud_firewall.this.id
-    ips6              = merge([for key, ip in hcloud_primary_ip.ips6 : { "${key}" = ip.id }]...)
-    ips4              = merge([for key, ip in hcloud_primary_ip.ips4 : { "${key}" = ip.id }]...)
+    network  = hcloud_network.this.id
+    machines = hcloud_network_subnet.machines.id
+    ips6     = merge([for key, ip in hcloud_primary_ip.ips6 : { "${key}" = ip.id }]...)
+    ips4     = merge([for key, ip in hcloud_primary_ip.ips4 : { "${key}" = ip.id }]...)
   }
 
   pool_nodes1 = merge([for key, node in var.pool.nodes : {

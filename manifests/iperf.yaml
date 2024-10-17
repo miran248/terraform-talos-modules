@@ -9,6 +9,20 @@ spec:
     - "30000"
     image: cagedata/iperf3
     name: iperf
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
 ---
 apiVersion: v1
 kind: Pod
@@ -23,3 +37,17 @@ spec:
     name: iperf
     ports:
     - containerPort: 5201
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault

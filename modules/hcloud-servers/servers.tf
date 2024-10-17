@@ -10,10 +10,10 @@ resource "hcloud_server" "this" {
   delete_protection        = false
   shutdown_before_deletion = true
 
-  # ignore_remote_firewall_ids = true
-  # firewall_ids = [
-  #   var.network.ids.firewall_deny_all,
-  # ]
+  ignore_remote_firewall_ids = true
+  firewall_ids = [
+    hcloud_firewall.deny_all.id,
+  ]
 
   public_net {
     ipv6_enabled = var.cluster.features.ip6
@@ -28,12 +28,6 @@ resource "hcloud_server" "this" {
   #   alias_ips  = []
   # }
 
-  # network {
-  #   network_id = hcloud_network.this.id
-  #   # ip         = var.config.nodes[each.key].private_ip4
-  #   alias_ips  = []
-  # }
-
   lifecycle {
     ignore_changes = [
       image,
@@ -42,7 +36,7 @@ resource "hcloud_server" "this" {
   }
 }
 
-# resource "hcloud_firewall_attachment" "this" {
-#   firewall_id = var.network.ids.firewall
-#   server_ids  = [for key, server in hcloud_server.this : server.id]
-# }
+resource "hcloud_firewall_attachment" "this" {
+  firewall_id = hcloud_firewall.this.id
+  server_ids  = [for key, server in hcloud_server.this : server.id]
+}

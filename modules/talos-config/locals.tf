@@ -22,6 +22,27 @@ locals {
     #   # }
     # }),
     yamlencode({
+      cluster = {
+        inlineManifests = [for key, node in local.network_nodes1 : {
+          name     = "talos-cilium-node-${key}"
+          contents = <<-EOF
+            apiVersion: cilium.io/v2
+            kind: CiliumNodeConfig
+            metadata:
+              name: "talos-cilium-node-${key}"
+              namespace: kube-system
+            spec:
+              nodeSelector:
+                matchLabels:
+                  "kubernetes.io/hostname": "${node.name}"
+              defaults:
+                ipv6-node: "${node.public_ip6}"
+                ipv6-native-routing-cidr: "${node.public_ip6_network_64}"
+                ipv6-service-range: "${cidrsubnet(node.public_ip6_network_64, 16, 1)}"
+                ipv6-range: "${cidrsubnet(node.public_ip6_network_64, 16, 2)}"
+          EOF
+        }]
+      }
       machine = {
         certSANs = local.cert_sans
       }
@@ -70,38 +91,33 @@ locals {
           #   #   }
           #   # }
           # }),
-          # yamlencode({
-          #   machine = {
-          #     network = {
-          #       interfaces = [
-          #         {
-          #           interface = "kubespan"
-          #           # addresses = [node.public_ip6_network_64]
-          #           mtu  = 1370
-          #           dhcp = true
-          #           dhcpOptions = {
-          #             ipv6 = true
-          #             ipv4 = true
-          #           }
-          #           routes = flatten([
-          #             {
-          #               # network = node.public_ip6_network_64
-          #               network = "fc00::10:0/108"
-          #               # gateway = "fe80::1"
-          #             },
-          #             # [for key, another_node in local.network_nodes1 : another_node.name == node.name ? [] : [
-          #             #   {
-          #             #     # network = another_node.public_ip6_network_64
-          #             #     network = "fc00::10:0/108"
-          #             #     gateway = cidrhost(another_node.public_ip6_network_64, 1)
-          #             #   },
-          #             # ]],
-          #           ])
-          #         },
-          #       ]
-          #     }
-          #   }
-          # }),
+          yamlencode({
+            machine = {
+              network = {
+                interfaces = [
+                  {
+                    interface = "eth0"
+                    mtu       = 1500
+                    dhcp      = true
+                    dhcpOptions = {
+                      ipv6 = true
+                      ipv4 = true
+                    }
+                    # routes = flatten([
+                    #   # {
+                    #   #   network = node.public_ip6_network_64,
+                    #   #   gateway = "fe80::1"
+                    #   # },
+                    #   {
+                    #     network = "fc00::/64"
+                    #     gateway = "fe80::1"
+                    #   },
+                    # ])
+                  },
+                ]
+              }
+            }
+          }),
           yamlencode({
             machine = {
               nodeAnnotations = {

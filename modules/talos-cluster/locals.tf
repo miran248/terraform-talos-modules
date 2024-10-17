@@ -58,7 +58,7 @@ locals {
           }
           hostDNS = {
             enabled              = true
-            forwardKubeDNSToHost = true
+            forwardKubeDNSToHost = false # doesn't work on singlestack ipv6! 169.254.116.108 address is hardcoded!
             resolveMemberNames   = true
           }
         }

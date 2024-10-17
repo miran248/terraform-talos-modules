@@ -14,6 +14,9 @@ helmCharts:
       - gateway.networking.k8s.io/v1/GatewayClass
       # - monitoring.coreos.com/v1
     valuesInline:
+      # daemon:
+      #   configSources: "cilium-node-config:kube-system"
+
       debug:
         enabled: true
 
@@ -24,6 +27,7 @@ helmCharts:
       enableIPv4BIGTCP: false
       # devices: kubespan
 
+      # annotateK8sNode: true
       annotateK8sNode: false
 
       cni:
@@ -73,8 +77,8 @@ helmCharts:
       k8sServicePort: 7445
 
       ipam:
-        mode: kubernetes
-        # mode: cluster-pool
+        # mode: kubernetes
+        mode: cluster-pool
 
       # operator:
       #   extraArgs:

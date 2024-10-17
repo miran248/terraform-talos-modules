@@ -18788,6 +18788,8 @@ data:
   cilium-endpoint-gc-interval: 5m0s
   cluster-id: "0"
   cluster-name: default
+  cluster-pool-ipv6-cidr: fd00::/104
+  cluster-pool-ipv6-mask-size: "120"
   clustermesh-enable-endpoint-sync: "false"
   clustermesh-enable-mcs-api: "false"
   cni-exclusive: "true"
@@ -18853,7 +18855,7 @@ data:
   identity-gc-interval: 15m0s
   identity-heartbeat-timeout: 30m0s
   install-no-conntrack-iptables-rules: "false"
-  ipam: kubernetes
+  ipam: cluster-pool
   ipam-cilium-node-update-rate: 15s
   k8s-client-burst: "20"
   k8s-client-qps: "10"
@@ -19280,7 +19282,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: da933806155e77566ee7d27af37b8b6e183567780f88b9b71bd0c517ae8f082c
+        cilium.io/cilium-configmap-checksum: e3c63a477b3b3f168ecda748efcefabb276257a97230d1220d9c4d3e1ff37e09
         prometheus.io/port: "9963"
         prometheus.io/scrape: "true"
       labels:
@@ -19385,7 +19387,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: da933806155e77566ee7d27af37b8b6e183567780f88b9b71bd0c517ae8f082c
+        cilium.io/cilium-configmap-checksum: e3c63a477b3b3f168ecda748efcefabb276257a97230d1220d9c4d3e1ff37e09
         prometheus.io/port: "9962"
         prometheus.io/scrape: "true"
       labels:

@@ -15,6 +15,7 @@ resource "hcloud_firewall" "this" {
       "::/0",
       "0.0.0.0/0",
     ]
+    destination_ips = var.cluster.features.ip6 ? [for key, node in var.config.nodes : node.public_ip6] : null
   }
   rule {
     description = "talos control planes"
@@ -25,6 +26,7 @@ resource "hcloud_firewall" "this" {
       "::/0",
       "0.0.0.0/0",
     ]
+    destination_ips = var.cluster.features.ip6 ? [for key, node in var.config.nodes : node.public_ip6] : null
   }
   rule {
     description = "talos workers"
@@ -35,15 +37,6 @@ resource "hcloud_firewall" "this" {
       "::/0",
       "0.0.0.0/0",
     ]
-  }
-
-  rule {
-    description = "allows pings"
-    direction   = "in"
-    protocol    = "icmp"
-    source_ips = [
-      "::/0",
-      "0.0.0.0/0",
-    ]
+    destination_ips = var.cluster.features.ip6 ? [for key, node in var.config.nodes : node.public_ip6] : null
   }
 }
