@@ -93,33 +93,6 @@ locals {
           # }),
           yamlencode({
             machine = {
-              network = {
-                interfaces = [
-                  {
-                    interface = "eth0"
-                    mtu       = 1500
-                    dhcp      = true
-                    dhcpOptions = {
-                      ipv6 = true
-                      ipv4 = true
-                    }
-                    # routes = flatten([
-                    #   # {
-                    #   #   network = node.public_ip6_network_64,
-                    #   #   gateway = "fe80::1"
-                    #   # },
-                    #   {
-                    #     network = "fc00::/64"
-                    #     gateway = "fe80::1"
-                    #   },
-                    # ])
-                  },
-                ]
-              }
-            }
-          }),
-          yamlencode({
-            machine = {
               nodeAnnotations = {
                 "network.cilium.io/ipv6-cilium-host" = node.public_ip6
                 "network.cilium.io/ipv6-health-ip"   = cidrhost(node.public_ip6_network_64, 2)

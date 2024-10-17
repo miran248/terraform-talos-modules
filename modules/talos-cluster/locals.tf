@@ -25,14 +25,13 @@ locals {
         network = {
           dnsDomain = "cluster.local"
           cni = {
-            name = "none"
-            # name = "custom"
-            # urls = (var.features.ip6
-            #   # sets ipv6.enabled: true
-            #   ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip6.yaml"]
-            #   # sets ipv6.enabled: false
-            #   : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
-            # )
+            name = "custom"
+            urls = (var.features.ip6
+              # sets ipv6.enabled: true
+              ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/cilium-ip6.yaml"]
+              # sets ipv6.enabled: false
+              : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
+            )
           }
           podSubnets = flatten([
             var.features.ip6 ? [local.cidrs6.pods] : [],
