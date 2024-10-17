@@ -18379,6 +18379,12 @@ rules:
   - list
   - watch
 - apiGroups:
+  - ""
+  resources:
+  - nodes/status
+  verbs:
+  - patch
+- apiGroups:
   - apiextensions.k8s.io
   resources:
   - customresourcedefinitions
@@ -18771,6 +18777,7 @@ subjects:
 apiVersion: v1
 data:
   agent-not-ready-taint-key: node.cilium.io/agent-not-ready
+  annotate-k8s-node: "true"
   arping-refresh-period: 30s
   auto-direct-node-routes: "false"
   bpf-events-drop-enabled: "true"
@@ -19282,7 +19289,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: e3c63a477b3b3f168ecda748efcefabb276257a97230d1220d9c4d3e1ff37e09
+        cilium.io/cilium-configmap-checksum: 185f19a036290ed824bb5f0bad9604d34e36236fe7533361cd79a2e484b3c921
         prometheus.io/port: "9963"
         prometheus.io/scrape: "true"
       labels:
@@ -19387,7 +19394,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: e3c63a477b3b3f168ecda748efcefabb276257a97230d1220d9c4d3e1ff37e09
+        cilium.io/cilium-configmap-checksum: 185f19a036290ed824bb5f0bad9604d34e36236fe7533361cd79a2e484b3c921
         prometheus.io/port: "9962"
         prometheus.io/scrape: "true"
       labels:

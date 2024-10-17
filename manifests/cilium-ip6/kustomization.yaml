@@ -27,8 +27,7 @@ helmCharts:
       enableIPv4BIGTCP: false
       # devices: kubespan
 
-      # annotateK8sNode: true
-      annotateK8sNode: false
+      annotateK8sNode: true
 
       cni:
         uninstall: true
