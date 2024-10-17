@@ -41,21 +41,21 @@ locals {
           local.patches_common,
           node.talos.machine_type == "controlplane" ? local.patches_control_planes : [],
           node.talos.machine_type == "worker" ? local.patches_workers : [],
-          yamlencode({
-            machine = {
-              kubelet = {
-                nodeIP = {
-                  # all ips are marked as InternalIP by talos-ccm
-                  # public ips must be included, otherwise it always uses ipv4 cidrs!
-                  # TODO: public ips should be ExternalIP!
-                  validSubnets = compact([
-                    node.public_ip6_network_64,
-                    node.public_ip4_32,
-                  ])
-                }
-              }
-            }
-          }),
+          # yamlencode({
+          #   machine = {
+          #     kubelet = {
+          #       nodeIP = {
+          #         # all ips are marked as InternalIP by talos-ccm
+          #         # public ips must be included, otherwise it always uses ipv4 cidrs!
+          #         # TODO: public ips should be ExternalIP!
+          #         validSubnets = compact([
+          #           node.public_ip6_network_64,
+          #           node.public_ip4_32,
+          #         ])
+          #       }
+          #     }
+          #   }
+          # }),
         ])
       },
     )

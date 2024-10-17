@@ -133,6 +133,7 @@ helmCharts:
               omni-kube-service-exposer.sidero.dev/port: "50080"
               omni-kube-service-exposer.sidero.dev/label: Hubble
       envoy:
+        enabled: true
         rollOutPods: true
         prometheus:
           serviceMonitor:
