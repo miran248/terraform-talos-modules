@@ -16,17 +16,10 @@ resource "hcloud_server" "this" {
   ]
 
   public_net {
-    ipv6_enabled = var.cluster.features.ip6
-    ipv6         = var.cluster.features.ip6 ? var.network.ids.ips6[each.key] : null
-    ipv4_enabled = var.cluster.features.ip4
-    ipv4         = var.cluster.features.ip4 ? var.network.ids.ips4[each.key] : null
+    ipv6_enabled = true
+    ipv6         = var.network.ids.ips6[each.key]
+    ipv4_enabled = false
   }
-
-  # network {
-  #   network_id = var.network.ids.network
-  #   ip         = var.config.nodes[each.key].private_ip4
-  #   alias_ips  = []
-  # }
 
   lifecycle {
     ignore_changes = [

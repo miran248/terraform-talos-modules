@@ -7,16 +7,8 @@ locals {
     services = "fc00::0:0/108"
   }
 
-  cidrs4 = {
-    # 12 is the largest supported 32b range
-    pods     = "10.16.0.0/12"
-    services = "10.0.0.0/12"
-  }
-
   cert_sans = [
     var.endpoint,
-    "::1",
-    "127.0.0.1",
   ]
 
   patches_common = flatten([
@@ -27,23 +19,12 @@ locals {
           cni = {
             name = "none"
             # name = "custom"
-            # urls = (var.features.ip6
-            #   # sets ipv6.enabled: true
-            #   ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/cilium-ip6.yaml"]
-            #   # sets ipv6.enabled: false
-            #   : ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/cilium-ip4.yaml"]
-            # )
+            # urls = [
+            #   "https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/cilium.yaml",
+            # ]
           }
-          podSubnets = flatten([
-            var.features.ip6 ? [local.cidrs6.pods] : [],
-            # var.features.ip4 ? [local.cidrs4.pods] : [],
-            # local.cidrs4.pods,
-          ])
-          serviceSubnets = flatten([
-            var.features.ip6 ? [local.cidrs6.services] : [],
-            # var.features.ip4 ? [local.cidrs4.services] : [],
-            # local.cidrs4.services,
-          ])
+          podSubnets     = [local.cidrs6.pods]
+          serviceSubnets = [local.cidrs6.services]
         }
       }
       machine = {
@@ -63,11 +44,7 @@ locals {
           }
         }
         kubelet = {
-          clusterDNS = distinct(flatten([
-            var.features.ip6 ? [cidrhost(local.cidrs6.services, 10)] : [],
-            # var.features.ip4 ? [cidrhost(local.cidrs4.services, 10)] : [],
-            # cidrhost(local.cidrs4.services, 10),
-          ]))
+          clusterDNS = [cidrhost(local.cidrs6.services, 10)]
           # https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
           extraArgs = {
             cloud-provider             = "external"
@@ -122,14 +99,11 @@ locals {
             # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
             extraArgs = merge(
               {
-                bind-address   = "::"
-                cloud-provider = "external"
-                controllers    = "*,tokencleaner,-node-ipam-controller"
-                # node-cidr-mask-size-ipv4 = 24
+                bind-address        = "::"
+                cloud-provider      = "external"
+                controllers         = "*,tokencleaner,-node-ipam-controller"
                 allocate-node-cidrs = false
               },
-              # var.features.ip6 ? { node-cidr-mask-size-ipv6 = 120 } : {},
-              # var.features.ip4 ? { node-cidr-mask-size-ipv4 = 24 } : {},
             )
           }
           etcd = {
@@ -146,12 +120,9 @@ locals {
           }
           externalCloudProvider = {
             enabled = true
-            # manifests = (var.features.ip6
-            #   # sets preferIPv6: true to prevent ccm from picking hetzner's cgnat ip address..
-            #   ? ["https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/talos-cloud-controller-manager.yaml"]
-            #   # sets preferIPv6: false to prevent ccm from picking machine's link-local ip address..
-            #   : ["https://raw.githubusercontent.com/siderolabs/talos-cloud-controller-manager/v1.8.0/docs/deploy/cloud-controller-manager-daemonset.yml"]
-            # )
+            # manifests = [
+            #   "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/talos-cloud-controller-manager.yaml",
+            # ]
           }
         }
         machine = {

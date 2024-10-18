@@ -9,14 +9,8 @@ output "talos_config" {
 output "names" {
   value = local.names
 }
-output "private_ips4" {
-  value = local.private_ips4
-}
 output "public_ips6" {
   value = local.public_ips6
-}
-output "public_ips4" {
-  value = local.public_ips4
 }
 output "nodes" {
   value = local.nodes

@@ -7,6 +7,6 @@ helmCharts:
     releaseName: hcloud-csi
     namespace: kube-system
     includeCRDs: true
-    valuesInline:
-      node:
-        hostNetwork: true
+    # valuesInline:
+    #   node:
+    #     hostNetwork: true

@@ -12,21 +12,6 @@ variable "endpoint" {
   }
 }
 
-# TODO: add cluster autoscaling
-variable "features" {
-  type = object({
-    ip6 = optional(bool, false)
-    ip4 = optional(bool, false)
-  })
-  description = "enables public ipv4 / ipv6 on servers"
-  default     = {}
-
-  validation {
-    condition     = var.features.ip6 || var.features.ip4
-    error_message = "ip6 and / or ip4 must be true"
-  }
-}
-
 variable "patches" {
   type = object({
     common         = optional(list(string), [])

@@ -17,15 +17,6 @@ variable "image_id" {
   description = "server image"
 }
 
-variable "cluster" {
-  type = object({
-    features = object({
-      ip6 = optional(bool, false)
-      ip4 = optional(bool, false)
-    })
-  })
-  description = "cluster config module outputs"
-}
 variable "pool" {
   type = object({
     prefix = string
@@ -35,10 +26,7 @@ variable "pool" {
 variable "network" {
   type = object({
     ids = object({
-      network  = number
-      machines = string
-      ips6     = map(number)
-      ips4     = map(number)
+      ips6 = map(number)
     })
     nodes = map(any)
   })
@@ -47,12 +35,11 @@ variable "network" {
 variable "config" {
   type = object({
     nodes = map(object({
-      name        = string
-      server_type = string
-      public_ip6  = optional(string, null)
-      public_ip4  = optional(string, null)
-      private_ip4 = string
-      data        = string
+      name                  = string
+      server_type           = string
+      public_ip6_network_64 = optional(string, null)
+      public_ip6            = optional(string, null)
+      data                  = string
     }))
   })
   description = "talos config module outputs"
