@@ -16,6 +16,9 @@ helmCharts:
       debug:
         enabled: true
 
+      extraConfig:
+        policy-audit-mode: true
+
       routingMode: native
 
       k8sServiceHost: "localhost"
@@ -46,6 +49,9 @@ helmCharts:
 
       localRedirectPolicy: true
 
+      hostFirewall:
+        enabled: true
+
       endpointRoutes:
         enabled: true
 
@@ -67,39 +73,6 @@ helmCharts:
         mutual:
           spire:
             enabled: true
-            # install:
-            #   agent:
-            #     podSecurityContext:
-            #       # runAsNonRoot: true
-            #       # runAsUser: 1000
-            #       seccompProfile:
-            #         type: RuntimeDefault
-            #     securityContext:
-            #       allowPrivilegeEscalation: true
-            #       # capabilities:
-            #       #   drop:
-            #       #     - ALL
-            #       privileged: true
-            #       # readOnlyRootFilesystem: false
-            #       # runAsNonRoot: true
-            #       seccompProfile:
-            #         type: RuntimeDefault
-            #   server:
-            #     podSecurityContext:
-            #       # runAsNonRoot: true
-            #       # runAsUser: 1000
-            #       seccompProfile:
-            #         type: RuntimeDefault
-            #     securityContext:
-            #       allowPrivilegeEscalation: true
-            #       # capabilities:
-            #       #   drop:
-            #       #     - ALL
-            #       privileged: true
-            #       # readOnlyRootFilesystem: false
-            #       # runAsNonRoot: true
-            #       seccompProfile:
-            #         type: RuntimeDefault
 
       gatewayAPI:
         enabled: true
