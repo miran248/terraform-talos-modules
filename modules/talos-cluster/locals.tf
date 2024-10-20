@@ -1,149 +1,119 @@
 locals {
-  cluster_endpoint = "https://${var.endpoint}:6443"
-
-  cidrs6 = {
-    # 108 is the largest supported 128b range
-    pods     = "fc00::10:0/108"
-    services = "fc00::0:0/108"
+  s1 = {
+    control_planes = merge([for i, pool in var.pools : pool.control_planes]...)
+    workers        = merge([for i, pool in var.pools : pool.workers]...)
   }
+  s2 = {
+    nodes = merge(local.s1.control_planes, local.s1.workers)
 
-  cert_sans = [
-    var.endpoint,
-  ]
-
-  patches_common = flatten([
-    yamlencode({
-      cluster = {
-        network = {
-          dnsDomain = "cluster.local"
-          cni = {
-            name = "none"
-            # name = "custom"
-            # urls = [
-            #   "https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/cilium.yaml",
-            # ]
-          }
-          podSubnets     = [local.cidrs6.pods]
-          serviceSubnets = [local.cidrs6.services]
-        }
-      }
-      machine = {
-        certSANs = local.cert_sans
-        features = {
-          rbac                 = true
-          stableHostname       = true
-          apidCheckExtKeyUsage = true
-          diskQuotaSupport     = true
-          kubePrism = {
-            enabled = true
-          }
-          hostDNS = {
-            enabled              = true
-            forwardKubeDNSToHost = false # doesn't work on singlestack ipv6! 169.254.116.108 address is hardcoded!
-            resolveMemberNames   = true
-          }
-        }
-        kubelet = {
-          clusterDNS = [cidrhost(local.cidrs6.services, 10)]
-          # https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
-          extraArgs = {
-            cloud-provider             = "external"
-            rotate-server-certificates = true
-          }
-          extraConfig = {
-            address            = "::"
-            healthzBindAddress = "::"
-          }
-        }
-        network = {
-          kubespan = {
-            enabled = false
-          }
-        }
-        sysctls = {
-          "net.core.somaxconn"          = 65535
-          "net.core.netdev_max_backlog" = 4096
-
-          "net.ipv6.conf.all.forwarding" = 1
-          "net.ipv4.ip_forward"          = 1
-        }
-      }
-    }),
-    var.patches.common,
-  ])
-
-  patches = {
-    control_planes = flatten([
-      local.patches_common,
+    aliases = {
+      control_planes = merge([for key, node in local.s1.control_planes : {
+        "${key}" = flatten([node.aliases, "c${index(keys(local.s1.control_planes), key) + 1}"])
+      }]...)
+      workers = merge([for key, node in local.s1.workers : {
+        "${key}" = flatten([node.aliases, "w${index(keys(local.s1.workers), key) + 1}"])
+      }]...)
+    }
+  }
+  s3 = {
+    aliases = merge(local.s2.aliases.control_planes, local.s2.aliases.workers)
+  }
+  s4 = {
+    cert_sans = flatten([for key, node in local.s2.nodes : [
+      var.endpoint,
+      node.public_ip6,
+      local.s3.aliases[key],
+    ]])
+  }
+  s5 = {
+    patches_common = flatten([
+      file("${path.module}/patches/common.yaml"),
       yamlencode({
-        cluster = {
-          proxy = {
-            disabled = true
-          }
-          discovery = {
-            enabled = true
-            registries = {
-              kubernetes = { disabled = true }
-              service    = {}
-            }
-          }
-          apiServer = {
-            certSANs = local.cert_sans
-            # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
-            extraArgs = {
-              advertise-address = "::"
-              bind-address      = "::"
-            }
-          }
-          controllerManager = {
-            # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
-            extraArgs = merge(
-              {
-                bind-address        = "::"
-                cloud-provider      = "external"
-                controllers         = "*,tokencleaner,-node-ipam-controller"
-                allocate-node-cidrs = false
-              },
-            )
-          }
-          etcd = {
-            # https://etcd.io/docs/v3.5/op-guide/configuration/
-            extraArgs = {
-              listen-metrics-urls = "http://[::]:2381"
-            }
-          }
-          scheduler = {
-            # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
-            extraArgs = {
-              bind-address = "::"
-            }
-          }
-          externalCloudProvider = {
-            enabled = true
-            # manifests = [
-            #   "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/talos-cloud-controller-manager.yaml",
-            # ]
-          }
-        }
         machine = {
-          features = {
-            kubernetesTalosAPIAccess = {
-              enabled = true
-              allowedRoles = [
-                "os:reader",
-              ]
-              allowedKubernetesNamespaces = [
-                "kube-system",
-              ]
-            }
-          }
+          certSANs = local.s4.cert_sans
         }
       }),
-      var.patches.control_planes,
-    ])
-    workers = flatten([
-      local.patches_common,
-      var.patches.workers,
+      var.patches.common,
     ])
   }
+  s6 = {
+    patches = {
+      control_planes = flatten([
+        local.s5.patches_common,
+        file("${path.module}/patches/control-planes.yaml"),
+        yamlencode({
+          cluster = {
+            apiServer = {
+              certSANs = local.s4.cert_sans
+            }
+            etcd = {
+              advertisedSubnets = [for key, node in local.s2.nodes : node.public_ip6_64]
+            }
+          }
+        }),
+        var.patches.control_planes,
+      ])
+      workers = flatten([
+        local.s5.patches_common,
+        var.patches.workers,
+      ])
+    }
+  }
+  s7 = {
+    control_planes = merge([for key, node in local.s1.control_planes : {
+      "${key}" = merge(node, {
+        talos = { machine_type = "controlplane" }
+        patches = flatten([
+          local.s6.patches.control_planes,
+          yamlencode({
+            machine = {
+              network = {
+                extraHostEntries = [{
+                  ip      = node.public_ip6
+                  aliases = local.s3.aliases[key]
+                }]
+              }
+            }
+          }),
+          node.patches,
+        ])
+      })
+    }]...)
+    workers = merge([for key, node in local.s1.workers : {
+      "${key}" = merge(node, {
+        talos = { machine_type = "worker" }
+        patches = flatten([
+          local.s6.patches.workers,
+          yamlencode({
+            machine = {
+              network = {
+                extraHostEntries = [{
+                  ip      = node.public_ip6
+                  aliases = local.s3.aliases[key]
+                }]
+              }
+            }
+          }),
+          node.patches,
+        ])
+      })
+    }]...)
+  }
+
+  cluster_endpoint = "https://${var.endpoint}:6443"
+
+  nodes = merge(local.s7.control_planes, local.s7.workers)
+
+  names = {
+    control_planes = [for key, node in local.s1.control_planes : node.name]
+    workers        = [for key, node in local.s1.workers : node.name]
+  }
+  public_ips6 = {
+    control_planes = [for key, node in local.s1.control_planes : node.public_ip6]
+    workers        = [for key, node in local.s1.workers : node.public_ip6]
+  }
+
+  configs = merge([for key, config in data.talos_machine_configuration.this : {
+    "${key}" = yamlencode(yamldecode(config.machine_configuration))
+  }]...)
 }

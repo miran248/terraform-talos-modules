@@ -11,7 +11,7 @@ resource "hcloud_firewall" "this" {
     protocol        = "tcp"
     port            = "6443"
     source_ips      = ["::/0"]
-    destination_ips = [for key, node in var.config.nodes : node.public_ip6]
+    destination_ips = [for key, node in var.pool.nodes : node.public_ip6]
   }
   rule {
     description     = "talos control planes"
@@ -19,7 +19,7 @@ resource "hcloud_firewall" "this" {
     protocol        = "tcp"
     port            = "50000"
     source_ips      = ["::/0"]
-    destination_ips = [for key, node in var.config.nodes : node.public_ip6]
+    destination_ips = [for key, node in var.pool.nodes : node.public_ip6]
   }
   rule {
     description     = "talos workers"
@@ -27,7 +27,7 @@ resource "hcloud_firewall" "this" {
     protocol        = "tcp"
     port            = "50001"
     source_ips      = ["::/0"]
-    destination_ips = [for key, node in var.config.nodes : node.public_ip6]
+    destination_ips = [for key, node in var.pool.nodes : node.public_ip6]
   }
 
   # allows full access between cluster nodes
@@ -37,8 +37,8 @@ resource "hcloud_firewall" "this" {
       direction       = "in"
       protocol        = rule.value
       port            = "any"
-      source_ips      = [for key, node in var.config.nodes : node.public_ip6_network_64]
-      destination_ips = [for key, node in var.config.nodes : node.public_ip6_network_64]
+      source_ips      = [for key, node in var.cluster.nodes : node.public_ip6_network_64]
+      destination_ips = [for key, node in var.pool.nodes : node.public_ip6_network_64]
     }
   }
   dynamic "rule" {
@@ -46,8 +46,8 @@ resource "hcloud_firewall" "this" {
     content {
       direction       = "in"
       protocol        = rule.value
-      source_ips      = [for key, node in var.config.nodes : node.public_ip6_network_64]
-      destination_ips = [for key, node in var.config.nodes : node.public_ip6_network_64]
+      source_ips      = [for key, node in var.cluster.nodes : node.public_ip6_network_64]
+      destination_ips = [for key, node in var.pool.nodes : node.public_ip6_network_64]
     }
   }
 }

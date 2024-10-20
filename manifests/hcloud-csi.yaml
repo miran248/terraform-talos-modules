@@ -397,6 +397,7 @@ spec:
           name: plugin-dir
         - mountPath: /dev
           name: device-dir
+      hostNetwork: true
       initContainers: null
       securityContext:
         fsGroup: 1001

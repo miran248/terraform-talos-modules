@@ -1,8 +1,8 @@
 @build:
-  just build-helm talos-cloud-controller-manager
   just build-helm cilium
   just build-helm hcloud-csi
   just build-helm iperf
+  just build-helm talos-ccm
 
 build-helm NAME:
   kustomize build --enable-helm {{ NAME }} > {{ NAME }}.yaml

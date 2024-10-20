@@ -1,10 +1,9 @@
 resource "talos_machine_configuration_apply" "this" {
-  for_each                    = var.config.nodes
-  client_configuration        = var.config.machine_secrets.client_configuration
+  for_each                    = var.cluster.configs
+  client_configuration        = var.cluster.machine_secrets.client_configuration
   endpoint                    = var.cluster.endpoint
-  machine_configuration_input = each.value.data
-  # node                        = each.key
-  node = each.value.name # node might be in a different network from control planes
+  machine_configuration_input = each.value
+  node                        = each.key
 
   depends_on = [
     talos_machine_bootstrap.this,

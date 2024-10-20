@@ -10,4 +10,4 @@ destroy:
 
 config PREFIX:
   terraform output --raw "{{ PREFIX }}_talos_config" > "{{ PREFIX }}-talos-config"
-  TALOSCONFIG="{{ PREFIX }}-talos-config" talosctl -n n1 kubeconfig "{{ PREFIX }}-kube-config"
+  TALOSCONFIG="{{ PREFIX }}-talos-config" talosctl -n c1 kubeconfig "{{ PREFIX }}-kube-config"

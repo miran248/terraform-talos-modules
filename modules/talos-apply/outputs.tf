@@ -1,3 +1,7 @@
+output "MODULE_NAME" {
+  value = "talos-apply"
+}
+
 output "kube_config" {
   value     = talos_cluster_kubeconfig.this.kubeconfig_raw
   sensitive = true

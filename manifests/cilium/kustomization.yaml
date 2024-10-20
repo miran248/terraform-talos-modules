@@ -17,56 +17,6 @@ helmCharts:
         enabled: true
 
       routingMode: native
-      autoDirectNodeRoutes: false
-      directRoutingSkipUnreachable: false
-      enableIPv6BIGTCP: true
-      enableIPv4BIGTCP: false
-
-      cni:
-        uninstall: true
-
-      socketLB:
-        enabled: true
-      localRedirectPolicy: true
-
-      endpointRoutes:
-        enabled: true
-
-      bgp:
-        enabled: false
-        announce:
-          loadbalancerIP: true
-          podCIDR: true
-      bgpControlPlane:
-        enabled: false
-
-      bpf:
-        datapathMode: veth
-        masquerade: false
-        tproxy: false
-        hostLegacyRouting: false
-
-      ipMasqAgent:
-        enabled: false
-
-      bandwidthManager:
-        enabled: true
-        bbr: true
-
-      l2NeighDiscovery:
-        enabled: false
-
-      l2announcements:
-        enabled: false
-
-      l2podAnnouncements:
-        enabled: false
-
-      nat46x64Gateway:
-        enabled: false
-
-      externalIPs:
-        enabled: true
 
       k8sServiceHost: "localhost"
       k8sServicePort: 7445
@@ -88,13 +38,71 @@ helmCharts:
       enableIPv6Masquerade: false
       enableIPv4Masquerade: false
 
-      gatewayAPI:
+      enableIPv6BIGTCP: true
+      enableIPv4BIGTCP: false
+
+      autoDirectNodeRoutes: false
+      directRoutingSkipUnreachable: false
+
+      localRedirectPolicy: true
+
+      endpointRoutes:
         enabled: true
 
+      externalIPs:
+        enabled: true
+
+      bpf:
+        datapathMode: veth
+        masquerade: false
+        tproxy: false
+        hostLegacyRouting: false
+
+      bandwidthManager:
+        enabled: true
+        bbr: true
+
       authentication:
+        enabled: true
         mutual:
           spire:
             enabled: true
+            # install:
+            #   agent:
+            #     podSecurityContext:
+            #       # runAsNonRoot: true
+            #       # runAsUser: 1000
+            #       seccompProfile:
+            #         type: RuntimeDefault
+            #     securityContext:
+            #       allowPrivilegeEscalation: true
+            #       # capabilities:
+            #       #   drop:
+            #       #     - ALL
+            #       privileged: true
+            #       # readOnlyRootFilesystem: false
+            #       # runAsNonRoot: true
+            #       seccompProfile:
+            #         type: RuntimeDefault
+            #   server:
+            #     podSecurityContext:
+            #       # runAsNonRoot: true
+            #       # runAsUser: 1000
+            #       seccompProfile:
+            #         type: RuntimeDefault
+            #     securityContext:
+            #       allowPrivilegeEscalation: true
+            #       # capabilities:
+            #       #   drop:
+            #       #     - ALL
+            #       privileged: true
+            #       # readOnlyRootFilesystem: false
+            #       # runAsNonRoot: true
+            #       seccompProfile:
+            #         type: RuntimeDefault
+
+      gatewayAPI:
+        enabled: true
 
       rollOutCiliumPods: true
 
@@ -172,3 +180,5 @@ helmCharts:
         autoMount:
           enabled: false
         hostRoot: /sys/fs/cgroup
+patches:
+  - path: patch-namespaces.yaml

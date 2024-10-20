@@ -1,11 +1,13 @@
 resource "hcloud_server" "this" {
-  for_each    = var.network.nodes
-  name        = var.config.nodes[each.key].name
-  image       = var.image_id
-  server_type = var.config.nodes[each.key].server_type
-  datacenter  = var.datacenter.name
-  user_data   = var.config.nodes[each.key].data
-  ssh_keys    = [hcloud_ssh_key.this.id]
+  for_each    = var.pool.nodes
+  name        = var.pool.nodes[each.key].name
+  image       = var.pool.nodes[each.key].image_id
+  server_type = var.pool.nodes[each.key].server_type
+  datacenter  = var.pool.datacenter
+  user_data   = var.cluster.configs[each.key]
+  ssh_keys = [
+    hcloud_ssh_key.this.id,
+  ]
 
   delete_protection        = false
   shutdown_before_deletion = true
@@ -17,7 +19,7 @@ resource "hcloud_server" "this" {
 
   public_net {
     ipv6_enabled = true
-    ipv6         = var.network.ids.ips6[each.key]
+    ipv6         = var.pool.nodes[each.key].public_ip6_id
     ipv4_enabled = false
   }
 
