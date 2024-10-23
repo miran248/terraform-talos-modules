@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     path: manifests/argocd-apps
-    repoURL: git@github.com:miran248/terraform-talos-modules.git
+    repoURL: https://github.com/miran248/terraform-talos-modules.git
     targetRevision: HEAD
   syncPolicy:
     syncOptions:
