@@ -1,14 +1,10 @@
 apply:
+  rm -f talos-config kube-config
   terraform init -upgrade
   terraform apply -auto-approve
+  terraform output --raw talos_config > talos-config
+  TALOSCONFIG=talos-config talosctl -n c1 kubeconfig kube-config
 
 destroy:
-  #!/usr/bin/env bash
-  rm *talos-config
-  rm *kube-config
+  rm -f talos-config kube-config
   terraform destroy -auto-approve
-
-# > just config single6
-config PREFIX:
-  terraform output --raw "{{ PREFIX }}_talos_config" > "{{ PREFIX }}-talos-config"
-  TALOSCONFIG="{{ PREFIX }}-talos-config" talosctl -n 192.168.1.11 kubeconfig "{{ PREFIX }}-kube-config"
