@@ -4,6 +4,7 @@ metadata:
   name: argocd-cm
   namespace: argocd
 data:
+  kustomize.buildOptions: --enable-helm
   resource.exclusions: |
     - apiGroups:
         - cilium.io
