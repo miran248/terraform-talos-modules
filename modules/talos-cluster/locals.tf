@@ -19,11 +19,13 @@ locals {
     aliases = merge(local.s2.aliases.control_planes, local.s2.aliases.workers)
   }
   s4 = {
-    cert_sans = flatten([for key, node in local.s2.nodes : [
+    cert_sans = flatten([
       var.endpoint,
-      node.public_ip6,
-      local.s3.aliases[key],
-    ]])
+      [for key, node in local.s2.nodes : [
+        node.public_ip6,
+        local.s3.aliases[key],
+      ]],
+    ])
   }
   s5 = {
     patches_common = flatten([
@@ -31,6 +33,12 @@ locals {
       yamlencode({
         machine = {
           certSANs = local.s4.cert_sans
+          network = {
+            extraHostEntries = [for key, node in local.s2.nodes : {
+              ip      = node.public_ip6
+              aliases = local.s3.aliases[key]
+            }]
+          }
         }
       }),
       var.patches.common,
@@ -47,7 +55,7 @@ locals {
               certSANs = local.s4.cert_sans
             }
             etcd = {
-              advertisedSubnets = [for key, node in local.s2.nodes : node.public_ip6_64]
+              advertisedSubnets = [for key, node in local.s2.nodes : node.public_ip6_network_64]
             }
           }
         }),
@@ -65,16 +73,6 @@ locals {
         talos = { machine_type = "controlplane" }
         patches = flatten([
           local.s6.patches.control_planes,
-          yamlencode({
-            machine = {
-              network = {
-                extraHostEntries = [{
-                  ip      = node.public_ip6
-                  aliases = local.s3.aliases[key]
-                }]
-              }
-            }
-          }),
           node.patches,
         ])
       })
@@ -84,16 +82,6 @@ locals {
         talos = { machine_type = "worker" }
         patches = flatten([
           local.s6.patches.workers,
-          yamlencode({
-            machine = {
-              network = {
-                extraHostEntries = [{
-                  ip      = node.public_ip6
-                  aliases = local.s3.aliases[key]
-                }]
-              }
-            }
-          }),
           node.patches,
         ])
       })

@@ -1,6 +1,6 @@
 variable "name" {
   type        = string
-  description = "cluster name and resource prefix"
+  description = "cluster name"
 }
 variable "endpoint" {
   type        = string

@@ -26,25 +26,27 @@ module "dev1_nuremberg_pool" {
 
   control_planes = [
     { server_type = "cx22", image_id = local.image_id },
-    # { server_type = "cx22", image_id = local.image_id },
-    # { server_type = "cx22", image_id = local.image_id },
+    { server_type = "cx22", image_id = local.image_id },
+    { server_type = "cx22", image_id = local.image_id },
   ]
   workers = [
-    { server_type = "cx22", image_id = local.image_id, patches = [local.dev1_patches_zitadel] },
+    # { server_type = "cx22", image_id = local.image_id, patches = [local.dev1_patches_zitadel] },
     # { server_type = "cx22", image_id = local.image_id, patches = [local.dev1_patches_zitadel] },
     # { server_type = "cx22", image_id = local.image_id, patches = [local.dev1_patches_zitadel] },
   ]
 }
-# module "dev1_helsinki_pool" {
-#   source = "../modules/hcloud-pool"
 
-#   prefix     = "dev1-hel"
-#   datacenter = data.hcloud_datacenter.dev1_helsinki.name
+module "dev1_helsinki_pool" {
+  source = "../modules/hcloud-pool"
 
-#   workers = [
-#     { server_type = "cx22", image_id = local.image_id },
-#   ]
-# }
+  prefix     = "dev1-hel"
+  datacenter = data.hcloud_datacenter.dev1_helsinki.name
+
+  workers = [
+    { server_type = "cx22", image_id = local.image_id },
+    # { server_type = "cx22", image_id = local.image_id },
+  ]
+}
 
 module "dev1_talos_cluster" {
   source = "../modules/talos-cluster"
@@ -56,7 +58,7 @@ module "dev1_talos_cluster" {
 
   pools = [
     module.dev1_nuremberg_pool,
-    # module.dev1_helsinki_pool,
+    module.dev1_helsinki_pool,
   ]
 
   patches = {
@@ -126,12 +128,18 @@ module "dev1_talos_cluster" {
 module "dev1_hcloud_apply" {
   for_each = merge([for pool in [
     module.dev1_nuremberg_pool,
-    # module.dev1_helsinki_pool,
+    module.dev1_helsinki_pool,
   ] : { "${pool.prefix}" = pool }]...)
   source = "../modules/hcloud-apply"
 
   cluster = module.dev1_talos_cluster
   pool    = each.value
+}
+
+module "dev1_talos_apply" {
+  source = "../modules/talos-apply"
+
+  cluster = module.dev1_talos_cluster
 }
 
 resource "google_dns_record_set" "dev1_talos_ipv6" {
@@ -143,14 +151,8 @@ resource "google_dns_record_set" "dev1_talos_ipv6" {
   rrdatas = module.dev1_talos_cluster.public_ips6.control_planes
 }
 
-module "dev1_talos_apply" {
-  source = "../modules/talos-apply"
-
-  cluster = module.dev1_talos_cluster
-}
-
 # outputs
-output "dev1_talos_config" {
+output "talos_config" {
   value     = module.dev1_talos_cluster.talos_config
   sensitive = true
 }
