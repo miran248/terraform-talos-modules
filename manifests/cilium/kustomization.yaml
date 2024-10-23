@@ -66,10 +66,10 @@ helmCharts:
         bbr: true
 
       authentication:
-        enabled: true
+        enabled: false
         mutual:
           spire:
-            enabled: true
+            enabled: false
 
       encryption:
         enabled: true
@@ -155,5 +155,5 @@ helmCharts:
         autoMount:
           enabled: false
         hostRoot: /sys/fs/cgroup
-patches:
-  - path: patch-namespaces.yaml
+# patches:
+#   - path: patch-namespaces.yaml

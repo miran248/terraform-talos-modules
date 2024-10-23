@@ -12,7 +12,7 @@ helmCharts:
 
       nameOverride: talos-ccm
       daemonSet:
-        enabled: false
+        enabled: true
       # features:
       #   # required when using ipv6 stack, otherwise ccm picks hetzner's cgnat ip address..
       #   preferIPv6: true
