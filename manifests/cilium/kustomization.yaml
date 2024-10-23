@@ -5,7 +5,7 @@ resources:
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: 1.16.2
+    version: 1.16.3
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -13,11 +13,8 @@ helmCharts:
       - gateway.networking.k8s.io/v1/GatewayClass
       # - monitoring.coreos.com/v1
     valuesInline:
-      debug:
-        enabled: true
-
-      extraConfig:
-        policy-audit-mode: true
+      # debug:
+      #   enabled: true
 
       routingMode: native
 
@@ -73,6 +70,11 @@ helmCharts:
         mutual:
           spire:
             enabled: true
+
+      encryption:
+        enabled: true
+        type: wireguard
+        nodeEncryption: false
 
       gatewayAPI:
         enabled: true

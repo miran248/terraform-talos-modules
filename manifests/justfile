@@ -1,5 +1,6 @@
 @build:
   just build-helm cilium
+  just build-helm hcloud-ccm
   just build-helm hcloud-csi
   just build-helm iperf
   just build-helm talos-ccm

@@ -10,3 +10,9 @@ helmCharts:
     valuesInline:
       node:
         hostNetwork: true
+
+        # extraEnvVars:
+        #   - name: LOG_LEVEL
+        #     value: trace
+        #   - name: HCLOUD_DEBUG
+        #     value: "1"
