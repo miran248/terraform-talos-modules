@@ -43,18 +43,18 @@ graph TD
 1. clone the repo
 2. navigate to [dev](dev) folder and run [just](https://github.com/casey/just) to deploy the cluster
 3. open talos dashboard and wait for `[talos] created` messages
-```console
-$ TALOSCONFIG=talos-config talosctl -n c1 dashboard
+```shell
+> TALOSCONFIG=talos-config talosctl -n c1 dashboard
 ```
 4. navigate to [manifests](manifests) folder and run `just` to generate all necessary yaml files
 5. apply them individually, `talos-ccm` and `cilium` are required
-```console
-$ KUBECONFIG=../dev/kube-config kubectl apply --server-side=true -f talos-ccm.yaml
-$ KUBECONFIG=../dev/kube-config kubectl apply --server-side=true -f cilium.yaml
+```shell
+> KUBECONFIG=../dev/kube-config kubectl apply --server-side=true -f talos-ccm.yaml
+> KUBECONFIG=../dev/kube-config kubectl apply --server-side=true -f cilium.yaml
 ...
 ```
 6. open talos dashboard again and wait for the message `[talos] machine is running and ready`.
 7. to verify, open [k9s](https://k9scli.io/)
-```console
-$ KUBECONFIG=kube-config k9s
+```shell
+> KUBECONFIG=kube-config k9s
 ```
