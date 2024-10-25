@@ -9,7 +9,7 @@ spec:
   destination:
     namespace: argocd
     server: "https://kubernetes.default.svc"
-  project: default
+  project: infra
   source:
     path: manifests/argocd-infra
     repoURL: https://github.com/miran248/terraform-talos-modules.git

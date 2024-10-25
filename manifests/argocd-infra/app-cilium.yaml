@@ -18,6 +18,7 @@ spec:
     syncOptions:
       - ServerSideApply=true
       - Validate=false # https://docs.cilium.io/en/latest/configuration/argocd-issues/#application-chart-for-cilium-deployed-to-talos-linux-fails-with-field-not-declared-in-schema
+      - RespectIgnoreDifferences=true
     automated:
       prune: true
       selfHeal: true
