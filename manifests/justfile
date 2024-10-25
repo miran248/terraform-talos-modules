@@ -2,6 +2,7 @@
   just build-helm argocd
   just build-helm argocd-infra
   just build-helm cilium
+  just build-helm gcp-wif-webhook
   just build-helm hcloud-ccm
   just build-helm hcloud-csi
   just build-helm iperf
