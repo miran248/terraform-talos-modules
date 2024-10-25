@@ -18,6 +18,24 @@ locals {
   image_id = data.hcloud_image.dev3_v1_8_1_amd64.id
 }
 
+module "dev3_gcp_wif" {
+  source = "../modules/gcp-wif"
+
+  name     = "dev3-wif"
+  location = "EUROPE-WEST3"
+
+  service_accounts = [
+    { subject = "cert-manager:cert-manager", name = "cert-manager", roles = ["roles/dns.admin"] },
+    { subject = "external-dns:external-dns", name = "external-dns", roles = ["roles/dns.admin"] },
+
+    { subject = "external-secrets:external-secrets", name = "external-secrets", roles = [
+      "roles/iam.serviceAccountTokenCreator",
+      "roles/secretmanager.admin",
+      # "roles/secretmanager.secretAccessor",
+    ] },
+  ]
+}
+
 module "dev3_nuremberg_pool" {
   source = "../modules/hcloud-pool"
 
@@ -122,6 +140,9 @@ module "dev3_talos_cluster" {
     #     }
     #   }),
     # ]
+    control_planes = flatten([
+      module.dev3_gcp_wif.patches.control_planes,
+    ])
   }
 }
 
@@ -140,6 +161,14 @@ module "dev3_talos_apply" {
   source = "../modules/talos-apply"
 
   cluster = module.dev3_talos_cluster
+}
+
+module "dev3_gcp_wif_apply" {
+  source = "../modules/gcp-wif-apply"
+
+  identities = module.dev3_gcp_wif
+  cluster    = module.dev3_talos_cluster
+  apply      = module.dev3_talos_apply
 }
 
 resource "google_dns_record_set" "dev3_talos_ipv6" {
