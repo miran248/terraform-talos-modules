@@ -9,6 +9,17 @@ output "datacenter" {
   value = var.datacenter
 }
 
+output "cidr" {
+  value = var.cidr
+}
+output "load_balancer_ip" {
+  value = var.load_balancer_ip
+}
+
+output "ids" {
+  value = local.ids
+}
+
 output "control_planes" {
   value = local.control_planes
 }

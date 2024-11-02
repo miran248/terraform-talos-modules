@@ -12,10 +12,15 @@ variable "pool" {
     MODULE_NAME = string
     prefix      = string
     datacenter  = string
+    ids = object({
+      network       = optional(string)
+      load_balancer = optional(string)
+    })
     nodes = map(object({
       name                  = string
       server_type           = string
       image_id              = number
+      private_ip4           = optional(string)
       public_ip6_id         = number
       public_ip6_network_64 = string
       public_ip6            = string

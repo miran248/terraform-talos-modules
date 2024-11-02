@@ -7,6 +7,19 @@ variable "datacenter" {
   description = "hcloud datacenter"
 }
 
+variable "cidr" {
+  type        = string
+  description = "hcloud private network cidr4"
+  nullable    = true
+  default     = null
+}
+variable "load_balancer_ip" {
+  type        = string
+  description = "hcloud load balancer ip4"
+  nullable    = true
+  default     = null
+}
+
 variable "control_planes" {
   type = list(object({
     server_type = string

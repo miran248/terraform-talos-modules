@@ -17,6 +17,15 @@ resource "hcloud_server" "this" {
     hcloud_firewall.deny_all.id,
   ]
 
+  dynamic "network" {
+    for_each = var.pool.nodes[each.key].private_ip4 == null ? [] : [1]
+    content {
+      network_id = var.pool.ids.network
+      ip         = var.pool.nodes[each.key].private_ip4
+      alias_ips  = []
+    }
+  }
+
   public_net {
     ipv6_enabled = true
     ipv6         = var.pool.nodes[each.key].public_ip6_id

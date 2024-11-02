@@ -1,9 +1,26 @@
 locals {
   s1 = {
+    patches_common = var.cidr == null ? [] : [
+      yamlencode({
+        machine = {
+          kubelet = {
+            nodeIP = {
+              validSubnets = [
+                var.cidr,
+              ]
+            }
+          }
+        }
+      }),
+    ]
+  }
+  s2 = {
     control_planes = merge([for i, node in var.control_planes : node.removed ? {} : {
       "${join("-", [var.prefix, "control-plane", i + 1])}" = merge(node, {
-        name = join("-", [var.prefix, "control-plane", i + 1])
+        name        = join("-", [var.prefix, "control-plane", i + 1])
+        private_ip4 = var.cidr == null ? null : cidrhost(var.cidr, i + 11)
         patches = flatten([
+          local.s1.patches_common,
           var.patches.common,
           var.patches.control_planes,
           node.patches,
@@ -12,8 +29,10 @@ locals {
     }]...)
     workers = merge([for i, node in var.workers : node.removed ? {} : {
       "${join("-", [var.prefix, "worker", i + 1])}" = merge(node, {
-        name = join("-", [var.prefix, "worker", i + 1])
+        name        = join("-", [var.prefix, "worker", i + 1])
+        private_ip4 = var.cidr == null ? null : cidrhost(var.cidr, i + 21)
         patches = flatten([
+          local.s1.patches_common,
           var.patches.common,
           var.patches.workers,
           node.patches,
@@ -21,10 +40,10 @@ locals {
       })
     }]...)
   }
-  s2 = {
-    nodes = merge(local.s1.control_planes, local.s1.workers)
-  }
   s3 = {
+    nodes = merge(local.s2.control_planes, local.s2.workers)
+  }
+  s4 = {
     ips6 = merge([for key, ip in hcloud_primary_ip.ips6 : {
       "${key}" = {
         public_ip6_id         = ip.id
@@ -35,11 +54,17 @@ locals {
     }]...)
   }
 
-  control_planes = merge([for key, node in local.s1.control_planes : {
-    "${key}" = merge(node, local.s3.ips6[key])
+  ids = {
+    network       = one(hcloud_network.this[*].id)
+    subnet        = one(hcloud_network_subnet.this[*].id)
+    load_balancer = one(hcloud_load_balancer.this[*].id)
+  }
+
+  control_planes = merge([for key, node in local.s2.control_planes : {
+    "${key}" = merge(node, local.s4.ips6[key])
   }]...)
-  workers = merge([for key, node in local.s1.workers : {
-    "${key}" = merge(node, local.s3.ips6[key])
+  workers = merge([for key, node in local.s2.workers : {
+    "${key}" = merge(node, local.s4.ips6[key])
   }]...)
   nodes = merge(local.control_planes, local.workers)
 }

@@ -11,10 +11,19 @@ data "terracurl_request" "jwks" {
   response_codes = [200]
 }
 
+resource "terraform_data" "jwks" {
+  input = timestamp()
+}
 resource "google_storage_bucket_object" "jwks" {
   bucket        = var.identities.ids.oidc_bucket
   name          = "openid/v1/jwks"
   content       = data.terracurl_request.jwks.response
   cache_control = "public, max-age=0"
   content_type  = "application/json"
+
+  lifecycle {
+    replace_triggered_by = [
+      terraform_data.jwks,
+    ]
+  }
 }
