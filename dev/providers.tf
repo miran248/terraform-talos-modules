@@ -1,11 +1,7 @@
 provider "google" {
-  project     = "sh-248-sandbox"
-  credentials = var.google_token
+  project = "miran248-talos-modules-dev"
+  region  = "global"
 }
 provider "hcloud" {
-  token = var.hcloud_token
-}
-provider "tfe" {
-  organization = "miran248"
-  token        = var.tfe_token
+  token = local.hcloud_token
 }

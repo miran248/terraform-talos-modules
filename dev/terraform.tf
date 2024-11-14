@@ -3,7 +3,7 @@ terraform {
     organization = "miran248"
 
     workspaces {
-      name = "terraform-talos-modules"
+      name = "dev"
     }
   }
   required_providers {
@@ -12,9 +12,6 @@ terraform {
     }
     hcloud = {
       source = "hetznercloud/hcloud"
-    }
-    tfe = {
-      source = "hashicorp/tfe"
     }
   }
   required_version = ">= 1"
