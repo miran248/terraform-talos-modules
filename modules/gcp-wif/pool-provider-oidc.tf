@@ -1,6 +1,6 @@
 resource "google_iam_workload_identity_pool_provider" "oidc" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.this.workload_identity_pool_id
-  workload_identity_pool_provider_id = "oidc"
+  workload_identity_pool_provider_id = "${var.name}-oidc"
 
   attribute_mapping = {
     "google.subject" = "assertion.sub"
