@@ -1,6 +1,6 @@
 resource "google_storage_bucket" "oidc" {
-  name          = "${var.name}-oidc"
-  location      = var.location
+  name          = var.bucket_name
+  location      = var.bucket_location
   force_destroy = true
   storage_class = "NEARLINE"
 

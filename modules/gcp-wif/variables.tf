@@ -2,7 +2,11 @@ variable "name" {
   type        = string
   description = "name of the google workload identity pool"
 }
-variable "location" {
+variable "bucket_name" {
+  type        = string
+  description = "name of the google object store bucket"
+}
+variable "bucket_location" {
   type        = string
   description = "location of the google object store bucket"
 }

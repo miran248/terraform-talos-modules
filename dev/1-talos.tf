@@ -15,8 +15,9 @@ locals {
 module "dev1_gcp_wif" {
   source = "../modules/gcp-wif"
 
-  name     = "dev1-wif"
-  location = "EUROPE-WEST3"
+  name            = "dev1-wif"
+  bucket_name     = "miran248-talos-modules-dev-dev1-wif"
+  bucket_location = "EUROPE-WEST3"
 
   service_accounts = [
     { subject = "cert-manager:cert-manager", name = "cert-manager", roles = ["roles/dns.admin"] },
