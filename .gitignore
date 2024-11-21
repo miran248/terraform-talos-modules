@@ -1,3 +1,8 @@
+# manifests
+charts
+.build
+
+# terraform
 .terraform
 current-plan
 talos-config
