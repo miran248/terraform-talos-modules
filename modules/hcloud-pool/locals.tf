@@ -10,28 +10,8 @@ locals {
               ]
             }
           }
-          network = {
-            kubespan = {
-              filters = {
-                endpoints = [
-                  "!100.64.0.0/10",
-                ]
-              }
-            }
-          }
         }
       }),
-    ]
-    patches_control_planes = [
-      yamlencode({
-        cluster = {
-          etcd = {
-            advertisedSubnets = [
-              "!100.64.0.0/10",
-            ]
-          }
-        }
-      })
     ]
   }
   s2 = {
@@ -41,7 +21,6 @@ locals {
         private_ip4 = var.cidr == null ? null : cidrhost(var.cidr, i + 11)
         patches = flatten([
           local.s1.patches_common,
-          local.s1.patches_control_planes,
           var.patches.common,
           var.patches.control_planes,
           node.patches,
