@@ -4,7 +4,7 @@ cluster:
       name: none
     dnsDomain: cluster.local
     podSubnets:
-      - "fc00:1::/108" # ensures the correct ip family is selected, unused otherwise!
+      - "fc00:1::/96" # ensures the correct ip family is selected, unused otherwise!
     # 108 is the largest supported 128b range
     # 20 bits is hardcoded here https://github.com/kubernetes/kubernetes/blob/ec16c90aaf5d1f0606747c421c8680bb2b243d4e/cmd/kube-apiserver/app/options/validation.go#L40
     serviceSubnets:
@@ -35,7 +35,17 @@ machine:
       healthzBindAddress: "::"
   network:
     kubespan:
-      enabled: false
+      enabled: true
+      advertiseKubernetesNetworks: false
+      allowDownPeerBypass: false
+      harvestExtraEndpoints: false
+      mtu: 1420
+      filters:
+        endpoints:
+          - "::/0"
+          - "fc00::/108"
+          - "fc00:1::/96"
+          - "!100.64.0.0/10"
   sysctls:
     net.core.somaxconn: 65535
     net.core.netdev_max_backlog: 4096

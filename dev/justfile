@@ -1,10 +1,10 @@
 apply:
   terraform init -upgrade
   terraform apply -auto-approve
-  rm -f talos-config kube-config
-  terraform output --raw talos_config > talos-config
-  TALOSCONFIG=talos-config talosctl -n c1 kubeconfig kube-config
+  rm -f ../talos-config ../kube-config
+  terraform output --raw talos_config > ../talos-config
+  TALOSCONFIG=../talos-config talosctl -n c1 kubeconfig ../kube-config
 
 destroy:
-  rm -f talos-config kube-config
+  rm -f ../talos-config ../kube-config
   terraform destroy -auto-approve

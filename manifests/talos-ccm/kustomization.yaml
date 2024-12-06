@@ -23,5 +23,6 @@ helmCharts:
       extraArgs:
         - --allocate-node-cidrs
         - --cidr-allocator-type=CloudAllocator
+        - --node-cidr-mask-size-ipv6=112
 patches:
   - path: patch-config-map.yaml

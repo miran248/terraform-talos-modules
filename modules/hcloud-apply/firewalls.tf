@@ -26,6 +26,27 @@ resource "hcloud_firewall" "this" {
     port        = "50001"
     source_ips  = ["::/0"]
   }
+  rule {
+    description = "https"
+    direction   = "in"
+    protocol    = "tcp"
+    port        = "443"
+    source_ips  = ["::/0"]
+  }
+  rule {
+    description = "http"
+    direction   = "in"
+    protocol    = "tcp"
+    port        = "80"
+    source_ips  = ["::/0"]
+  }
+  rule {
+    description = "healthz"
+    direction   = "in"
+    protocol    = "tcp"
+    port        = "10256"
+    source_ips  = ["::/0"]
+  }
 
   # allows full access between cluster nodes
   dynamic "rule" {

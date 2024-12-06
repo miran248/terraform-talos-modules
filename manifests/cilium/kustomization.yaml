@@ -5,7 +5,8 @@ resources:
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: 1.16.3
+    # version: 1.17.0-pre.3
+    version: 1.16.4
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -55,6 +56,26 @@ helmCharts:
       externalIPs:
         enabled: true
 
+      nodePort:
+        enabled: true
+        bindProtection: false
+
+      hostPort:
+        enabled: true
+
+      l7Proxy: true
+
+      bgpControlPlane:
+        enabled: false
+        announce:
+          loadbalancerIP: true
+
+      nat46x64Gateway:
+        enabled: false
+
+      nodeIPAM:
+        enabled: false
+
       bpf:
         datapathMode: veth
         masquerade: false
@@ -72,12 +93,17 @@ helmCharts:
             enabled: false
 
       encryption:
-        enabled: true
+        enabled: false
         type: wireguard
         nodeEncryption: false
 
       gatewayAPI:
         enabled: true
+        hostNetwork:
+          enabled: true
+
+      # defaultLBServiceIPAM: nodeipam
+      kubeProxyReplacementHealthzBindAddr: "[::]:10256"
 
       rollOutCiliumPods: true
 
@@ -126,6 +152,14 @@ helmCharts:
           serviceMonitor:
             enabled: false
             interval: 60s
+        securityContext:
+          capabilities:
+            keepCapNetBindService: true
+            envoy:
+              - NET_BIND_SERVICE
+              - NET_ADMIN
+              - SYS_ADMIN
+              - BPF
       prometheus:
         enabled: true
         serviceMonitor:

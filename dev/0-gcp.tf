@@ -5,5 +5,5 @@ data "google_dns_managed_zone" "this" {
 
 # secrets
 data "google_secret_manager_secret_version" "hcloud_token" {
-  secret = "hcloud-248"
+  secret = "hcloud"
 }

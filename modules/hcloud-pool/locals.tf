@@ -10,8 +10,28 @@ locals {
               ]
             }
           }
+          network = {
+            kubespan = {
+              filters = {
+                endpoints = [
+                  "!100.64.0.0/10",
+                ]
+              }
+            }
+          }
         }
       }),
+    ]
+    patches_control_planes = [
+      yamlencode({
+        cluster = {
+          etcd = {
+            advertisedSubnets = [
+              "!100.64.0.0/10",
+            ]
+          }
+        }
+      })
     ]
   }
   s2 = {
@@ -21,6 +41,7 @@ locals {
         private_ip4 = var.cidr == null ? null : cidrhost(var.cidr, i + 11)
         patches = flatten([
           local.s1.patches_common,
+          local.s1.patches_control_planes,
           var.patches.common,
           var.patches.control_planes,
           node.patches,
@@ -44,14 +65,14 @@ locals {
     nodes = merge(local.s2.control_planes, local.s2.workers)
   }
   s4 = {
-    ips6 = merge([for key, ip in hcloud_primary_ip.ips6 : {
-      "${key}" = {
+    ips6 = { for key, ip in hcloud_primary_ip.ips6 :
+      key => {
         public_ip6_id         = ip.id
         public_ip6_network_64 = ip.ip_network                      # 2000:2:3:4::/64
         public_ip6_64         = "${cidrhost(ip.ip_network, 1)}/64" # 2000:2:3:4::1/64
         public_ip6            = cidrhost(ip.ip_network, 1)         # 2000:2:3:4::1
       }
-    }]...)
+    }
   }
 
   ids = {
@@ -60,11 +81,11 @@ locals {
     load_balancer = one(hcloud_load_balancer.this[*].id)
   }
 
-  control_planes = merge([for key, node in local.s2.control_planes : {
-    "${key}" = merge(node, local.s4.ips6[key])
-  }]...)
-  workers = merge([for key, node in local.s2.workers : {
-    "${key}" = merge(node, local.s4.ips6[key])
-  }]...)
+  control_planes = { for key, node in local.s2.control_planes :
+    key => merge(node, local.s4.ips6[key])
+  }
+  workers = { for key, node in local.s2.workers :
+    key => merge(node, local.s4.ips6[key])
+  }
   nodes = merge(local.control_planes, local.workers)
 }

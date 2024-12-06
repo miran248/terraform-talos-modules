@@ -7,12 +7,12 @@ locals {
     nodes = merge(local.s1.control_planes, local.s1.workers)
 
     aliases = {
-      control_planes = merge([for key, node in local.s1.control_planes : {
-        "${key}" = flatten([node.aliases, "c${index(keys(local.s1.control_planes), key) + 1}"])
-      }]...)
-      workers = merge([for key, node in local.s1.workers : {
-        "${key}" = flatten([node.aliases, "w${index(keys(local.s1.workers), key) + 1}"])
-      }]...)
+      control_planes = { for key, node in local.s1.control_planes :
+        key => flatten([node.aliases, "c${index(keys(local.s1.control_planes), key) + 1}"])
+      }
+      workers = { for key, node in local.s1.workers :
+        key => flatten([node.aliases, "w${index(keys(local.s1.workers), key) + 1}"])
+      }
     }
   }
   s3 = {
@@ -68,24 +68,24 @@ locals {
     }
   }
   s7 = {
-    control_planes = merge([for key, node in local.s1.control_planes : {
-      "${key}" = merge(node, {
+    control_planes = { for key, node in local.s1.control_planes :
+      key => merge(node, {
         talos = { machine_type = "controlplane" }
         patches = flatten([
           local.s6.patches.control_planes,
           node.patches,
         ])
       })
-    }]...)
-    workers = merge([for key, node in local.s1.workers : {
-      "${key}" = merge(node, {
+    }
+    workers = { for key, node in local.s1.workers :
+      key => merge(node, {
         talos = { machine_type = "worker" }
         patches = flatten([
           local.s6.patches.workers,
           node.patches,
         ])
       })
-    }]...)
+    }
   }
 
   cluster_endpoint = "https://${var.endpoint}:6443"
@@ -101,7 +101,7 @@ locals {
     workers        = [for key, node in local.s1.workers : node.public_ip6]
   }
 
-  configs = merge([for key, config in data.talos_machine_configuration.this : {
-    "${key}" = yamlencode(yamldecode(config.machine_configuration))
-  }]...)
+  configs = { for key, config in data.talos_machine_configuration.this :
+    key => yamlencode(yamldecode(config.machine_configuration))
+  }
 }

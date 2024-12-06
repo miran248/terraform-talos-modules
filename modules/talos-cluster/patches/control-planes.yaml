@@ -11,6 +11,7 @@ cluster:
       bind-address: "::"
       cloud-provider: external
       controllers: "*,tokencleaner,-node-ipam-controller"
+      node-cidr-mask-size-ipv6: 112
   discovery:
     enabled: true
     registries:

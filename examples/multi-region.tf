@@ -106,10 +106,10 @@ module "talos_cluster" {
 }
 
 module "hcloud_apply" {
-  for_each = merge([for pool in [
+  for_each = { for pool in [
     module.nuremberg_pool,
     module.helsinki_pool,
-  ] : { "${pool.prefix}" = pool }]...)
+  ] : pool.prefix => pool }
   source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v2.1.0"
 
   cluster = module.talos_cluster

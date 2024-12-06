@@ -1,9 +1,7 @@
 locals {
   oidc_bucket_url = "https://storage.googleapis.com/${google_storage_bucket.oidc.id}"
 
-  service_accounts = merge([for a in var.service_accounts : {
-    "${a.name}" = a
-  }]...)
+  service_accounts = { for a in var.service_accounts : a.name => a }
 
   roles = merge(flatten([
     for name, a in local.service_accounts : [
