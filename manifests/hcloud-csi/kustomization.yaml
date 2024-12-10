@@ -3,11 +3,13 @@ kind: Kustomization
 helmCharts:
   - name: hcloud-csi
     repo: https://charts.hetzner.cloud
-    version: 2.9.0
+    version: 2.11.0
     releaseName: hcloud-csi
     namespace: kube-system
     includeCRDs: true
     valuesInline:
+      global:
+        enableProvidedByTopology: true
       node:
         hostNetwork: true
 

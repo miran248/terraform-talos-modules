@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/experimental-install.yaml
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
@@ -14,6 +14,16 @@ helmCharts:
       - gateway.networking.k8s.io/v1/GatewayClass
       # - monitoring.coreos.com/v1
     valuesInline:
+      defs:
+        hubble: &hubble false
+        ipv6: &ipv6 true
+        ipv4: &ipv4 false
+        rollout: &rollout true
+        serviceMonitor: &serviceMonitor
+          serviceMonitor:
+            enabled: false
+            interval: 60s
+
       # debug:
       #   enabled: true
 
@@ -28,22 +38,24 @@ helmCharts:
       kubeProxyReplacement: true
 
       ipv6:
-        enabled: true
+        enabled: *ipv6
       ipv4:
-        enabled: false
+        enabled: *ipv4
 
       k8s:
-        requireIPv6PodCIDR: true
-        requireIPv4PodCIDR: false
+        requireIPv6PodCIDR: *ipv6
+        requireIPv4PodCIDR: *ipv4
 
       enableIPv6Masquerade: false
       enableIPv4Masquerade: false
 
-      enableIPv6BIGTCP: true
-      enableIPv4BIGTCP: false
+      enableIPv6BIGTCP: *ipv6
+      enableIPv4BIGTCP: *ipv4
 
       autoDirectNodeRoutes: false
       directRoutingSkipUnreachable: false
+
+      # ipv6NativeRoutingCIDR: "fc00:1::/96"
 
       localRedirectPolicy: false
 
@@ -77,7 +89,8 @@ helmCharts:
         enabled: false
 
       bpf:
-        datapathMode: veth
+        # datapathMode: veth
+        datapathMode: netkit
         masquerade: false
         tproxy: false
         hostLegacyRouting: false
@@ -85,6 +98,13 @@ helmCharts:
       bandwidthManager:
         enabled: true
         bbr: true
+
+      # native causes the following error
+      # interface kubespan: attaching program cil_xdp_entry using bpf_link: create link: operation not supported
+      # loadBalancer:
+      #   acceleration: native
+      loadBalancer:
+        acceleration: best-effort
 
       authentication:
         enabled: false
@@ -95,29 +115,30 @@ helmCharts:
       encryption:
         enabled: false
         type: wireguard
-        nodeEncryption: false
+        nodeEncryption: false # broken
 
       gatewayAPI:
         enabled: true
         hostNetwork:
           enabled: true
 
+      socketLB:
+        enabled: true
+
       # defaultLBServiceIPAM: nodeipam
       kubeProxyReplacementHealthzBindAddr: "[::]:10256"
 
-      rollOutCiliumPods: true
+      rollOutCiliumPods: *rollout
 
       operator:
         replicas: 1
-        rollOutPods: true
+        rollOutPods: *rollout
         prometheus:
           enabled: true
-          serviceMonitor:
-            enabled: false
-            interval: 60s
+          <<: *serviceMonitor
 
       hubble:
-        enabled: true
+        enabled: *hubble
         enableOpenMetrics: true
         metrics:
           enabled:
@@ -128,30 +149,24 @@ helmCharts:
             - icmp
             - port-distribution
             - http
-          serviceMonitor:
-            enabled: false
-            interval: 60s
+          <<: *serviceMonitor
         relay:
-          enabled: true
-          rollOutPods: true
+          enabled: *hubble
+          rollOutPods: *rollout
           prometheus:
-            serviceMonitor:
-              enabled: false
-              interval: 60s
+            <<: *serviceMonitor
         ui:
-          enabled: true
-          rollOutPods: true
+          enabled: *hubble
+          rollOutPods: *rollout
           service:
             annotations:
               omni-kube-service-exposer.sidero.dev/port: "50080"
               omni-kube-service-exposer.sidero.dev/label: Hubble
       envoy:
         enabled: true
-        rollOutPods: true
+        rollOutPods: *rollout
         prometheus:
-          serviceMonitor:
-            enabled: false
-            interval: 60s
+          <<: *serviceMonitor
         securityContext:
           capabilities:
             keepCapNetBindService: true
@@ -160,11 +175,10 @@ helmCharts:
               - NET_ADMIN
               - SYS_ADMIN
               - BPF
+
       prometheus:
         enabled: true
-        serviceMonitor:
-          enabled: false
-          interval: 60s
+        <<: *serviceMonitor
 
       securityContext:
         privileged: true

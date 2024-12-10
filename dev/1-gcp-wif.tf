@@ -1,4 +1,3 @@
-
 module "gcp_wif" {
   source = "../modules/gcp-wif"
 
