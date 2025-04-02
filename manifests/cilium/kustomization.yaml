@@ -5,8 +5,7 @@ resources:
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    # version: 1.17.0-pre.3
-    version: 1.16.4
+    version: v1.17.2
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -27,9 +26,15 @@ helmCharts:
       # debug:
       #   enabled: true
 
+      # cni:
+      #   uninstall: true
+
+      # cleanState: true
+      # cleanBpfState: true
+
       routingMode: native
 
-      k8sServiceHost: "localhost"
+      k8sServiceHost: localhost
       k8sServicePort: 7445
 
       ipam:
@@ -55,15 +60,13 @@ helmCharts:
       autoDirectNodeRoutes: false
       directRoutingSkipUnreachable: false
 
-      # ipv6NativeRoutingCIDR: "fc00:1::/96"
-
       localRedirectPolicy: false
 
       hostFirewall:
         enabled: false
 
       endpointRoutes:
-        enabled: false
+        enabled: true
 
       externalIPs:
         enabled: true
@@ -77,10 +80,14 @@ helmCharts:
 
       l7Proxy: true
 
-      bgpControlPlane:
+      bgp:
         enabled: false
         announce:
-          loadbalancerIP: true
+          loadbalancerIP: false
+          podCIDR: false
+
+      bgpControlPlane:
+        enabled: false
 
       nat46x64Gateway:
         enabled: false
@@ -92,8 +99,13 @@ helmCharts:
         # datapathMode: veth
         datapathMode: netkit
         masquerade: false
-        tproxy: false
+        tproxy: true
         hostLegacyRouting: false
+        distributedLRU:
+          enabled: true
+        mapDynamicSizeRatio: 0.08
+
+      bpfClockProbe: true
 
       bandwidthManager:
         enabled: true
@@ -125,7 +137,6 @@ helmCharts:
       socketLB:
         enabled: true
 
-      # defaultLBServiceIPAM: nodeipam
       kubeProxyReplacementHealthzBindAddr: "[::]:10256"
 
       rollOutCiliumPods: *rollout
