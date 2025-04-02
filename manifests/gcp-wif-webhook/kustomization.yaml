@@ -7,7 +7,7 @@ patches:
 helmCharts:
   - name: gcp-workload-identity-federation-webhook
     repo: https://pfnet-research.github.io/gcp-workload-identity-federation-webhook
-    version: 0.4.5
+    version: 0.5.0
     releaseName: gcp-wif-webhook
     namespace: gcp-wif-webhook-system
     includeCRDs: true

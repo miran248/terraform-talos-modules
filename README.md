@@ -50,7 +50,7 @@ graph TD
 
 ## try it out
 1. clone the repo
-2. navigate to [dev](dev) folder and run [just](https://github.com/casey/just) to deploy the cluster
+2. navigate to [dev](dev) folder and run [just](https://github.com/casey/just) to deploy the cluster (run it again, when it fails, to apply the gcp-wif)
 3. navigate to [base](/) folder, open talos dashboard and wait for `[talos] created` messages
 ```shell
 > TALOSCONFIG=talos-config talosctl -n c1 dashboard
@@ -58,8 +58,8 @@ graph TD
 4. run `just` to generate all necessary yaml files
 5. apply them individually, `talos-ccm` and `cilium` are required
 ```shell
-> KUBECONFIG=kube-config kubectl apply --server-side=true -f talos-ccm.yaml
-> KUBECONFIG=kube-config kubectl apply --server-side=true -f cilium.yaml
+> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/talos-ccm.yaml
+> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium.yaml
 ...
 ```
 6. open talos dashboard again and wait for the message `[talos] machine is running and ready`.

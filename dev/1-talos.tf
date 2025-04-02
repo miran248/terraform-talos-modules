@@ -5,7 +5,7 @@ locals {
         app: zitadel
   EOF
 
-  image_id = data.hcloud_image.v1_9_0_amd64.id
+  image_id = data.hcloud_image.v1_9_5_amd64.id
 }
 
 module "dev1_nuremberg_pool" {
@@ -44,7 +44,7 @@ module "dev1_helsinki_pool" {
 locals {
   pools = [
     module.dev1_nuremberg_pool,
-    # module.dev1_helsinki_pool,
+    module.dev1_helsinki_pool,
   ]
 }
 
@@ -53,8 +53,8 @@ module "dev1_talos_cluster" {
 
   name               = "dev1"
   endpoint           = "dev1.dev.248.sh"
-  talos_version      = "v1.8.3"
-  kubernetes_version = "v1.31.3"
+  talos_version      = "v1.9.5"
+  kubernetes_version = "v1.32.2"
 
   pools = local.pools
 
@@ -65,21 +65,12 @@ module "dev1_talos_cluster" {
           network = {
             cni = {
               name = "none"
-              # name = "custom"
-              # urls = [
-              #   "https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/cilium.yaml",
-              # ]
             }
           }
-          # extraManifests = [
-          #   "https://raw.githubusercontent.com/miran248/terraform-talos-modules/95c41f61ca0801479fd713d6c26810b8bdfcbb9d/manifests/hcloud-csi.yaml",
-          # ]
         }
         machine = {
           network = {
             nameservers = [
-              # "2a01:4ff:ff00::add:2", # hetzner
-              # "2a01:4ff:ff00::add:1", # hetzner
               "2a00:1098:2b::1",      # https://nat64.net
               "2a00:1098:2c::1",      # https://nat64.net
               "2a01:4f8:c2c:123f::1", # https://nat64.net
@@ -98,11 +89,6 @@ module "dev1_talos_cluster" {
       yamlencode({
         cluster = {
           allowSchedulingOnControlPlanes = true
-          # externalCloudProvider = {
-          #   manifests = [
-          #     "https://raw.githubusercontent.com/miran248/terraform-talos-modules/v1.3.0/manifests/talos-ccm.yaml",
-          #   ]
-          # }
         }
       }),
     ])
