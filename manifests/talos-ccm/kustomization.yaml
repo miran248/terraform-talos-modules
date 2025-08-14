@@ -3,7 +3,7 @@ kind: Kustomization
 helmCharts:
   - name: talos-cloud-controller-manager
     repo: oci://ghcr.io/siderolabs/charts
-    version: 0.4.4
+    version: 0.5.0
     releaseName: talos-ccm
     namespace: kube-system
     includeCRDs: true

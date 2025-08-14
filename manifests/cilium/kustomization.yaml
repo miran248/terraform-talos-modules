@@ -5,7 +5,7 @@ resources:
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: v1.17.2
+    version: v1.18.0
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -32,6 +32,7 @@ helmCharts:
       # cleanState: true
       # cleanBpfState: true
 
+      # TODO: try tunnel again
       routingMode: native
 
       k8sServiceHost: localhost
@@ -62,11 +63,13 @@ helmCharts:
 
       localRedirectPolicy: false
 
+      underlayProtocol: ipv6
+
       hostFirewall:
         enabled: false
 
       endpointRoutes:
-        enabled: true
+        enabled: false
 
       externalIPs:
         enabled: true
@@ -151,6 +154,7 @@ helmCharts:
       hubble:
         enabled: *hubble
         enableOpenMetrics: true
+        preferIpv6: *ipv6
         metrics:
           enabled:
             - dns
@@ -173,6 +177,10 @@ helmCharts:
             annotations:
               omni-kube-service-exposer.sidero.dev/port: "50080"
               omni-kube-service-exposer.sidero.dev/label: Hubble
+          frontend:
+            server:
+              ipv6:
+                enabled: *ipv6
       envoy:
         enabled: true
         rollOutPods: *rollout

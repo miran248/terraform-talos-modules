@@ -1,11 +1,5 @@
 locals {
-  dev1_patches_zitadel = <<-EOF
-    machine:
-      nodeLabels:
-        app: zitadel
-  EOF
-
-  image_id = data.hcloud_image.v1_9_5_amd64.id
+  dev1_image_id = data.hcloud_image.v1_10_6_amd64.id
 }
 
 module "dev1_nuremberg_pool" {
@@ -18,33 +12,33 @@ module "dev1_nuremberg_pool" {
   # load_balancer_ip = "192.168.1.5"
 
   control_planes = [
-    { server_type = "cx22", image_id = local.image_id },
-    { server_type = "cx22", image_id = local.image_id },
-    { server_type = "cx22", image_id = local.image_id },
+    { server_type = "cx22", image_id = local.dev1_image_id },
+    { server_type = "cx22", image_id = local.dev1_image_id },
+    { server_type = "cx22", image_id = local.dev1_image_id },
   ]
-  # workers = [
-  #   { server_type = "cx22", image_id = local.image_id, patches = [local.dev1_patches_zitadel] },
-  #   # { server_type = "cx22", image_id = local.image_id, patches = [local.dev1_patches_zitadel] },
-  #   # { server_type = "cx22", image_id = local.image_id, patches = [local.dev1_patches_zitadel] },
-  # ]
-}
-
-module "dev1_helsinki_pool" {
-  source = "../modules/hcloud-pool"
-
-  prefix     = "dev1-hel"
-  datacenter = data.hcloud_datacenter.helsinki.name
-
   workers = [
-    { server_type = "cx22", image_id = local.image_id },
-    # { server_type = "cx22", image_id = local.image_id },
+    { server_type = "cx22", image_id = local.dev1_image_id },
+    { server_type = "cx22", image_id = local.dev1_image_id },
+    { server_type = "cx22", image_id = local.dev1_image_id },
   ]
 }
+
+# module "dev1_helsinki_pool" {
+#   source = "../modules/hcloud-pool"
+
+#   prefix     = "dev1-hel"
+#   datacenter = data.hcloud_datacenter.helsinki.name
+
+#   workers = [
+#     { server_type = "cx22", image_id = local.dev1_image_id },
+#     # { server_type = "cx22", image_id = local.dev1_image_id },
+#   ]
+# }
 
 locals {
-  pools = [
+  dev1_pools = [
     module.dev1_nuremberg_pool,
-    module.dev1_helsinki_pool,
+    # module.dev1_helsinki_pool,
   ]
 }
 
@@ -53,50 +47,41 @@ module "dev1_talos_cluster" {
 
   name               = "dev1"
   endpoint           = "dev1.dev.248.sh"
-  talos_version      = "v1.9.5"
-  kubernetes_version = "v1.32.2"
+  talos_version      = "v1.10.6"
+  kubernetes_version = "v1.33.3"
 
-  pools = local.pools
+  pools = local.dev1_pools
 
   patches = {
     common = [
-      yamlencode({
-        cluster = {
-          network = {
-            cni = {
-              name = "none"
-            }
-          }
-        }
-        machine = {
-          network = {
-            nameservers = [
-              "2a00:1098:2b::1",      # https://nat64.net
-              "2a00:1098:2c::1",      # https://nat64.net
-              "2a01:4f8:c2c:123f::1", # https://nat64.net
-            ]
-          }
-          time = {
-            servers = [
-              "/dev/ptp0",
-            ]
-          }
-        }
-      }),
+      <<-EOF
+        cluster:
+          network:
+            cni:
+              name: none
+        machine:
+          network:
+            nameservers:
+              - 2a00:1098:2b::1 # https://nat64.net
+              - 2a00:1098:2c::1 # https://nat64.net
+              - 2a01:4f8:c2c:123f::1 # https://nat64.net
+          time:
+            servers:
+              - /dev/ptp0
+      EOF
     ]
     control_planes = flatten([
       module.gcp_wif.patches.control_planes,
-      yamlencode({
-        cluster = {
-          allowSchedulingOnControlPlanes = true
-        }
-      }),
+      # <<-EOF
+      #   cluster:
+      #     allowSchedulingOnControlPlanes: true
+      # EOF
     ])
   }
 }
 
 module "dev1_hcloud_apply" {
-  for_each = { for pool in local.pools : pool.prefix => pool }
+  for_each = { for pool in local.dev1_pools : pool.prefix => pool }
   source   = "../modules/hcloud-apply"
 
   cluster = module.dev1_talos_cluster
