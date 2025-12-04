@@ -3,7 +3,7 @@ kind: Kustomization
 helmCharts:
   - name: hcloud-csi
     repo: https://charts.hetzner.cloud
-    version: 2.17.0
+    version: 2.18.2
     releaseName: hcloud-csi
     namespace: kube-system
     includeCRDs: true
@@ -85,15 +85,15 @@ helmCharts:
               memory: 80Mi
               cpu: 100m
         hostNetwork: true
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                    - key: "node-role.kubernetes.io/control-plane"
-                      operator: NotIn
-                      values:
-                        - ""
+        # affinity:
+        #   nodeAffinity:
+        #     requiredDuringSchedulingIgnoredDuringExecution:
+        #       nodeSelectorTerms:
+        #         - matchExpressions:
+        #             - key: "node-role.kubernetes.io/control-plane"
+        #               operator: NotIn
+        #               values:
+        #                 - ""
         # extraEnvVars:
         #   - name: LOG_LEVEL
         #     value: trace
