@@ -1,7 +1,10 @@
 @build:
   mkdir -p .build/manifests
   just build-helm manifests/argocd
+  just build-helm manifests/cert-manager
   just build-helm manifests/cilium
+  just build-helm manifests/coroot
+  just build-helm manifests/external-secrets
   just build-helm manifests/gcp-wif-webhook
   just build-helm manifests/hcloud-ccm
   just build-helm manifests/hcloud-csi

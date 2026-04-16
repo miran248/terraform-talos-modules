@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+helmCharts:
+  - name: external-secrets
+    repo: https://charts.external-secrets.io
+    version: 2.3.0
+    releaseName: external-secrets
+    namespace: external-secrets
+    includeCRDs: true
+    valuesInline:
+      hostNetwork: true
+      serviceAccount:
+        annotations:
+          cloud.google.com/workload-identity-provider: "projects/603494906590/locations/global/workloadIdentityPools/talos/providers/talos-oidc"
+          cloud.google.com/service-account-email: "external-secrets@miran248-talos-modules-dev.iam.gserviceaccount.com"
+          cloud.google.com/audience: "sts.googleapis.com"
+          cloud.google.com/gcloud-run-as-user: "1000"
+          cloud.google.com/injection-mode: "direct"
+          # cloud.google.com/injection-mode: "gcloud"
+      # webhook:
+      #   create: false
+      #   certManager:
+      #     enabled: false

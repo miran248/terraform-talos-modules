@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - instance.yaml
+helmCharts:
+  - name: coroot-operator
+    repo: https://coroot.github.io/helm-charts
+    version: 0.9.4
+    releaseName: coroot-operator
+    namespace: coroot
+    includeCRDs: true
+    valuesInline:
+      fullnameOverride: coroot-operator

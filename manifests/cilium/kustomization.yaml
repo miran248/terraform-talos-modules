@@ -1,11 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
+  # - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/standard-install.yaml
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: v1.18.0
+    version: v1.19.2
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -24,18 +25,6 @@ helmCharts:
             enabled: false
             interval: 60s
 
-      # debug:
-      #   enabled: true
-
-      # cni:
-      #   uninstall: true
-
-      # cleanState: true
-      # cleanBpfState: true
-
-      # TODO: try tunnel again
-      routingMode: native
-
       k8sServiceHost: localhost
       k8sServicePort: 7445
 
@@ -53,24 +42,11 @@ helmCharts:
         requireIPv6PodCIDR: *ipv6
         requireIPv4PodCIDR: *ipv4
 
-      enableIPv6Masquerade: false
-      enableIPv4Masquerade: false
-
       enableIPv6BIGTCP: *ipv6
       enableIPv4BIGTCP: *ipv4
-
-      autoDirectNodeRoutes: false
-      directRoutingSkipUnreachable: false
-
-      localRedirectPolicy: false
+      enableTunnelBIGTCP: true
 
       underlayProtocol: ipv6
-
-      hostFirewall:
-        enabled: false
-
-      endpointRoutes:
-        enabled: false
 
       externalIPs:
         enabled: true
@@ -84,27 +60,9 @@ helmCharts:
 
       l7Proxy: true
 
-      bgp:
-        enabled: false
-        announce:
-          loadbalancerIP: false
-          podCIDR: false
-
-      bgpControlPlane:
-        enabled: false
-
-      nat46x64Gateway:
-        enabled: false
-
-      nodeIPAM:
-        enabled: false
-
       bpf:
-        # datapathMode: veth
         datapathMode: netkit
-        masquerade: false
-        tproxy: true
-        hostLegacyRouting: false
+        masquerade: true
         distributedLRU:
           enabled: true
         mapDynamicSizeRatio: 0.08
@@ -119,19 +77,10 @@ helmCharts:
       # interface kubespan: attaching program cil_xdp_entry using bpf_link: create link: operation not supported
       # loadBalancer:
       #   acceleration: native
-      loadBalancer:
-        acceleration: best-effort
 
-      authentication:
-        enabled: false
-        mutual:
-          spire:
-            enabled: false
-
-      encryption:
-        enabled: false
-        type: wireguard
-        nodeEncryption: false # broken
+      # unable to initialize kube-proxy replacement options: XDP acceleration cannot be used with an IPv6 underlay
+      # loadBalancer:
+      #   acceleration: best-effort
 
       gatewayAPI:
         enabled: true
@@ -223,5 +172,3 @@ helmCharts:
         autoMount:
           enabled: false
         hostRoot: /sys/fs/cgroup
-# patches:
-#   - path: patch-namespaces.yaml
