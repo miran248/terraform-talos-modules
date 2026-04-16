@@ -1,4 +1,19 @@
 init:
   packer init .
-build:
-  packer build .
+
+hcloud:
+  packer build hcloud.pkr.hcl
+
+TMP_FILE_PATH := "./tmp-scaleway/talos-1.12.6-amd64"
+FILE_NAME := "talos-1.12.6-amd64"
+scaleway:
+  # https://docs.siderolabs.com/talos/v1.12/platform-specific-installations/cloud-platforms/scaleway
+  # https://factory.talos.dev/?arch=amd64&bootloader=auto&cmdline-set=true&extensions=-&platform=scaleway&target=cloud&version=1.12.6
+  mkdir -p ./tmp-scaleway
+  wget "https://factory.talos.dev/image/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/v1.12.6/scaleway-amd64.raw.zst" -O {{ TMP_FILE_PATH }}.raw.zst
+  zstd -d {{ TMP_FILE_PATH }}.raw.zst -o {{ TMP_FILE_PATH }}.raw
+  qemu-img convert -O qcow2 {{ TMP_FILE_PATH }}.raw {{ TMP_FILE_PATH }}.qcow2
+  rclone copy {{ TMP_FILE_PATH }}.qcow2 scaleway:miran248-terraform-talos-modules-dev-images
+  # scw block snapshot import-from-object-storage zone=fr-par-1 name=talos-1.12.6-amd64 bucket=miran248-terraform-talos-modules-dev-images key=scaleway-talos-1.12.6-amd64.qcow2 size=10GB -o json | jq '.id' | xargs scw block snapshot wait
+  # scw instance snapshot create zone=fr-par-1 name={{ FILE_NAME }} bucket=miran248-terraform-talos-modules-dev-images key={{ FILE_NAME }}.qcow2 --wait -o json | jq '.id' | xargs -I {} scw instance image create zone=fr-par-1 name={{ FILE_NAME }} volume_id={}
+  # rm -Rf ./tmp-scaleway
