@@ -73,6 +73,13 @@ locals {
         talos = { machine_type = "controlplane" }
         patches = flatten([
           local.s6.patches.control_planes,
+          <<-EOF
+            apiVersion: v1alpha1
+            kind: HostnameConfig
+            hostname: ${node.name}
+            auto: off
+          EOF
+          ,
           node.patches,
         ])
       })
@@ -82,6 +89,13 @@ locals {
         talos = { machine_type = "worker" }
         patches = flatten([
           local.s6.patches.workers,
+          <<-EOF
+            apiVersion: v1alpha1
+            kind: HostnameConfig
+            hostname: ${node.name}
+            auto: off
+          EOF
+          ,
           node.patches,
         ])
       })

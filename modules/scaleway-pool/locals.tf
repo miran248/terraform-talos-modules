@@ -25,17 +25,17 @@ locals {
     nodes = merge(local.s1.control_planes, local.s1.workers)
   }
   s3 = {
-    ips6 = { for key, ip in hcloud_primary_ip.ips6 :
+    ips6 = { for key, ip in scaleway_instance_ip.ips6 :
       key => {
         public_ip6_id         = ip.id
-        public_ip6_network_64 = ip.ip_network                      # 2000:2:3:4::/64
-        public_ip6            = cidrhost(ip.ip_network, 1)         # 2000:2:3:4::1
+        public_ip6_network_64 = ip.prefix                      # 2000:2:3:4::/64
+        public_ip6            = cidrhost(ip.prefix, 1)         # 2000:2:3:4::1
       }
     }
   }
 
   ids = {
-    group = hcloud_placement_group.this.id
+    group = scaleway_instance_placement_group.this.id
   }
 
   control_planes = { for key, node in local.s1.control_planes :
