@@ -1,30 +1,22 @@
 resource "hcloud_server" "this" {
-  for_each    = var.pool.nodes
-  name        = var.pool.nodes[each.key].name
-  image       = var.pool.nodes[each.key].image_id
-  server_type = var.pool.nodes[each.key].server_type
-  datacenter  = var.pool.datacenter
-  user_data   = var.cluster.configs[each.key]
+  for_each                 = var.pool.nodes
+  name                     = var.pool.nodes[each.key].name
+  image                    = var.pool.nodes[each.key].image
+  server_type              = var.pool.nodes[each.key].server_type
+  location                 = var.pool.location
+  user_data                = var.cluster.configs[each.key]
+  placement_group_id       = var.pool.ids.group
+  delete_protection        = false
+  shutdown_before_deletion = true
+
   ssh_keys = [
     hcloud_ssh_key.this.id,
   ]
-
-  delete_protection        = false
-  shutdown_before_deletion = true
 
   ignore_remote_firewall_ids = true
   firewall_ids = [
     hcloud_firewall.deny_all.id,
   ]
-
-  dynamic "network" {
-    for_each = var.pool.nodes[each.key].private_ip4 == null ? [] : [1]
-    content {
-      network_id = var.pool.ids.network
-      ip         = var.pool.nodes[each.key].private_ip4
-      alias_ips  = []
-    }
-  }
 
   public_net {
     ipv6_enabled = true

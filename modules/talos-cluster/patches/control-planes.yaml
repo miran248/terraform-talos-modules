@@ -7,10 +7,11 @@ cluster:
   controllerManager:
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
     extraArgs:
-      allocate-node-cidrs: false
+      # allocate-node-cidrs: false
+      allocate-node-cidrs: true
       bind-address: "::"
-      cloud-provider: external
-      controllers: "*,tokencleaner,-node-ipam-controller"
+      # cloud-provider: external
+      # controllers: "*,tokencleaner,-node-ipam-controller"
       node-cidr-mask-size-ipv6: 112
   discovery:
     enabled: true
@@ -24,7 +25,8 @@ cluster:
     extraArgs:
       listen-metrics-urls: "http://[::]:2381"
   externalCloudProvider:
-    enabled: true
+    # enabled: true
+    enabled: false
   scheduler:
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
     extraArgs:

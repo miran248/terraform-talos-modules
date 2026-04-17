@@ -102,6 +102,6 @@ locals {
   }
 
   configs = { for key, config in data.talos_machine_configuration.this :
-    key => yamlencode(yamldecode(config.machine_configuration))
+    key => config.machine_configuration
   }
 }

@@ -5,15 +5,8 @@ output "MODULE_NAME" {
 output "prefix" {
   value = var.prefix
 }
-output "datacenter" {
-  value = var.datacenter
-}
-
-output "cidr" {
-  value = var.cidr
-}
-output "load_balancer_ip" {
-  value = var.load_balancer_ip
+output "location" {
+  value = var.location
 }
 
 output "ids" {

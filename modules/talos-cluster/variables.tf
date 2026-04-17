@@ -23,12 +23,10 @@ variable "kubernetes_version" {
 variable "pools" {
   type = list(object({
     prefix = string
-    cidr   = optional(string)
     control_planes = map(object({
       name                  = string
       aliases               = list(string)
       public_ip6_network_64 = string
-      public_ip6_64         = string
       public_ip6            = string
       patches               = list(string)
     }))
@@ -36,7 +34,6 @@ variable "pools" {
       name                  = string
       aliases               = list(string)
       public_ip6_network_64 = string
-      public_ip6_64         = string
       public_ip6            = string
       patches               = list(string)
     }))
@@ -45,10 +42,6 @@ variable "pools" {
   validation {
     condition     = length([for i, pool in var.pools : pool.prefix]) == length(distinct([for i, pool in var.pools : pool.prefix]))
     error_message = "pool prefixes must be unique"
-  }
-  validation {
-    condition     = length(compact([for i, pool in var.pools : pool.cidr])) == length(distinct(compact([for i, pool in var.pools : pool.cidr])))
-    error_message = "pool cidrs must be unique"
   }
 }
 

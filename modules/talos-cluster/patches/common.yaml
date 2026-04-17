@@ -8,7 +8,7 @@ cluster:
     # 108 is the largest supported 128b range
     # 20 bits is hardcoded here https://github.com/kubernetes/kubernetes/blob/ec16c90aaf5d1f0606747c421c8680bb2b243d4e/cmd/kube-apiserver/app/options/validation.go#L40
     serviceSubnets:
-      - "fc00::/108"
+      - "fc00::/112"
   proxy:
     disabled: true
 machine:
@@ -16,7 +16,6 @@ machine:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
     rbac: true
-    stableHostname: true
     hostDNS:
       enabled: true
       forwardKubeDNSToHost: false # doesn't work on singlestack ipv6! 169.254.116.108 address is hardcoded!
@@ -27,12 +26,14 @@ machine:
     clusterDNS:
       - "fc00::a"
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
-    extraArgs:
-      cloud-provider: external
-      rotate-server-certificates: true
+    # extraArgs:
+    #   cloud-provider: external
+    #   rotate-server-certificates: true
+    # https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/#kubelet-config-k8s-io-v1beta1-KubeletConfiguration
     extraConfig:
       address: "::"
-      healthzBindAddress: "::"
+      healthzBindAddress: "::" # must be ::, ::1 didn't work
+      # rotateCertificates: true # already true and can't be set again
   network:
     kubespan:
       enabled: true
@@ -43,7 +44,7 @@ machine:
       filters:
         endpoints:
           - "::/0"
-          - "fc00::/108"
+          - "fc00::/112"
           - "fc00:1::/96"
   sysctls:
     net.core.somaxconn: 65535

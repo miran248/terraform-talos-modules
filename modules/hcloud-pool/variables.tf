@@ -2,28 +2,15 @@ variable "prefix" {
   type        = string
   description = "hcloud resource name prefix, must be unique"
 }
-variable "datacenter" {
+variable "location" {
   type        = string
-  description = "hcloud datacenter"
-}
-
-variable "cidr" {
-  type        = string
-  description = "hcloud private network cidr4"
-  nullable    = true
-  default     = null
-}
-variable "load_balancer_ip" {
-  type        = string
-  description = "hcloud load balancer ip4"
-  nullable    = true
-  default     = null
+  description = "hcloud location"
 }
 
 variable "control_planes" {
   type = list(object({
     server_type = string
-    image_id    = number
+    image       = number
     aliases     = optional(list(string), [])
     patches     = optional(list(string), [])
     removed     = optional(bool, false)
@@ -34,7 +21,7 @@ variable "control_planes" {
 variable "workers" {
   type = list(object({
     server_type = string
-    image_id    = number
+    image       = number
     aliases     = optional(list(string), [])
     patches     = optional(list(string), [])
     removed     = optional(bool, false)
