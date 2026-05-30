@@ -5,9 +5,9 @@ Modules in this repository help provision and maintain multi-region [Kubernetes]
 - [Talos Linux](https://www.talos.dev) with KubeSpan, KubePrism and HostDNS
 - IPv6-only node connectivity (NAT64 for outbound IPv4)
 - Single-stack IPv6 internals (dual-stack possible with additional patches)
-- [Cilium](https://cilium.io) — tunnel mode (netkit), BigTCP and BBR
-- [talos-ccm](https://github.com/siderolabs/talos-cloud-controller-manager) — optional, node IPAM (CloudAllocator) and cloud metadata, requires additional patches (see [examples/talos-ccm.tf](examples/talos-ccm.tf))
-- [gcp-wif](modules/gcp-wif) + [gcp-wif-apply](modules/gcp-wif-apply) — optional GCP Workload Identity Federation integration
+- [Cilium](https://cilium.io) - tunnel mode (netkit), BigTCP and BBR
+- [talos-ccm](https://github.com/siderolabs/talos-cloud-controller-manager) - optional, node IPAM (CloudAllocator) and cloud metadata, requires additional patches (see [examples/talos-ccm.tf](examples/talos-ccm.tf))
+- [gcp-wif](modules/gcp-wif) + [gcp-wif-apply](modules/gcp-wif-apply) - optional GCP Workload Identity Federation integration
 
 ## modules
 
@@ -83,7 +83,7 @@ graph TD
 ```shell
 > TALOSCONFIG=talos-config talosctl -n c1 dashboard
 ```
-4. Run `just` from the repo root to generate manifests from the [manifests](manifests) directory, then apply them — `talos-ccm` and `cilium` are required
+4. Run `just` from the repo root to generate manifests from the [manifests](manifests) directory, then apply them - `talos-ccm` and `cilium` are required
 ```shell
 > KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/talos-ccm.yaml
 > KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium.yaml

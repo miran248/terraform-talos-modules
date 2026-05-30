@@ -1,5 +1,5 @@
 # hcloud-pool
-Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per node and a placement group. Does not provision servers — pass outputs to [hcloud-apply](../hcloud-apply) and [talos-cluster](../talos-cluster).
+Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per node and a placement group. Does not provision servers - pass outputs to [hcloud-apply](../hcloud-apply) and [talos-cluster](../talos-cluster).
 
 ## inputs
 

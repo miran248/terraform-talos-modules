@@ -1,5 +1,5 @@
 # talos-cluster
-Generates Talos machine secrets, computes per-node config patches (cert SANs, etcd advertised subnets, hostname, aliases), and produces `user_data` configs for each node. Provider-agnostic — accepts outputs from any pool module.
+Generates Talos machine secrets, computes per-node config patches (cert SANs, etcd advertised subnets, hostname, aliases), and produces `user_data` configs for each node. Provider-agnostic - accepts outputs from any pool module.
 
 ## inputs
 

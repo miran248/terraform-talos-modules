@@ -1,12 +1,6 @@
 # scaleway-apply
 Provisions Scaleway instances with Talos `user_data`, ephemeral local SSD volumes and security groups. Accepts outputs from [scaleway-pool](../scaleway-pool) and [talos-cluster](../talos-cluster). Pass outputs to [talos-apply](../talos-apply).
 
-Control plane servers are created before workers to support rolling upgrades. Run with `-parallelism=1` to enforce ordering:
-
-```shell
-> terraform apply -parallelism=1
-```
-
 ## inputs
 
 | name | type | description |
@@ -18,7 +12,7 @@ Control plane servers are created before workers to support rolling upgrades. Ru
 
 | name | description |
 |---|---|
-| `ips` | node IP addresses — `ips.v6` and `ips.v4` (maps keyed by node name) |
+| `ips` | node IP addresses - `ips.v6` and `ips.v4` (maps keyed by node name) |
 
 ## example
 

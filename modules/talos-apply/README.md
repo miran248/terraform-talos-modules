@@ -1,14 +1,18 @@
 # talos-apply
 Applies Talos machine configurations, bootstraps the cluster and retrieves the kubeconfig. Collects actual node IPs from apply module outputs to inject `StaticHostConfig` entries into each node's config.
 
-Control planes are configured before workers, enabling rolling upgrades when `kubernetes_version` or `talos_version` changes on `talos-cluster`.
+Control planes are configured before workers, enabling rolling upgrades when `kubernetes_version` or `talos_version` changes on `talos-cluster`. Run with `-parallelism=1` to enforce ordering:
+
+```shell
+> terraform apply -parallelism=1
+```
 
 ## inputs
 
 | name | type | required | description |
 |---|---|---|---|
 | `cluster` | `object` | yes | `talos-cluster` module outputs |
-| `applies` | `list(object)` | yes | list of apply module outputs (e.g. `hcloud-apply`, `scaleway-apply`) — used to collect actual node IPs for static host entries |
+| `applies` | `list(object)` | yes | list of apply module outputs (e.g. `hcloud-apply`, `scaleway-apply`) - used to collect actual node IPs for static host entries |
 
 ## outputs
 

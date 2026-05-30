@@ -5,8 +5,8 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 
 | name | description | required |
 |---|---|---|
-| [cilium](cilium) | CNI — tunnel mode (netkit), BigTCP, BBR, Gateway API | yes |
-| [talos-ccm](talos-ccm) | Talos Cloud Controller Manager — node IPAM and cloud metadata | yes |
+| [cilium](cilium) | CNI - tunnel mode (netkit), BigTCP, BBR, Gateway API | yes |
+| [talos-ccm](talos-ccm) | Talos Cloud Controller Manager - node IPAM and cloud metadata | yes |
 | [argocd](argocd) | GitOps controller | no |
 | [cert-manager](cert-manager) | certificate management | no |
 | [coroot](coroot) | observability | no |

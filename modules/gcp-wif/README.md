@@ -27,7 +27,7 @@ Use with [gcp-wif-apply](../gcp-wif-apply) to upload OIDC documents after the cl
 | `name` | pool name |
 | `bucket_name` | GCS bucket name |
 | `ids` | resource IDs including `oidc_bucket` |
-| `patches` | Talos config patches — pass `patches.control_planes` to `talos-cluster` |
+| `patches` | Talos config patches - pass `patches.control_planes` to `talos-cluster` |
 
 ## example
 

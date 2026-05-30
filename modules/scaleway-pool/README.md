@@ -1,5 +1,5 @@
 # scaleway-pool
-Allocates Scaleway resources for a node pool: one routed IPv6 and one routed IPv4 IP per node, and a placement group. Does not provision servers — pass outputs to [scaleway-apply](../scaleway-apply) and [talos-cluster](../talos-cluster).
+Allocates Scaleway resources for a node pool: one routed IPv6 and one routed IPv4 IP per node, and a placement group. Does not provision servers - pass outputs to [scaleway-apply](../scaleway-apply) and [talos-cluster](../talos-cluster).
 
 ## inputs
 
@@ -36,7 +36,7 @@ Allocates Scaleway resources for a node pool: one routed IPv6 and one routed IPv
 | `prefix` | pool prefix |
 | `zone` | Scaleway zone |
 | `nodes` | map of fully resolved node objects, keyed by node name |
-| `ids` | resource IDs (`group`, `ips.v6`, `ips.v4`) — IPv4 is temporary, instances currently require it to boot |
+| `ids` | resource IDs (`group`, `ips.v6`, `ips.v4`) - IPv4 is temporary, instances currently require it to boot |
 
 ## example
 

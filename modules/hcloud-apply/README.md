@@ -1,12 +1,6 @@
 # hcloud-apply
 Provisions Hetzner Cloud servers with Talos `user_data` and sets up firewalls. Accepts outputs from [hcloud-pool](../hcloud-pool) and [talos-cluster](../talos-cluster). Pass outputs to [talos-apply](../talos-apply).
 
-Control plane servers are created before workers to support rolling upgrades. Run with `-parallelism=1` to enforce ordering:
-
-```shell
-> terraform apply -parallelism=1
-```
-
 ## inputs
 
 | name | type | description |
@@ -18,7 +12,7 @@ Control plane servers are created before workers to support rolling upgrades. Ru
 
 | name | description |
 |---|---|
-| `ips` | node IP addresses — `ips.v6` (map of IPv6 addresses, keyed by node name) |
+| `ips` | node IP addresses - `ips.v6` (map of IPv6 addresses, keyed by node name) |
 
 ## example
 
