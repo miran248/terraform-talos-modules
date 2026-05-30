@@ -37,13 +37,13 @@ resource "scaleway_instance_security_group" "this" {
     port     = "10256"
   }
 
-  # allows full access between cluster nodes
+  # allows full access between all cluster nodes across all pools
   dynamic "inbound_rule" {
     for_each = var.cluster.nodes
     content {
       action   = "accept"
       protocol = "ANY"
-      ip_range = inbound_rule.value.public_ip6_network_64
+      ip_range = inbound_rule.value.ip_64
     }
   }
 }

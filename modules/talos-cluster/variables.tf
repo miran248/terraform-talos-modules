@@ -4,12 +4,7 @@ variable "name" {
 }
 variable "endpoint" {
   type        = string
-  description = "cluster endpoint"
-
-  validation {
-    condition     = startswith(var.endpoint, "http") == false && endswith(var.endpoint, "6443") == false
-    error_message = "must not contain protocol or port"
-  }
+  description = "cluster DNS endpoint (e.g. prod.example.com)"
 }
 variable "talos_version" {
   type        = string
@@ -23,19 +18,12 @@ variable "kubernetes_version" {
 variable "pools" {
   type = list(object({
     prefix = string
-    control_planes = map(object({
-      name                  = string
-      aliases               = list(string)
-      public_ip6_network_64 = string
-      public_ip6            = string
-      patches               = list(string)
-    }))
-    workers = map(object({
-      name                  = string
-      aliases               = list(string)
-      public_ip6_network_64 = string
-      public_ip6            = string
-      patches               = list(string)
+    nodes = map(object({
+      kind    = string
+      name    = string
+      aliases = list(string)
+      ip_64   = string
+      patches = list(string)
     }))
   }))
   description = "list of node pool module outputs"

@@ -48,14 +48,14 @@ resource "hcloud_firewall" "this" {
     source_ips  = ["::/0"]
   }
 
-  # allows full access between cluster nodes
+  # allows full access between all cluster nodes across all pools
   dynamic "rule" {
     for_each = toset(["tcp", "udp"])
     content {
       direction  = "in"
       protocol   = rule.value
       port       = "any"
-      source_ips = [for key, node in var.cluster.nodes : node.public_ip6_network_64]
+      source_ips = [for _, node in var.cluster.nodes : node.ip_64]
     }
   }
   dynamic "rule" {
@@ -63,7 +63,7 @@ resource "hcloud_firewall" "this" {
     content {
       direction  = "in"
       protocol   = rule.value
-      source_ips = [for key, node in var.cluster.nodes : node.public_ip6_network_64]
+      source_ips = [for _, node in var.cluster.nodes : node.ip_64]
     }
   }
 }

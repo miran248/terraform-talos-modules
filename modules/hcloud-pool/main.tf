@@ -1,11 +1,10 @@
 # ips
-resource "hcloud_primary_ip" "ips6" {
-  for_each      = local.s2.nodes
-  name          = "${each.value.name}-ip6"
-  location      = var.location
-  type          = "ipv6"
-  assignee_type = "server"
-  auto_delete   = false
+resource "hcloud_primary_ip" "this" {
+  for_each    = local.s1
+  name        = each.key
+  location    = var.location
+  type        = "ipv6"
+  auto_delete = false
 
   delete_protection = false
 }

@@ -1,121 +1,66 @@
 locals {
-  s1 = {
-    control_planes = merge([for i, pool in var.pools : pool.control_planes]...)
-    workers        = merge([for i, pool in var.pools : pool.workers]...)
-  }
-  s2 = {
-    nodes = merge(local.s1.control_planes, local.s1.workers)
+  # s1: merge all pool nodes into one map
+  s1 = merge([for pool in var.pools : pool.nodes]...)
 
-    aliases = {
-      control_planes = { for key, node in local.s1.control_planes :
-        key => flatten([node.aliases, "c${index(keys(local.s1.control_planes), key) + 1}"])
-      }
-      workers = { for key, node in local.s1.workers :
-        key => flatten([node.aliases, "w${index(keys(local.s1.workers), key) + 1}"])
-      }
-    }
-  }
-  s3 = {
-    aliases = merge(local.s2.aliases.control_planes, local.s2.aliases.workers)
-  }
-  s4 = {
-    cert_sans = flatten([
-      var.endpoint,
-      [for key, node in local.s2.nodes : [
-        node.public_ip6,
-        local.s3.aliases[key],
-      ]],
-    ])
-  }
-  s5 = {
-    patches_common = flatten([
-      file("${path.module}/patches/common.yaml"),
+  # s2: short per-kind ordinal alias (c1/c2... w1/w2...)
+  s2 = merge(
+    { for i, key in [for k, v in local.s1 : k if v.kind == "control-plane"] : key => "c${i + 1}" },
+    { for i, key in [for k, v in local.s1 : k if v.kind == "worker"] : key => "w${i + 1}" },
+  )
+
+  # s3: expanded aliases (ordinal + original)
+  s3 = { for key, node in local.s1 : key => flatten([node.aliases, local.s2[key]]) }
+
+  # s4: cert SANs
+  s4 = flatten([
+    var.endpoint,
+    [for key, _ in local.s1 : local.s3[key]],
+  ])
+
+  # s5: common patches (base for all nodes)
+  s5 = flatten([
+    file("${path.module}/patches/common.yaml"),
+    yamlencode({ machine = { certSANs = local.s4, install = { image = "ghcr.io/siderolabs/installer:${var.talos_version}" } } }),
+    var.patches.common,
+  ])
+
+  # s6: per-kind full patches
+  s6 = {
+    control_planes = flatten([
+      local.s5,
+      file("${path.module}/patches/control-planes.yaml"),
       yamlencode({
-        machine = {
-          certSANs = local.s4.cert_sans
-          network = {
-            extraHostEntries = [for key, node in local.s2.nodes : {
-              ip      = node.public_ip6
-              aliases = local.s3.aliases[key]
-            }]
-          }
+        cluster = {
+          apiServer = { certSANs = local.s4 }
+          etcd      = { advertisedSubnets = [for _, node in local.s1 : node.ip_64] }
         }
       }),
-      var.patches.common,
+      var.patches.control_planes,
     ])
-  }
-  s6 = {
-    patches = {
-      control_planes = flatten([
-        local.s5.patches_common,
-        file("${path.module}/patches/control-planes.yaml"),
-        yamlencode({
-          cluster = {
-            apiServer = {
-              certSANs = local.s4.cert_sans
-            }
-            etcd = {
-              advertisedSubnets = [for key, node in local.s2.nodes : node.public_ip6_network_64]
-            }
-          }
-        }),
-        var.patches.control_planes,
-      ])
-      workers = flatten([
-        local.s5.patches_common,
-        var.patches.workers,
-      ])
-    }
-  }
-  s7 = {
-    control_planes = { for key, node in local.s1.control_planes :
-      key => merge(node, {
-        talos = { machine_type = "controlplane" }
-        patches = flatten([
-          local.s6.patches.control_planes,
-          <<-EOF
-            apiVersion: v1alpha1
-            kind: HostnameConfig
-            hostname: ${node.name}
-            auto: off
-          EOF
-          ,
-          node.patches,
-        ])
-      })
-    }
-    workers = { for key, node in local.s1.workers :
-      key => merge(node, {
-        talos = { machine_type = "worker" }
-        patches = flatten([
-          local.s6.patches.workers,
-          <<-EOF
-            apiVersion: v1alpha1
-            kind: HostnameConfig
-            hostname: ${node.name}
-            auto: off
-          EOF
-          ,
-          node.patches,
-        ])
-      })
-    }
+    workers = flatten([local.s5, var.patches.workers])
   }
 
+  # s7: final nodes map with all derived fields merged in
+  s7 = { for key, node in local.s1 :
+    key => merge(node, {
+      talos   = { machine_type = node.kind == "control-plane" ? "controlplane" : "worker" }
+      aliases = local.s3[key]
+      patches = flatten([
+        node.kind == "control-plane" ? local.s6.control_planes : local.s6.workers,
+        <<-EOF
+          apiVersion: v1alpha1
+          kind: HostnameConfig
+          hostname: ${key}
+          auto: "off"
+        EOF
+        ,
+        node.patches,
+      ])
+    })
+  }
+
+  endpoint         = var.endpoint
   cluster_endpoint = "https://${var.endpoint}:6443"
-
-  nodes = merge(local.s7.control_planes, local.s7.workers)
-
-  names = {
-    control_planes = [for key, node in local.s1.control_planes : node.name]
-    workers        = [for key, node in local.s1.workers : node.name]
-  }
-  public_ips6 = {
-    control_planes = [for key, node in local.s1.control_planes : node.public_ip6]
-    workers        = [for key, node in local.s1.workers : node.public_ip6]
-  }
-
-  configs = { for key, config in data.talos_machine_configuration.this :
-    key => config.machine_configuration
-  }
+  nodes            = local.s7
+  configs          = { for key, config in data.talos_machine_configuration.this : key => config.machine_configuration }
 }

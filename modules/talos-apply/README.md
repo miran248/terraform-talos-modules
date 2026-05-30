@@ -1,0 +1,40 @@
+# talos-apply
+Applies Talos machine configurations, bootstraps the cluster and retrieves the kubeconfig. Collects actual node IPs from apply module outputs to inject `StaticHostConfig` entries into each node's config.
+
+Control planes are configured before workers, enabling rolling upgrades when `kubernetes_version` or `talos_version` changes on `talos-cluster`.
+
+## inputs
+
+| name | type | required | description |
+|---|---|---|---|
+| `cluster` | `object` | yes | `talos-cluster` module outputs |
+| `applies` | `list(object)` | yes | list of apply module outputs (e.g. `hcloud-apply`, `scaleway-apply`) — used to collect actual node IPs for static host entries |
+
+## outputs
+
+| name | description |
+|---|---|
+| `kube_config` | Kubernetes client configuration (sensitive) |
+| `ca_certificate` | Kubernetes CA certificate (sensitive) |
+| `client_certificate` | Kubernetes client certificate (sensitive) |
+| `client_key` | Kubernetes client key (sensitive) |
+
+## example
+
+```hcl
+module "talos_apply" {
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v3.2.3"
+
+  cluster = module.talos_cluster
+  applies = [module.nuremberg_apply, module.helsinki_apply]
+}
+
+output "talos_config" {
+  value     = module.talos_cluster.talos_config
+  sensitive = true
+}
+output "kube_config" {
+  value     = module.talos_apply.kube_config
+  sensitive = true
+}
+```

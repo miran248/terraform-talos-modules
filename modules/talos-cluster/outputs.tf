@@ -6,7 +6,7 @@ output "name" {
   value = var.name
 }
 output "endpoint" {
-  value = var.endpoint
+  value = local.endpoint
 }
 
 output "cluster_endpoint" {
@@ -24,12 +24,13 @@ output "nodes" {
   value = local.nodes
 }
 
-output "names" {
-  value = local.names
-}
-output "public_ips6" {
-  value = local.public_ips6
-}
 output "configs" {
   value = local.configs
+}
+
+output "talos_version" {
+  value = var.talos_version
+}
+output "kubernetes_version" {
+  value = var.kubernetes_version
 }

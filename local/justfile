@@ -1,0 +1,62 @@
+CONTROL_PLANE_COUNT := "3"
+WORKER_COUNT := "3"
+
+# lists all available recipes
+list:
+  @just --list --unsorted
+
+# spins up a local cluster
+up:
+  TALOSCONFIG=talos-config KUBECONFIG=kube-config talosctl cluster create \
+    --name talos \
+    --provisioner docker \
+    --state .talos \
+    --controlplanes {{ CONTROL_PLANE_COUNT }} \
+    --workers {{ WORKER_COUNT }} \
+    --with-kubespan \
+    --config-patch patches/common.yaml \
+    --config-patch-control-plane patches/control-planes.yaml
+
+# tears down the cluster
+down:
+  TALOSCONFIG=talos-config talosctl cluster destroy \
+    --name talos \
+    --provisioner docker \
+    --state .talos
+  rm kube-config talos-config
+
+# patches all machines
+apply-all MODE="auto": (apply-control-planes MODE) (apply-workers MODE)
+
+# patches all control planes
+apply-control-planes MODE="auto":
+  #!/usr/bin/env sh
+  for i in {1..{{ CONTROL_PLANE_COUNT }}}
+  do
+    @just apply-control-plane $i MODE
+  done
+
+# patches all workers
+apply-workers MODE="auto":
+  #!/usr/bin/env sh
+  for i in {1..{{ WORKER_COUNT }}}
+  do
+    @just apply-worker $i MODE
+  done
+
+# patches one control plane
+apply-control-plane N MODE="auto":
+  TALOSCONFIG=talos-config talosctl apply-config \
+    --cluster talos \
+    --nodes talos-controlplane-{{ N }} \
+    --mode {{ MODE }} \
+    --config-patch patches/common.yaml \
+    --config-patch patches/control-planes.yaml
+
+# patches one worker
+apply-worker N MODE="auto":
+  TALOSCONFIG=talos-config talosctl apply-config \
+    --cluster talos \
+    --nodes talos-worker-{{ N }} \
+    --mode {{ MODE }} \
+    --config-patch patches/common.yaml

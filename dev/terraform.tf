@@ -13,6 +13,13 @@ terraform {
     hcloud = {
       source = "hetznercloud/hcloud"
     }
+    scaleway = {
+      source = "scaleway/scaleway"
+    }
+    talos = {
+      source  = "siderolabs/talos"
+      version = "0.12.0-alpha.1"
+    }
   }
   required_version = ">= 1"
 }

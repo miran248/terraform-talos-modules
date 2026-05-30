@@ -7,3 +7,6 @@ data "google_dns_managed_zone" "this" {
 data "google_secret_manager_secret_version" "hcloud_token" {
   secret = "hcloud"
 }
+data "google_secret_manager_secret_version" "scaleway_token" {
+  secret = "scaleway"
+}
