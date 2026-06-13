@@ -5,15 +5,25 @@ Provisions Scaleway instances with Talos `user_data`, ephemeral local SSD volume
 
 | name | type | description |
 |---|---|---|
-| `pool` | `object` | `scaleway-pool` module outputs |
-| `cluster` | `object` | `talos-cluster` module outputs |
-| `inbound_rules` | `list(object)` | Additional inbound security group rules. Fields: `action` (required), `protocol`, `port`, `port_range`, `ip_range`. |
+| `pool` | [scaleway-pool](../scaleway-pool) outputs | |
+| `cluster` | [talos-cluster](../talos-cluster) outputs | |
+| `inbound_rules` | `list(inbound_rule)` | additional inbound security group rules |
+
+### inbound_rule fields
+
+| name | type | required | description |
+|---|---|---|---|
+| `action` | `string` | yes | `accept` or `drop` |
+| `protocol` | `string` | no | `TCP`, `UDP`, `ICMP`, or `ANY` |
+| `port` | `number` | no | single port |
+| `port_range` | `string` | no | port range (e.g. `8000-9000`) |
+| `ip_range` | `string` | no | source IP range (e.g. `2001:db8::/32`) |
 
 ## outputs
 
 | name | description |
 |---|---|
-| `ips` | node IP addresses - `ips.v6` (map keyed by node name) |
+| `nodes` | [scaleway-pool](../scaleway-pool) node objects enriched with an `ip` field |
 
 ## example
 

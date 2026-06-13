@@ -6,13 +6,13 @@ Generates Talos machine secrets, computes per-node config patches (cert SANs, et
 | name | type | required | description |
 |---|---|---|---|
 | `name` | `string` | yes | cluster name |
-| `endpoint` | `string` | yes | cluster DNS endpoint (e.g. `prod.example.com`) |
-| `talos_version` | `string` | yes | Talos version (e.g. `v1.13.3`) |
+| `endpoint` | `string` | yes | cluster DNS endpoint or IP (e.g. `prod.example.com`) |
+| `talos_version` | `string` | yes | Talos version (e.g. `v1.14.0`) |
 | `kubernetes_version` | `string` | yes | Kubernetes version (e.g. `v1.36.1`) |
-| `pools` | `list(object)` | yes | list of pool module outputs |
-| `patches` | `object` | no | cluster-wide config patches |
+| `pools` | `list(`[hcloud-pool](../hcloud-pool) or [scaleway-pool](../scaleway-pool) outputs`)` | yes | |
+| `patches` | `patches` | no | cluster-wide config patches |
 
-### patches object fields
+### patches fields
 
 | name | type | description |
 |---|---|---|
@@ -25,7 +25,7 @@ Generates Talos machine secrets, computes per-node config patches (cert SANs, et
 | name | description |
 |---|---|
 | `name` | cluster name |
-| `endpoint` | cluster DNS endpoint |
+| `endpoint` | cluster endpoint |
 | `cluster_endpoint` | full API server URL (`https://<endpoint>:6443`) |
 | `nodes` | map of fully resolved node objects with patches and aliases |
 | `configs` | map of rendered machine configurations (user_data), keyed by node name |
@@ -42,7 +42,7 @@ module "talos_cluster" {
 
   name               = "prod"
   endpoint           = "prod.example.com"
-  talos_version      = "v1.13.3"
+  talos_version      = "v1.14.0"
   kubernetes_version = "v1.36.1"
 
   pools = [

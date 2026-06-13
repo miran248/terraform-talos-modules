@@ -1,22 +1,18 @@
 locals {
-  s1              = merge([for a in var.applies : a.ips.v6]...)
+  nodes           = merge([for a in var.applies : a.nodes]...)
   installer_image = coalesce(var.installer_image, "ghcr.io/siderolabs/installer:${var.cluster.talos_version}")
 
-  ips = {
-    nodes = local.s1
-  }
-
   patches = {
-    static_hosts = { for key in keys(var.cluster.nodes) :
-      key => [for k, ip in local.s1 : yamlencode({
+    static_hosts = { for key in keys(local.nodes) :
+      key => [for k, n in local.nodes : yamlencode({
         apiVersion = "v1alpha1"
         kind       = "StaticHostConfig"
-        name       = ip
+        name       = n.ip
         hostnames  = concat(var.cluster.nodes[k].aliases, [k])
       })]
     }
-    cert_sans = { for key, ip in local.s1 :
-      key => yamlencode({ machine = { certSANs = [ip] } })
+    cert_sans = { for key, n in local.nodes :
+      key => yamlencode({ machine = { certSANs = [n.ip] } })
     }
   }
 }
@@ -37,22 +33,22 @@ data "talos_machine_configuration" "this" {
 }
 
 resource "talos_machine" "control_planes" {
-  for_each = { for k, ip in local.ips.nodes : k => ip if var.cluster.nodes[k].kind == "control-plane" }
+  for_each = { for k, n in local.nodes : k => n if n.kind == "control-plane" }
 
   client_configuration  = var.cluster.machine_secrets.client_configuration
   endpoint              = var.cluster.endpoint
-  node                  = each.value
+  node                  = each.value.ip
   image                 = local.installer_image
   machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
   drain_on_upgrade      = false
 }
 
 resource "talos_machine" "workers" {
-  for_each = { for k, ip in local.ips.nodes : k => ip if var.cluster.nodes[k].kind == "worker" }
+  for_each = { for k, n in local.nodes : k => n if n.kind == "worker" }
 
   client_configuration  = var.cluster.machine_secrets.client_configuration
   endpoint              = var.cluster.endpoint
-  node                  = each.value
+  node                  = each.value.ip
   image                 = local.installer_image
   machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
   drain_on_upgrade      = false
@@ -63,8 +59,8 @@ resource "talos_machine" "workers" {
 resource "talos_cluster" "this" {
   client_configuration = var.cluster.machine_secrets.client_configuration
   endpoint             = var.cluster.endpoint
-  node                 = values({ for k, ip in local.ips.nodes : k => ip if var.cluster.nodes[k].kind == "control-plane" })[0]
-  control_plane_nodes  = values({ for k, ip in local.ips.nodes : k => ip if var.cluster.nodes[k].kind == "control-plane" })
+  node                 = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })[0]
+  control_plane_nodes  = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })
   kubernetes_version   = var.cluster.kubernetes_version
 
   depends_on = [talos_machine.control_planes]
@@ -73,7 +69,7 @@ resource "talos_cluster" "this" {
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = var.cluster.machine_secrets.client_configuration
   endpoint             = var.cluster.endpoint
-  node                 = values({ for k, ip in local.ips.nodes : k => ip if var.cluster.nodes[k].kind == "control-plane" })[0]
+  node = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })[0]
 
   depends_on = [talos_cluster.this]
 }

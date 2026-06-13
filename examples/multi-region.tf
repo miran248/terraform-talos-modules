@@ -1,17 +1,5 @@
 data "hcloud_image" "talos" {
-  with_selector = "name=talos,version=v1.13.3,arch=amd64"
-}
-
-locals {
-  image_ids = {
-    hcloud = data.hcloud_image.talos.id
-  }
-
-  patches_zitadel = <<-EOF
-    machine:
-      nodeLabels:
-        app: zitadel
-  EOF
+  with_selector = "name=talos,version=v1.14.0,arch=amd64"
 }
 
 module "nuremberg_pool" {
@@ -21,12 +9,12 @@ module "nuremberg_pool" {
   location = "nbg1"
 
   control_planes = [
-    { server_type = "cx22", image = local.image_ids.hcloud },
-    { server_type = "cx22", image = local.image_ids.hcloud },
-    { server_type = "cx22", image = local.image_ids.hcloud },
+    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx22", image = data.hcloud_image.talos.id },
   ]
   workers = [
-    { server_type = "cx22", image = local.image_ids.hcloud, patches = [local.patches_zitadel] },
+    { server_type = "cx22", image = data.hcloud_image.talos.id },
   ]
 }
 
@@ -37,7 +25,7 @@ module "helsinki_pool" {
   location = "hel1"
 
   workers = [
-    { server_type = "cx22", image = local.image_ids.hcloud },
+    { server_type = "cx22", image = data.hcloud_image.talos.id },
   ]
 }
 
@@ -46,7 +34,7 @@ module "talos_cluster" {
 
   name               = "example"
   endpoint           = "example.example.com"
-  talos_version      = "v1.13.3"
+  talos_version      = "v1.14.0"
   kubernetes_version = "v1.36.1"
 
   pools = [
@@ -61,17 +49,6 @@ module "talos_cluster" {
           network:
             cni:
               name: none
-          inlineManifests:
-            - name: hcloud-secret
-              contents: |
-                apiVersion: v1
-                kind: Secret
-                metadata:
-                  name: hcloud
-                  namespace: kube-system
-                stringData:
-                  token: ${var.hcloud_token}
-                type: Opaque
       EOF
       ,
       <<-EOF
@@ -117,11 +94,8 @@ module "talos_apply" {
 }
 
 locals {
-  ips = {
-    v6 = merge(module.nuremberg_apply.ips.v6, module.helsinki_apply.ips.v6)
-  }
+  nodes = merge(module.nuremberg_apply.nodes, module.helsinki_apply.nodes)
 }
-
 
 resource "google_dns_record_set" "control_planes" {
   name         = "${module.talos_cluster.name}.${data.google_dns_managed_zone.this.dns_name}"
@@ -129,7 +103,7 @@ resource "google_dns_record_set" "control_planes" {
   type         = "AAAA"
   ttl          = 300
 
-  rrdatas = values({ for k, v in local.ips.v6 : k => v if module.talos_cluster.nodes[k].kind == "control-plane" })
+  rrdatas = [for k, n in local.nodes : n.ip if n.kind == "control-plane"]
 }
 
 # outputs

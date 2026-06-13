@@ -6,10 +6,6 @@ locals {
         install:
           disk: /dev/vdb
           wipe: true
-        network:
-          interfaces:
-            - interface: eth0
-              dhcp: true
     EOF
     ,
     <<-EOF

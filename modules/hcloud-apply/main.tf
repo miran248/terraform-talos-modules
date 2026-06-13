@@ -1,7 +1,7 @@
 locals {
-  ips = {
-    v6 = { for key, node in var.pool.nodes : key => cidrhost(node.ip_64, 1) }
-  }
+  nodes = { for key, node in var.pool.nodes : key => merge(node, {
+    ip = cidrhost(node.ip_64, 1)
+  }) }
 }
 
 resource "tls_private_key" "ssh_key" {

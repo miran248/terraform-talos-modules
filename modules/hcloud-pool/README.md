@@ -7,11 +7,11 @@ Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per n
 |---|---|---|---|
 | `prefix` | `string` | yes | resource name prefix, must be unique across pools |
 | `location` | `string` | yes | Hetzner Cloud location (e.g. `nbg1`, `hel1`, `fsn1`) |
-| `control_planes` | `list(object)` | no | control plane node definitions |
-| `workers` | `list(object)` | no | worker node definitions |
-| `patches` | `object` | no | pool-wide config patches |
+| `control_planes` | `list(node)` | no | control plane node definitions |
+| `workers` | `list(node)` | no | worker node definitions |
+| `patches` | `patches` | no | pool-wide config patches |
 
-### node object fields
+### node fields
 
 | name | type | required | description |
 |---|---|---|---|
@@ -21,7 +21,7 @@ Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per n
 | `patches` | `list(string)` | no | node-specific config patches |
 | `removed` | `bool` | no | set `true` to drain and remove the node |
 
-### patches object fields
+### patches fields
 
 | name | type | description |
 |---|---|---|
@@ -42,7 +42,7 @@ Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per n
 
 ```hcl
 data "hcloud_image" "talos" {
-  with_selector = "name=talos,version=v1.13.3,arch=amd64"
+  with_selector = "name=talos,version=v1.14.0,arch=amd64"
 }
 
 module "nuremberg_pool" {

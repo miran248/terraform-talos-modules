@@ -11,7 +11,6 @@ variable "cluster" {
       machine_secrets      = any
     })
     nodes = map(object({
-      kind    = string
       aliases = list(string)
       patches = list(string)
       talos   = object({ machine_type = string })
@@ -23,18 +22,18 @@ variable "cluster" {
     error_message = "must be of type talos-cluster"
   }
 }
+variable "applies" {
+  type = list(object({
+    nodes = map(object({
+      kind = string
+      ip   = string
+    }))
+  }))
+  description = "list of apply module outputs (e.g. hcloud-apply, scaleway-apply)"
+}
 
 variable "installer_image" {
   type        = string
   default     = null
   description = "Talos installer image for OS version management via talos_machine. Defaults to ghcr.io/siderolabs/installer:<talos_version>. Override for dev builds or custom schematics."
-}
-
-variable "applies" {
-  type = list(object({
-    ips = object({
-      v6 = map(string)
-    })
-  }))
-  description = "apply module outputs to collect actual node IPs for host entries and control plane health checks"
 }

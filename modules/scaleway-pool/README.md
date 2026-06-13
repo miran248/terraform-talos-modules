@@ -7,11 +7,11 @@ Allocates Scaleway resources for a node pool: one routed IPv6 IP per node and a 
 |---|---|---|---|
 | `prefix` | `string` | yes | resource name prefix, must be unique across pools |
 | `zone` | `string` | yes | Scaleway zone (e.g. `fr-par-1`) |
-| `control_planes` | `list(object)` | no | control plane node definitions |
-| `workers` | `list(object)` | no | worker node definitions |
-| `patches` | `object` | no | pool-wide config patches |
+| `control_planes` | `list(node)` | no | control plane node definitions |
+| `workers` | `list(node)` | no | worker node definitions |
+| `patches` | `patches` | no | pool-wide config patches |
 
-### node object fields
+### node fields
 
 | name | type | required | description |
 |---|---|---|---|
@@ -21,7 +21,7 @@ Allocates Scaleway resources for a node pool: one routed IPv6 IP per node and a 
 | `patches` | `list(string)` | no | node-specific config patches |
 | `removed` | `bool` | no | set `true` to drain and remove the node |
 
-### patches object fields
+### patches fields
 
 | name | type | description |
 |---|---|---|

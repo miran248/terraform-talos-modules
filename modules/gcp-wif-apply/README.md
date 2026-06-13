@@ -3,11 +3,11 @@ Fetches OIDC discovery documents (`openid-configuration` and `jwks`) from the ru
 
 ## inputs
 
-| name | type | description |
-|---|---|---|
-| `identities` | `object` | `gcp-wif` module outputs |
-| `cluster` | `object` | `talos-cluster` module outputs |
-| `apply` | `object` | `talos-apply` module outputs |
+| name | description |
+|---|---|
+| `identities` | [gcp-wif](../gcp-wif) outputs |
+| `cluster` | [talos-cluster](../talos-cluster) outputs |
+| `apply` | [talos-apply](../talos-apply) outputs |
 
 ## example
 

@@ -20,7 +20,6 @@ locals {
   # s5: common patches (base for all nodes)
   s5 = flatten([
     file("${path.module}/patches/common.yaml"),
-    # yamlencode({ machine = { certSANs = local.s4, install = { image = "ghcr.io/siderolabs/installer:${var.talos_version}" } } }),
     yamlencode({ machine = { certSANs = local.s4 } }),
     var.patches.common,
   ])

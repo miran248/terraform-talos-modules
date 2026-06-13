@@ -6,44 +6,32 @@ module "scaleway_image" {
   version = "v1.14.0"
 }
 
-locals {
-  image_ids = {
-    scaleway = module.scaleway_image["fr-par-1"].ids.image
-  }
-
-  paris_zone = "fr-par-1"
-}
-
 module "paris_pool" {
   source = "github.com/miran248/terraform-talos-modules//modules/scaleway-pool?ref=v3.2.3"
 
   prefix = "par1"
-  zone   = local.paris_zone
+  zone   = "fr-par-1"
 
   control_planes = [
-    { type = "DEV1-M", image = local.image_ids.scaleway },
-    { type = "DEV1-M", image = local.image_ids.scaleway },
-    { type = "DEV1-M", image = local.image_ids.scaleway },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
   ]
   workers = [
-    { type = "DEV1-M", image = local.image_ids.scaleway },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
   ]
 }
 
 resource "scaleway_lb_ip" "this" {
-  zone    = local.paris_zone
+  zone    = "fr-par-1"
   is_ipv6 = true
 }
 
 resource "scaleway_lb" "this" {
   ip_ids = [scaleway_lb_ip.this.id]
-  zone   = local.paris_zone
+  zone   = "fr-par-1"
   name   = "example"
   type   = "LB-S"
-}
-
-locals {
-  control_plane_keys = [for k, v in module.talos_cluster.nodes : k if v.kind == "control-plane"]
 }
 
 resource "scaleway_lb_backend" "talos" {
@@ -52,7 +40,7 @@ resource "scaleway_lb_backend" "talos" {
   forward_protocol = "tcp"
   forward_port     = 50000
   proxy_protocol   = "none"
-  server_ips       = [for k in local.control_plane_keys : module.paris_apply.ips.v6[k]]
+  server_ips       = [for k, n in module.paris_apply.nodes : n.ip if n.kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "talos" {
@@ -68,7 +56,7 @@ resource "scaleway_lb_backend" "k8s" {
   forward_protocol = "tcp"
   forward_port     = 6443
   proxy_protocol   = "none"
-  server_ips       = [for k in local.control_plane_keys : module.paris_apply.ips.v6[k]]
+  server_ips       = [for k, n in module.paris_apply.nodes : n.ip if n.kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "k8s" {
@@ -101,19 +89,19 @@ module "talos_cluster" {
       ,
       <<-EOF
         apiVersion: v1alpha1
-        kind: TimeSyncConfig
-        ptp:
-          devices:
-            - /dev/ptp0
-      EOF
-      ,
-      <<-EOF
-        apiVersion: v1alpha1
         kind: ResolverConfig
         nameservers:
           - address: 2a00:1098:2b::1 # https://nat64.net
           - address: 2a00:1098:2c::1 # https://nat64.net
           - address: 2a01:4f8:c2c:123f::1 # https://nat64.net
+      EOF
+      ,
+      <<-EOF
+        apiVersion: v1alpha1
+        kind: TimeSyncConfig
+        ptp:
+          devices:
+            - /dev/ptp0
       EOF
       ,
     ]
@@ -122,6 +110,7 @@ module "talos_cluster" {
         cluster:
           allowSchedulingOnControlPlanes: true
       EOF
+      ,
     ]
   }
 }

@@ -5,20 +5,20 @@ Use with [gcp-wif-apply](../gcp-wif-apply) to upload OIDC documents after the cl
 
 ## inputs
 
-| name | type | description |
-|---|---|---|
-| `name` | `string` | workload identity pool name |
-| `bucket_name` | `string` | GCS bucket name for OIDC discovery documents |
-| `bucket_location` | `string` | GCS bucket location (e.g. `EU`) |
-| `service_accounts` | `list(object)` | Kubernetes service accounts to federate |
+| name | type | required | description |
+|---|---|---|---|
+| `name` | `string` | yes | workload identity pool name |
+| `bucket_name` | `string` | yes | GCS bucket name for OIDC discovery documents |
+| `bucket_location` | `string` | yes | GCS bucket location (e.g. `EU`) |
+| `service_accounts` | `list(service_account)` | no | Kubernetes service accounts to federate |
 
-### service account object fields
+### service_account fields
 
-| name | type | description |
-|---|---|---|
-| `subject` | `string` | Kubernetes subject in `namespace:name` format |
-| `name` | `string` | GCP service account name |
-| `roles` | `list(string)` | GCP IAM roles to grant |
+| name | type | required | description |
+|---|---|---|---|
+| `subject` | `string` | yes | Kubernetes subject in `namespace:name` format |
+| `name` | `string` | yes | GCP service account name |
+| `roles` | `list(string)` | yes | GCP IAM roles to grant |
 
 ## outputs
 
@@ -27,7 +27,7 @@ Use with [gcp-wif-apply](../gcp-wif-apply) to upload OIDC documents after the cl
 | `name` | pool name |
 | `bucket_name` | GCS bucket name |
 | `ids` | resource IDs including `oidc_bucket` |
-| `patches` | Talos config patches - pass `patches.control_planes` to `talos-cluster` |
+| `patches` | Talos config patches - pass `patches.control_planes` to [talos-cluster](../talos-cluster) |
 
 ## example
 
@@ -40,11 +40,7 @@ module "gcp_wif" {
   bucket_location = "EU"
 
   service_accounts = [
-    {
-      subject = "kube-system:cert-manager"
-      name    = "cert-manager"
-      roles   = ["roles/dns.admin"]
-    },
+    { subject = "kube-system:cert-manager", name = "cert-manager", roles = ["roles/dns.admin"] },
   ]
 }
 
@@ -53,7 +49,7 @@ module "talos_cluster" {
 
   name               = "prod"
   endpoint           = "prod.example.com"
-  talos_version      = "v1.13.3"
+  talos_version      = "v1.14.0"
   kubernetes_version = "v1.36.1"
 
   pools = [

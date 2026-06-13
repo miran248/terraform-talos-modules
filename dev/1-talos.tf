@@ -50,17 +50,13 @@ resource "scaleway_lb" "dev1" {
   type   = "LB-S"
 }
 
-locals {
-  dev1_control_plane_keys = [for k, v in module.dev1_talos_cluster.nodes : k if v.kind == "control-plane"]
-}
-
 resource "scaleway_lb_backend" "dev1_talos" {
   lb_id            = scaleway_lb.dev1.id
   name             = "dev1-talos"
   forward_protocol = "tcp"
   forward_port     = 50000
   proxy_protocol   = "none"
-  server_ips       = [for k in local.dev1_control_plane_keys : module.dev1_paris_apply.ips.v6[k]]
+  server_ips       = [for k, n in module.dev1_paris_apply.nodes : n.ip if module.dev1_talos_cluster.nodes[k].kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "dev1_talos" {
@@ -76,7 +72,7 @@ resource "scaleway_lb_backend" "dev1_k8s" {
   forward_protocol = "tcp"
   forward_port     = 6443
   proxy_protocol   = "none"
-  server_ips       = [for k in local.dev1_control_plane_keys : module.dev1_paris_apply.ips.v6[k]]
+  server_ips       = [for k, n in module.dev1_paris_apply.nodes : n.ip if module.dev1_talos_cluster.nodes[k].kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "dev1_k8s" {

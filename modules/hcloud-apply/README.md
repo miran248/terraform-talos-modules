@@ -5,15 +5,26 @@ Provisions Hetzner Cloud servers with Talos `user_data` and sets up firewalls. A
 
 | name | type | description |
 |---|---|---|
-| `pool` | `object` | `hcloud-pool` module outputs |
-| `cluster` | `object` | `talos-cluster` module outputs |
-| `rules` | `list(object)` | Additional firewall rules. Fields: `direction` (required), `protocol` (required), `port`, `source_ips`, `destination_ips`, `description`. |
+| `pool` | [hcloud-pool](../hcloud-pool) outputs | |
+| `cluster` | [talos-cluster](../talos-cluster) outputs | |
+| `rules` | `list(rule)` | additional firewall rules |
+
+### rule fields
+
+| name | type | required | description |
+|---|---|---|---|
+| `direction` | `string` | yes | `in` or `out` |
+| `protocol` | `string` | yes | `tcp`, `udp`, `icmp`, `gre`, or `esp` |
+| `port` | `string` | no | port or range (e.g. `443`, `8000-9000`) |
+| `source_ips` | `list(string)` | no | source IP ranges |
+| `destination_ips` | `list(string)` | no | destination IP ranges |
+| `description` | `string` | no | |
 
 ## outputs
 
 | name | description |
 |---|---|
-| `ips` | node IP addresses - `ips.v6` (map of IPv6 addresses, keyed by node name) |
+| `nodes` | [hcloud-pool](../hcloud-pool) node objects enriched with an `ip` field |
 
 ## example
 

@@ -10,25 +10,16 @@ module "scaleway_image" {
   version = "v1.14.0"
 }
 
-locals {
-  image_ids = {
-    hcloud   = data.hcloud_image.talos.id
-    scaleway = module.scaleway_image["fr-par-1"].ids.image
-  }
-
-  paris_zone = "fr-par-1"
-}
-
 module "paris_pool" {
   source = "github.com/miran248/terraform-talos-modules//modules/scaleway-pool?ref=v3.2.3"
 
   prefix = "par1"
-  zone   = local.paris_zone
+  zone   = "fr-par-1"
 
   control_planes = [
-    { type = "DEV1-M", image = local.image_ids.scaleway },
-    { type = "DEV1-M", image = local.image_ids.scaleway },
-    { type = "DEV1-M", image = local.image_ids.scaleway },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
   ]
 }
 
@@ -39,25 +30,21 @@ module "nuremberg_pool" {
   location = "nbg1"
 
   workers = [
-    { server_type = "cx22", image = local.image_ids.hcloud },
-    { server_type = "cx22", image = local.image_ids.hcloud },
+    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx22", image = data.hcloud_image.talos.id },
   ]
 }
 
 resource "scaleway_lb_ip" "this" {
-  zone    = local.paris_zone
+  zone    = "fr-par-1"
   is_ipv6 = true
 }
 
 resource "scaleway_lb" "this" {
   ip_ids = [scaleway_lb_ip.this.id]
-  zone   = local.paris_zone
+  zone   = "fr-par-1"
   name   = "example"
   type   = "LB-S"
-}
-
-locals {
-  control_plane_keys = [for k, v in module.talos_cluster.nodes : k if v.kind == "control-plane"]
 }
 
 resource "scaleway_lb_backend" "talos" {
@@ -66,7 +53,7 @@ resource "scaleway_lb_backend" "talos" {
   forward_protocol = "tcp"
   forward_port     = 50000
   proxy_protocol   = "none"
-  server_ips       = [for k in local.control_plane_keys : module.paris_apply.ips.v6[k]]
+  server_ips       = [for k, n in module.paris_apply.nodes : n.ip if n.kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "talos" {
@@ -82,7 +69,7 @@ resource "scaleway_lb_backend" "k8s" {
   forward_protocol = "tcp"
   forward_port     = 6443
   proxy_protocol   = "none"
-  server_ips       = [for k in local.control_plane_keys : module.paris_apply.ips.v6[k]]
+  server_ips       = [for k, n in module.paris_apply.nodes : n.ip if n.kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "k8s" {
@@ -116,19 +103,19 @@ module "talos_cluster" {
       ,
       <<-EOF
         apiVersion: v1alpha1
-        kind: TimeSyncConfig
-        ptp:
-          devices:
-            - /dev/ptp0
-      EOF
-      ,
-      <<-EOF
-        apiVersion: v1alpha1
         kind: ResolverConfig
         nameservers:
           - address: 2a00:1098:2b::1 # https://nat64.net
           - address: 2a00:1098:2c::1 # https://nat64.net
           - address: 2a01:4f8:c2c:123f::1 # https://nat64.net
+      EOF
+      ,
+      <<-EOF
+        apiVersion: v1alpha1
+        kind: TimeSyncConfig
+        ptp:
+          devices:
+            - /dev/ptp0
       EOF
       ,
     ]
@@ -137,15 +124,9 @@ module "talos_cluster" {
         cluster:
           allowSchedulingOnControlPlanes: true
       EOF
+      ,
     ]
   }
-}
-
-module "nuremberg_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v3.2.3"
-
-  pool    = module.nuremberg_pool
-  cluster = module.talos_cluster
 }
 
 module "paris_apply" {
@@ -155,11 +136,18 @@ module "paris_apply" {
   cluster = module.talos_cluster
 }
 
+module "nuremberg_apply" {
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v3.2.3"
+
+  pool    = module.nuremberg_pool
+  cluster = module.talos_cluster
+}
+
 module "talos_apply" {
   source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v3.2.3"
 
   cluster = module.talos_cluster
-  applies = [module.nuremberg_apply, module.paris_apply]
+  applies = [module.paris_apply, module.nuremberg_apply]
 }
 
 # outputs
