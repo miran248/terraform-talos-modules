@@ -7,14 +7,17 @@ Provisions Scaleway instances with Talos `user_data`, ephemeral local SSD volume
 |---|---|---|
 | `pool` | `object` | `scaleway-pool` module outputs |
 | `cluster` | `object` | `talos-cluster` module outputs |
+| `inbound_rules` | `list(object)` | Additional inbound security group rules. Fields: `action` (required), `protocol`, `port`, `port_range`, `ip_range`. |
 
 ## outputs
 
 | name | description |
 |---|---|
-| `ips` | node IP addresses - `ips.v6` and `ips.v4` (maps keyed by node name) |
+| `ips` | node IP addresses - `ips.v6` (map keyed by node name) |
 
 ## example
+
+See [scaleway-lb.tf](../../examples/scaleway-lb.tf) for a full example including a Scaleway load balancer frontend for the Talos API and Kubernetes API.
 
 ```hcl
 module "paris_apply" {
@@ -22,21 +25,11 @@ module "paris_apply" {
 
   pool    = module.paris_pool
   cluster = module.talos_cluster
-}
 
-locals {
-  ips = {
-    v6 = module.paris_apply.ips.v6
-    v4 = module.paris_apply.ips.v4
-  }
-}
-
-
-resource "google_dns_record_set" "control_planes" {
-  name         = "${module.talos_cluster.name}.${data.google_dns_managed_zone.this.dns_name}"
-  managed_zone = data.google_dns_managed_zone.this.name
-  type         = "AAAA"
-  ttl          = 300
-  rrdatas      = values({ for k, v in local.ips.v6 : k => v if module.talos_cluster.nodes[k].kind == "control-plane" })
+  # open http/https for ingress
+  inbound_rules = [
+    { action = "accept", protocol = "TCP", port = 443 },
+    { action = "accept", protocol = "TCP", port = 80 },
+  ]
 }
 ```

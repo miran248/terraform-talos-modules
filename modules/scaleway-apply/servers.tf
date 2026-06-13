@@ -8,7 +8,7 @@ resource "scaleway_instance_server" "this" {
   placement_group_id    = var.pool.ids.group
   protected             = false
   security_group_id     = scaleway_instance_security_group.this.id
-  ip_ids                = [var.pool.ids.ips.v6[each.key], var.pool.ids.ips.v4[each.key]]
+  ip_ids                = [var.pool.ids.ips.v6[each.key]]
   additional_volume_ids = [scaleway_instance_volume.ephemeral[each.key].id]
 
   lifecycle {

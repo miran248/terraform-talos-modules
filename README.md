@@ -17,7 +17,7 @@ Allocate node resources (IPs, placement groups). Pass their outputs to `talos-cl
 | module | provider | description |
 |---|---|---|
 | [hcloud-pool](modules/hcloud-pool) | Hetzner Cloud | allocates IPv6 /64 blocks and a placement group |
-| [scaleway-pool](modules/scaleway-pool) | Scaleway | allocates routed IPv6 + IPv4 IPs and a placement group |
+| [scaleway-pool](modules/scaleway-pool) | Scaleway | allocates routed IPv6 IPs and a placement group |
 
 ### cluster
 | module | description |
@@ -41,7 +41,14 @@ Provision servers. One apply module per pool.
 | [gcp-wif-apply](modules/gcp-wif-apply) | fetches OIDC documents from the running cluster and uploads them to GCP |
 
 ## examples
-See the [examples](examples) folder.
+
+| example | description |
+|---|---|
+| [minimal.tf](examples/minimal.tf) | single Hetzner Cloud pool, single-region cluster |
+| [multi-region.tf](examples/multi-region.tf) | two Hetzner Cloud pools across regions |
+| [multi-cloud.tf](examples/multi-cloud.tf) | Scaleway control planes + Hetzner Cloud workers, Scaleway LB as cluster endpoint |
+| [scaleway-lb.tf](examples/scaleway-lb.tf) | IPv6-only Scaleway cluster with a load balancer frontend for Talos and Kubernetes APIs |
+| [talos-ccm.tf](examples/talos-ccm.tf) | talos-ccm integration with node IPAM and cloud metadata |
 
 ## diagram
 The following [Mermaid](https://github.com/mermaid-js/mermaid) flowchart outlines the order of operations between modules for a cluster spanning two regions.
@@ -83,9 +90,8 @@ graph TD
 ```shell
 > TALOSCONFIG=talos-config talosctl -n c1 dashboard
 ```
-4. Run `just` from the repo root to generate manifests from the [manifests](manifests) directory, then apply them - `talos-ccm` and `cilium` are required
+4. Run `just` from the repo root to generate manifests from the [manifests](manifests) directory, then apply them
 ```shell
-> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/talos-ccm.yaml
 > KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium.yaml
 ```
 5. Verify with [k9s](https://k9scli.io/)

@@ -5,50 +5,38 @@ resource "hcloud_firewall" "deny_all" {
 resource "hcloud_firewall" "this" {
   name = var.pool.prefix
 
-  rule {
-    description = "apiserver"
-    direction   = "in"
-    protocol    = "tcp"
-    port        = "6443"
-    source_ips  = ["::/0"]
+  # kubernetes apiserver - only opened when pool contains control planes
+  dynamic "rule" {
+    for_each = anytrue([for n in var.pool.nodes : n.kind == "control-plane"]) ? [1] : []
+    content {
+      description = "apiserver"
+      direction   = "in"
+      protocol    = "tcp"
+      port        = "6443"
+      source_ips  = ["::/0"]
+    }
   }
+  # talos apid - opened on all nodes
   rule {
-    description = "talos control planes"
+    description = "talos apid"
     direction   = "in"
     protocol    = "tcp"
     port        = "50000"
     source_ips  = ["::/0"]
   }
-  rule {
-    description = "talos workers"
-    direction   = "in"
-    protocol    = "tcp"
-    port        = "50001"
-    source_ips  = ["::/0"]
-  }
-  rule {
-    description = "https"
-    direction   = "in"
-    protocol    = "tcp"
-    port        = "443"
-    source_ips  = ["::/0"]
-  }
-  rule {
-    description = "http"
-    direction   = "in"
-    protocol    = "tcp"
-    port        = "80"
-    source_ips  = ["::/0"]
-  }
-  rule {
-    description = "healthz"
-    direction   = "in"
-    protocol    = "tcp"
-    port        = "10256"
-    source_ips  = ["::/0"]
+  # talos trustd - only opened when pool contains control planes
+  dynamic "rule" {
+    for_each = anytrue([for n in var.pool.nodes : n.kind == "control-plane"]) ? [1] : []
+    content {
+      description = "talos trustd"
+      direction   = "in"
+      protocol    = "tcp"
+      port        = "50001"
+      source_ips  = ["::/0"]
+    }
   }
 
-  # allows full access between all cluster nodes across all pools
+  # full intra-cluster access across all pools
   dynamic "rule" {
     for_each = toset(["tcp", "udp"])
     content {
@@ -64,6 +52,19 @@ resource "hcloud_firewall" "this" {
       direction  = "in"
       protocol   = rule.value
       source_ips = [for _, node in var.cluster.nodes : node.ip_64]
+    }
+  }
+
+  # additional rules (e.g. http/https for ingress)
+  dynamic "rule" {
+    for_each = var.rules
+    content {
+      description     = rule.value.description
+      direction       = rule.value.direction
+      protocol        = rule.value.protocol
+      port            = rule.value.port
+      source_ips      = rule.value.source_ips
+      destination_ips = rule.value.destination_ips
     }
   }
 }

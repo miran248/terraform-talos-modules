@@ -13,6 +13,7 @@ Control planes are configured before workers, enabling rolling upgrades when `ku
 |---|---|---|---|
 | `cluster` | `object` | yes | `talos-cluster` module outputs |
 | `applies` | `list(object)` | yes | list of apply module outputs (e.g. `hcloud-apply`, `scaleway-apply`) - used to collect actual node IPs for static host entries |
+| `installer_image` | `string` | no | Talos installer image for OS upgrades via `talos_machine`. Defaults to `ghcr.io/siderolabs/installer:<talos_version>`. Override for custom schematics or dev builds. |
 
 ## outputs
 

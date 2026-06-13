@@ -4,12 +4,6 @@ resource "scaleway_instance_ip" "this" {
   zone     = var.zone
   type     = "routed_ipv6"
 }
-# TODO: remove once instances boot without IPv4
-resource "scaleway_instance_ip" "ipv4" {
-  for_each = local.s2
-  zone     = var.zone
-  type     = "routed_ipv4"
-}
 
 # placement groups
 resource "scaleway_instance_placement_group" "this" {

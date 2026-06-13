@@ -11,7 +11,7 @@ variable "pool" {
     }))
     ids = object({
       group = string
-      ips   = object({ v6 = map(string), v4 = map(string) })
+      ips   = object({ v6 = map(string) })
     })
   })
   description = "scaleway-pool module outputs"
@@ -31,4 +31,16 @@ variable "cluster" {
     condition     = var.cluster.MODULE_NAME == "talos-cluster"
     error_message = "must be of type talos-cluster"
   }
+}
+
+variable "inbound_rules" {
+  type = list(object({
+    action     = string
+    protocol   = optional(string)
+    port       = optional(number)
+    port_range = optional(string)
+    ip_range   = optional(string)
+  }))
+  default     = []
+  description = "Additional inbound rules to add to the pool security group."
 }

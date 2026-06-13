@@ -20,7 +20,8 @@ locals {
   # s5: common patches (base for all nodes)
   s5 = flatten([
     file("${path.module}/patches/common.yaml"),
-    yamlencode({ machine = { certSANs = local.s4, install = { image = "ghcr.io/siderolabs/installer:${var.talos_version}" } } }),
+    # yamlencode({ machine = { certSANs = local.s4, install = { image = "ghcr.io/siderolabs/installer:${var.talos_version}" } } }),
+    yamlencode({ machine = { certSANs = local.s4 } }),
     var.patches.common,
   ])
 
@@ -60,7 +61,7 @@ locals {
   }
 
   endpoint         = var.endpoint
-  cluster_endpoint = "https://${var.endpoint}:6443"
+  cluster_endpoint = strcontains(var.endpoint, ":") ? "https://[${var.endpoint}]:6443" : "https://${var.endpoint}:6443"
   nodes            = local.s7
   configs          = { for key, config in data.talos_machine_configuration.this : key => config.machine_configuration }
 }

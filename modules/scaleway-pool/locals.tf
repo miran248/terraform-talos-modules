@@ -48,7 +48,6 @@ locals {
     group = scaleway_instance_placement_group.this.id
     ips = {
       v6 = { for key, ip in scaleway_instance_ip.this : key => ip.id }
-      v4 = { for key, ip in scaleway_instance_ip.ipv4 : key => ip.id }
     }
   }
 

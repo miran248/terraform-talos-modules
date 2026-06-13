@@ -33,3 +33,16 @@ variable "cluster" {
     error_message = "must be of type talos-cluster"
   }
 }
+
+variable "rules" {
+  type = list(object({
+    description     = optional(string)
+    direction       = string
+    protocol        = string
+    port            = optional(string)
+    source_ips      = optional(list(string), [])
+    destination_ips = optional(list(string), [])
+  }))
+  default     = []
+  description = "Additional firewall rules to add to the pool firewall."
+}

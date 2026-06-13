@@ -1,9 +1,9 @@
 locals {
-  s1 = merge([for a in var.applies : a.ips.v6]...)
+  s1              = merge([for a in var.applies : a.ips.v6]...)
+  installer_image = coalesce(var.installer_image, "ghcr.io/siderolabs/installer:${var.cluster.talos_version}")
 
   ips = {
-    nodes          = local.s1
-    control_planes = { for k, ip in local.s1 : k => ip if var.cluster.nodes[k].kind == "control-plane" }
+    nodes = local.s1
   }
 
   patches = {

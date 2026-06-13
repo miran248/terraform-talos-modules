@@ -7,6 +7,7 @@ Provisions Hetzner Cloud servers with Talos `user_data` and sets up firewalls. A
 |---|---|---|
 | `pool` | `object` | `hcloud-pool` module outputs |
 | `cluster` | `object` | `talos-cluster` module outputs |
+| `rules` | `list(object)` | Additional firewall rules. Fields: `direction` (required), `protocol` (required), `port`, `source_ips`, `destination_ips`, `description`. |
 
 ## outputs
 
@@ -22,20 +23,11 @@ module "nuremberg_apply" {
 
   pool    = module.nuremberg_pool
   cluster = module.talos_cluster
-}
 
-locals {
-  ips = {
-    v6 = module.nuremberg_apply.ips.v6
-  }
-}
-
-
-resource "google_dns_record_set" "control_planes" {
-  name         = "${module.talos_cluster.name}.${data.google_dns_managed_zone.this.dns_name}"
-  managed_zone = data.google_dns_managed_zone.this.name
-  type         = "AAAA"
-  ttl          = 300
-  rrdatas      = values({ for k, v in local.ips.v6 : k => v if module.talos_cluster.nodes[k].kind == "control-plane" })
+  # open http/https for ingress
+  rules = [
+    { direction = "in", protocol = "tcp", port = "443", source_ips = ["::/0"] },
+    { direction = "in", protocol = "tcp", port = "80",  source_ips = ["::/0"] },
+  ]
 }
 ```
