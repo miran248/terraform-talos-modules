@@ -8,8 +8,8 @@
 - [talos-apply](modules/talos-apply) replaces `talos_machine_configuration_apply` + `talos_machine_bootstrap` with `talos_machine` + `talos_cluster` — existing state will require resource recreation on first apply.
 
 ### features
-- **IPv6-only Scaleway support** — IPv4 no longer required
-- **Scaleway load balancer examples** — new [scaleway-lb.tf](examples/scaleway-lb.tf) and [multi-cloud.tf](examples/multi-cloud.tf) examples
+- **New modules** — [scaleway-pool](modules/scaleway-pool), [scaleway-apply](modules/scaleway-apply), [scaleway-image](modules/scaleway-image) for provisioning Talos clusters on Scaleway
+- **IPv6-only Scaleway support** — IPv4 no longer required; Scaleway instances boot with routed IPv6 only
 - **Rolling upgrades via `talos_machine`** — [talos-apply](modules/talos-apply) now uses `talos_machine` + `talos_cluster` resources for proper lifecycle management and rolling OS upgrades
 - **`installer_image` variable** on [talos-apply](modules/talos-apply) — override the Talos installer image for custom schematics or dev builds
 - **Conditional firewall rules** — ports 6443 (apiserver) and 50001 (trustd) only opened on pools containing control planes; 50000 (apid) opened on all nodes
@@ -17,11 +17,19 @@
 - **Scaleway security group hardened** — `inbound_default_policy = "drop"` with explicit `ip_range = "::/0"` on all public rules (required for IPv6-only instances — rules without `ip_range` are treated as IPv4-only by Scaleway)
 
 ### changes
+- Upgraded to talos provider 0.12.x with new resource types (`talos_machine`, `talos_cluster`)
+- Cilium switched from direct routing to tunnel mode (netkit datapath)
 - All module resource files consolidated into `main.tf` per module
 - [scaleway-pool](modules/scaleway-pool) drops IPv4 IPs — instances boot IPv6-only
 - [scaleway-pool](modules/scaleway-pool) removes `network.interfaces.eth0.dhcp` patch — network configured statically by Talos platform code
+- Removed private network and load balancer resources from hcloud modules
+- Upgraded terraform providers (hcloud, scaleway, google)
 - Port 80/443 removed from default firewall rules — pass via `rules`/`inbound_rules` if needed
 - Port 10256 (kube-proxy healthz) removed — not applicable when using Cilium as kube-proxy replacement
+
+### manifests
+- Added cert-manager, external-secrets manifests
+- Updated Cilium, ArgoCD and other manifest dependencies
 
 ### docs
 - READMEs updated across all modules — complex types in subsections, module output inputs link to source module
