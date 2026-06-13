@@ -2,8 +2,10 @@ module "scaleway_image" {
   source   = "github.com/miran248/terraform-talos-modules//modules/scaleway-image?ref=v3.2.3"
   for_each = toset(["fr-par-1"])
 
-  zone    = each.key
-  version = "v1.14.0"
+  zone   = each.key
+  bucket = "my-talos-images"
+  object = "talos-v1.14.0-amd64.qcow2"
+  name   = "talos-v1.14.0-amd64"
 }
 
 module "paris_pool" {

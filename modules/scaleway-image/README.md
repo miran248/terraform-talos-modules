@@ -26,8 +26,8 @@ module "scaleway_image" {
 
   zone   = each.key
   bucket = "my-talos-images"
-  object = "talos-v1.13.3-scaleway-amd64.qcow2"
-  name   = "talos-v1.13.3"
+  object = "talos-v1.14.0-amd64.qcow2"
+  name   = "talos-v1.14.0-amd64"
 }
 
 module "paris_pool" {
