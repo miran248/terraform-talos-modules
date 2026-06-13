@@ -62,14 +62,12 @@ resource "talos_cluster" "this" {
   node                 = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })[0]
   control_plane_nodes  = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })
   kubernetes_version   = var.cluster.kubernetes_version
-
-  depends_on = [talos_machine.control_planes]
 }
 
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = var.cluster.machine_secrets.client_configuration
   endpoint             = var.cluster.endpoint
-  node = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })[0]
+  node                 = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })[0]
 
   depends_on = [talos_cluster.this]
 }

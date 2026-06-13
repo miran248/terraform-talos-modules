@@ -23,6 +23,7 @@ resource "scaleway_instance_security_group" "this" {
       action   = "accept"
       protocol = "TCP"
       port     = "6443"
+      ip_range = "::/0"
     }
   }
   # talos apid - opened on all nodes
@@ -30,6 +31,7 @@ resource "scaleway_instance_security_group" "this" {
     action   = "accept"
     protocol = "TCP"
     port     = "50000"
+    ip_range = "::/0"
   }
   # talos trustd - only opened when pool contains control planes
   dynamic "inbound_rule" {
@@ -38,6 +40,7 @@ resource "scaleway_instance_security_group" "this" {
       action   = "accept"
       protocol = "TCP"
       port     = "50001"
+      ip_range = "::/0"
     }
   }
 

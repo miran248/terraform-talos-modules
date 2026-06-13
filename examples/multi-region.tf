@@ -9,12 +9,12 @@ module "nuremberg_pool" {
   location = "nbg1"
 
   control_planes = [
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
   ]
   workers = [
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
   ]
 }
 
@@ -25,7 +25,7 @@ module "helsinki_pool" {
   location = "hel1"
 
   workers = [
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
   ]
 }
 

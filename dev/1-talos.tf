@@ -1,26 +1,10 @@
 locals {
   dev1_image_ids = {
-    hcloud   = data.hcloud_image.v1_13_3_amd64.id
+    hcloud = data.hcloud_image.v1_13_3_amd64.id
     # scaleway = module.scaleway_image["fr-par-1"].ids.image
     scaleway = module.scaleway_image_dev["fr-par-1"].ids.image
   }
 }
-
-# module "dev1_nuremberg_pool" {
-#   source = "../modules/hcloud-pool"
-
-#   prefix   = "dev1-nbg"
-#   location = data.hcloud_location.nuremberg.name
-
-#   control_planes = [
-#     { server_type = "cx23", image = local.dev1_image_ids.hcloud },
-#     { server_type = "cx23", image = local.dev1_image_ids.hcloud },
-#     { server_type = "cx23", image = local.dev1_image_ids.hcloud },
-#   ]
-#   workers = [
-#     # { server_type = "cx23", image = local.dev1_image_ids.hcloud },
-#   ]
-# }
 
 module "dev1_paris_pool" {
   source = "../modules/scaleway-pool"
@@ -37,6 +21,19 @@ module "dev1_paris_pool" {
     # { type = "DEV1-M", image = local.dev1_image_ids.scaleway },
   ]
 }
+
+# module "dev1_nuremberg_pool" {
+#   source = "../modules/hcloud-pool"
+#
+#   prefix   = "dev1-nbg"
+#   location = data.hcloud_location.nuremberg.name
+#
+#   workers = [
+#     { server_type = "cx23", image = data.hcloud_image.v1_14_0_alpha_1_amd64.id },
+#     { server_type = "cx23", image = data.hcloud_image.v1_14_0_alpha_1_amd64.id },
+#     { server_type = "cx23", image = data.hcloud_image.v1_14_0_alpha_1_amd64.id },
+#   ]
+# }
 
 resource "scaleway_lb_ip" "dev1" {
   zone    = data.scaleway_availability_zones.paris.zones[0]
@@ -56,7 +53,7 @@ resource "scaleway_lb_backend" "dev1_talos" {
   forward_protocol = "tcp"
   forward_port     = 50000
   proxy_protocol   = "none"
-  server_ips       = [for k, n in module.dev1_paris_apply.nodes : n.ip if module.dev1_talos_cluster.nodes[k].kind == "control-plane"]
+  server_ips       = [for k, n in module.dev1_paris_apply.nodes : n.ip if n.kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "dev1_talos" {
@@ -72,7 +69,7 @@ resource "scaleway_lb_backend" "dev1_k8s" {
   forward_protocol = "tcp"
   forward_port     = 6443
   proxy_protocol   = "none"
-  server_ips       = [for k, n in module.dev1_paris_apply.nodes : n.ip if module.dev1_talos_cluster.nodes[k].kind == "control-plane"]
+  server_ips       = [for k, n in module.dev1_paris_apply.nodes : n.ip if n.kind == "control-plane"]
 }
 
 resource "scaleway_lb_frontend" "dev1_k8s" {
@@ -91,8 +88,8 @@ module "dev1_talos_cluster" {
   kubernetes_version = "v1.36.1"
 
   pools = [
-    # module.dev1_nuremberg_pool,
     module.dev1_paris_pool,
+    # module.dev1_nuremberg_pool,
   ]
 
   patches = {
@@ -132,13 +129,6 @@ module "dev1_talos_cluster" {
   }
 }
 
-# module "dev1_nuremberg_apply" {
-#   source = "../modules/hcloud-apply"
-
-#   pool    = module.dev1_nuremberg_pool
-#   cluster = module.dev1_talos_cluster
-# }
-
 module "dev1_paris_apply" {
   source = "../modules/scaleway-apply"
 
@@ -146,16 +136,24 @@ module "dev1_paris_apply" {
   cluster = module.dev1_talos_cluster
 
   inbound_rules = [
-    { action = "accept", protocol = "TCP", port = 443 },
-    { action = "accept", protocol = "TCP", port = 80 },
+    { action = "accept", protocol = "TCP", port = 443, ip_range = "::/0" },
+    { action = "accept", protocol = "TCP", port = 80, ip_range = "::/0" },
   ]
 }
+
+# module "dev1_nuremberg_apply" {
+#   source = "../modules/hcloud-apply"
+#
+#   pool    = module.dev1_nuremberg_pool
+#   cluster = module.dev1_talos_cluster
+# }
 
 module "dev1_talos_apply" {
   source = "../modules/talos-apply"
 
-  cluster = module.dev1_talos_cluster
+  cluster         = module.dev1_talos_cluster
   applies         = [module.dev1_paris_apply]
+  # applies       = [module.dev1_paris_apply, module.dev1_nuremberg_apply]
   installer_image = "ghcr.io/siderolabs/installer:v1.14.0-alpha.1-dev.7"
 }
 

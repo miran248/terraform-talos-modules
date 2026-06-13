@@ -15,7 +15,7 @@ Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per n
 
 | name | type | required | description |
 |---|---|---|---|
-| `server_type` | `string` | yes | Hetzner server type (e.g. `cx22`) |
+| `server_type` | `string` | yes | Hetzner server type (e.g. `cx23`) |
 | `image` | `number` | yes | Hetzner image ID (use `hcloud_image` data source) |
 | `aliases` | `list(string)` | no | additional DNS aliases for this node |
 | `patches` | `list(string)` | no | node-specific config patches |
@@ -52,12 +52,12 @@ module "nuremberg_pool" {
   location = "nbg1"
 
   control_planes = [
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
   ]
   workers = [
-    { server_type = "cx22", image = data.hcloud_image.talos.id },
+    { server_type = "cx23", image = data.hcloud_image.talos.id },
   ]
 }
 ```

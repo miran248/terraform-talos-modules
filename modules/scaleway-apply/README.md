@@ -9,6 +9,8 @@ Provisions Scaleway instances with Talos `user_data`, ephemeral local SSD volume
 | `cluster` | [talos-cluster](../talos-cluster) outputs | |
 | `inbound_rules` | `list(inbound_rule)` | additional inbound security group rules |
 
+> **Note:** Scaleway treats rules without `ip_range` as IPv4-only. On IPv6-only instances, always set `ip_range = "::/0"` to match all IPv6 traffic.
+
 ### inbound_rule fields
 
 | name | type | required | description |
@@ -38,8 +40,8 @@ module "paris_apply" {
 
   # open http/https for ingress
   inbound_rules = [
-    { action = "accept", protocol = "TCP", port = 443 },
-    { action = "accept", protocol = "TCP", port = 80 },
+    { action = "accept", protocol = "TCP", port = 443, ip_range = "::/0" },
+    { action = "accept", protocol = "TCP", port = 80, ip_range = "::/0" },
   ]
 }
 ```

@@ -5,6 +5,7 @@
 ### breaking changes
 - [hcloud-apply](modules/hcloud-apply) and [scaleway-apply](modules/scaleway-apply) now output `nodes` instead of `ips` — each node object is the pool node enriched with an `ip` field. Update references from `module.x_apply.ips.v6[k]` to `module.x_apply.nodes[k].ip`.
 - [talos-apply](modules/talos-apply) `applies` variable now expects objects with a `nodes` map instead of `ips.v6`.
+- [talos-apply](modules/talos-apply) replaces `talos_machine_configuration_apply` + `talos_machine_bootstrap` with `talos_machine` + `talos_cluster` — existing state will require resource recreation on first apply.
 
 ### features
 - **IPv6-only Scaleway support** — IPv4 no longer required
@@ -13,7 +14,7 @@
 - **`installer_image` variable** on [talos-apply](modules/talos-apply) — override the Talos installer image for custom schematics or dev builds
 - **Conditional firewall rules** — ports 6443 (apiserver) and 50001 (trustd) only opened on pools containing control planes; 50000 (apid) opened on all nodes
 - **Extensible firewall rules** — `rules` ([hcloud-apply](modules/hcloud-apply)) and `inbound_rules` ([scaleway-apply](modules/scaleway-apply)) variables for adding extra rules per deployment
-- **Scaleway security group hardened** — `inbound_default_policy = "drop"`
+- **Scaleway security group hardened** — `inbound_default_policy = "drop"` with explicit `ip_range = "::/0"` on all public rules (required for IPv6-only instances — rules without `ip_range` are treated as IPv4-only by Scaleway)
 
 ### changes
 - All module resource files consolidated into `main.tf` per module
