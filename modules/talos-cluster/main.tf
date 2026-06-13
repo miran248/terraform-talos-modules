@@ -65,3 +65,24 @@ locals {
   nodes            = local.s7
   configs          = { for key, config in data.talos_machine_configuration.this : key => config.machine_configuration }
 }
+
+resource "talos_machine_secrets" "this" {
+  talos_version = var.talos_version
+}
+
+data "talos_machine_configuration" "this" {
+  for_each           = local.nodes
+  cluster_endpoint   = local.cluster_endpoint
+  cluster_name       = var.name
+  config_patches     = each.value.patches
+  kubernetes_version = var.kubernetes_version
+  machine_secrets    = talos_machine_secrets.this.machine_secrets
+  machine_type       = each.value.talos.machine_type
+  talos_version      = var.talos_version
+}
+
+data "talos_client_configuration" "this" {
+  client_configuration = talos_machine_secrets.this.client_configuration
+  cluster_name         = var.name
+  endpoints            = [local.endpoint]
+}
