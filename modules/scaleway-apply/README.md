@@ -9,7 +9,7 @@ Provisions Scaleway instances with Talos `user_data`, ephemeral local SSD volume
 | `cluster` | [talos-cluster](../talos-cluster) outputs | |
 | `inbound_rules` | `list(inbound_rule)` | additional inbound security group rules |
 
-> **Note:** Scaleway treats rules without `ip_range` as IPv4-only. On IPv6-only instances, always set `ip_range = "::/0"` to match all IPv6 traffic.
+> **Note:** Scaleway treats rules without `ip_range` as IPv4-only. On IPv6 instances, always set `ip_range = "::/0"` to match all IPv6 traffic; on IPv4 instances use `ip_range = "0.0.0.0/0"`. The module sets built-in rules automatically based on the pool `mode`.
 
 ### inbound_rule fields
 

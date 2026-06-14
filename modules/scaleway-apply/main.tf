@@ -1,8 +1,10 @@
 locals {
+  any_cidr = var.pool.mode == "ipv6" ? "::/0" : "0.0.0.0/0"
+
   nodes = { for key, _ in var.pool.nodes :
     key => merge(var.pool.nodes[key], {
       ip = [for pip in scaleway_instance_server.this[key].public_ips :
-        pip.address if pip.id == var.pool.ids.ips.v6[key]
+        pip.address if pip.id == var.pool.ids.ips[key]
       ][0]
     })
   }
@@ -23,7 +25,7 @@ resource "scaleway_instance_security_group" "this" {
       action   = "accept"
       protocol = "TCP"
       port     = "6443"
-      ip_range = "::/0"
+      ip_range = local.any_cidr
     }
   }
   # talos apid - opened on all nodes
@@ -31,7 +33,7 @@ resource "scaleway_instance_security_group" "this" {
     action   = "accept"
     protocol = "TCP"
     port     = "50000"
-    ip_range = "::/0"
+    ip_range = local.any_cidr
   }
   # talos trustd - only opened when pool contains control planes
   dynamic "inbound_rule" {
@@ -40,7 +42,7 @@ resource "scaleway_instance_security_group" "this" {
       action   = "accept"
       protocol = "TCP"
       port     = "50001"
-      ip_range = "::/0"
+      ip_range = local.any_cidr
     }
   }
 
@@ -50,7 +52,7 @@ resource "scaleway_instance_security_group" "this" {
     content {
       action   = "accept"
       protocol = "ANY"
-      ip_range = inbound_rule.value.ip_64
+      ip_range = inbound_rule.value.ip_cidr
     }
   }
 
@@ -77,7 +79,7 @@ resource "scaleway_instance_server" "this" {
   placement_group_id    = var.pool.ids.group
   protected             = false
   security_group_id     = scaleway_instance_security_group.this.id
-  ip_ids                = [var.pool.ids.ips.v6[each.key]]
+  ip_ids                = [var.pool.ids.ips[each.key]]
   additional_volume_ids = [scaleway_instance_volume.ephemeral[each.key].id]
 
   lifecycle {

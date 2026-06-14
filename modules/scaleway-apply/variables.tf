@@ -3,6 +3,7 @@ variable "pool" {
     MODULE_NAME = string
     prefix      = string
     zone        = string
+    mode        = string
     nodes = map(object({
       kind  = string
       name  = string
@@ -11,7 +12,7 @@ variable "pool" {
     }))
     ids = object({
       group = string
-      ips   = object({ v6 = map(string) })
+      ips   = map(string)
     })
   })
   description = "scaleway-pool module outputs"
@@ -23,7 +24,7 @@ variable "pool" {
 variable "cluster" {
   type = object({
     MODULE_NAME = string
-    nodes       = map(object({ ip_64 = string }))
+    nodes       = map(object({ ip_cidr = string }))
     configs     = map(string)
   })
   description = "talos-cluster module outputs"

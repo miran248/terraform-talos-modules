@@ -1,10 +1,12 @@
 apply:
   terraform init -upgrade
   terraform apply -auto-approve
-  rm -f ../talos-config ../kube-config
-  terraform output --raw talos_config > ../talos-config
-  TALOSCONFIG=../talos-config talosctl -n c1 kubeconfig ../kube-config
+  rm -f ../talos-config-ipv6 ../kube-config-ipv6 ../talos-config-ipv4 ../kube-config-ipv4
+  terraform output --raw talos_config_ipv6 > ../talos-config-ipv6
+  TALOSCONFIG=../talos-config-ipv6 talosctl -n c1 kubeconfig ../kube-config-ipv6
+  terraform output --raw talos_config_ipv4 > ../talos-config-ipv4
+  TALOSCONFIG=../talos-config-ipv4 talosctl -n c1 kubeconfig ../kube-config-ipv4
 
 destroy:
-  rm -f ../talos-config ../kube-config
+  rm -f ../talos-config-ipv6 ../kube-config-ipv6 ../talos-config-ipv4 ../kube-config-ipv4
   terraform destroy -auto-approve

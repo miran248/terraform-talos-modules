@@ -1,5 +1,5 @@
 # hcloud-pool
-Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per node and a placement group. Does not provision servers - pass outputs to [hcloud-apply](../hcloud-apply) and [talos-cluster](../talos-cluster).
+Allocates Hetzner Cloud resources for a node pool: one primary IP per node (IPv6 /64 or IPv4 /32) and a placement group. Does not provision servers - pass outputs to [hcloud-apply](../hcloud-apply) and [talos-cluster](../talos-cluster).
 
 ## inputs
 
@@ -7,6 +7,7 @@ Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per n
 |---|---|---|---|
 | `prefix` | `string` | yes | resource name prefix, must be unique across pools |
 | `location` | `string` | yes | Hetzner Cloud location (e.g. `nbg1`, `hel1`, `fsn1`) |
+| `mode` | `string` | no | IP family: `ipv6` (default) or `ipv4` |
 | `control_planes` | `list(node)` | no | control plane node definitions |
 | `workers` | `list(node)` | no | worker node definitions |
 | `patches` | `patches` | no | pool-wide config patches |
@@ -36,7 +37,8 @@ Allocates Hetzner Cloud resources for a node pool: one IPv6 /64 primary IP per n
 | `prefix` | pool prefix |
 | `location` | Hetzner location |
 | `nodes` | map of fully resolved node objects, keyed by node name |
-| `ids` | resource IDs (`group`, `ips.v6`) |
+| `mode` | IP family (`ipv6` or `ipv4`) |
+| `ids` | resource IDs (`group`, `ips`) |
 
 ## example
 

@@ -3,37 +3,34 @@
 ## Unreleased
 
 ### breaking changes
-- [hcloud-apply](modules/hcloud-apply) and [scaleway-apply](modules/scaleway-apply) now output `nodes` instead of `ips` — each node object is the pool node enriched with an `ip` field. Update references from `module.x_apply.ips.v6[k]` to `module.x_apply.nodes[k].ip`.
-- [talos-apply](modules/talos-apply) `applies` variable now expects objects with a `nodes` map instead of `ips.v6`.
-- [talos-apply](modules/talos-apply) replaces `talos_machine_configuration_apply` + `talos_machine_bootstrap` with `talos_machine` + `talos_cluster` — existing state will require resource recreation on first apply.
+- [talos-apply](modules/talos-apply) replaces `talos_machine_configuration_apply` + `talos_machine_bootstrap` with `talos_machine` + `talos_cluster` — existing state requires resource recreation on first apply
+- [hcloud-apply](modules/hcloud-apply) and [scaleway-apply](modules/scaleway-apply) output `nodes` instead of `ips` — update references from `module.x_apply.ips.v6[k]` to `module.x_apply.nodes[k].ip`
+- [talos-apply](modules/talos-apply) `applies` variable now expects objects with a `nodes` map instead of `ips.v6`
+- [hcloud-pool](modules/hcloud-pool) and [scaleway-pool](modules/scaleway-pool) pool output field `ip_64` renamed to `ip_cidr`; `ids.ips.v6` renamed to `ids.ips`
+- Ports 80/443 removed from default firewall rules — pass via `rules` / `inbound_rules` if needed
+- Removed private network and load balancer resources from hcloud modules
 
 ### features
-- **New modules** — [scaleway-pool](modules/scaleway-pool), [scaleway-apply](modules/scaleway-apply), [scaleway-image](modules/scaleway-image) for provisioning Talos clusters on Scaleway
-- **IPv6-only Scaleway support** — IPv4 no longer required; Scaleway instances boot with routed IPv6 only
-- **Rolling upgrades via `talos_machine`** — [talos-apply](modules/talos-apply) now uses `talos_machine` + `talos_cluster` resources for proper lifecycle management and rolling OS upgrades
-- **`installer_image` variable** on [talos-apply](modules/talos-apply) — override the Talos installer image for custom schematics or dev builds
-- **Conditional firewall rules** — ports 6443 (apiserver) and 50001 (trustd) only opened on pools containing control planes; 50000 (apid) opened on all nodes
-- **Extensible firewall rules** — `rules` ([hcloud-apply](modules/hcloud-apply)) and `inbound_rules` ([scaleway-apply](modules/scaleway-apply)) variables for adding extra rules per deployment
-- **Scaleway security group hardened** — `inbound_default_policy = "drop"` with explicit `ip_range = "::/0"` on all public rules (required for IPv6-only instances — rules without `ip_range` are treated as IPv4-only by Scaleway)
+- **Scaleway support** — new [scaleway-pool](modules/scaleway-pool), [scaleway-apply](modules/scaleway-apply), [scaleway-image](modules/scaleway-image) modules; instances boot with routed IPv6, no IPv4 required
+- **IPv4 support** — `mode` variable on [hcloud-pool](modules/hcloud-pool) and [scaleway-pool](modules/scaleway-pool) (`"ipv6"` default, `"ipv4"` option); [talos-cluster](modules/talos-cluster) validates all pools share the same mode and selects matching built-in patches automatically; [cilium-ipv6](manifests/cilium-ipv6) and [cilium-ipv4](manifests/cilium-ipv4) manifests
+- **Rolling OS upgrades** — [talos-apply](modules/talos-apply) uses `talos_machine` + `talos_cluster` from talos provider 0.12.x for proper lifecycle management and rolling upgrades
+- **Custom installer image** — `installer_image` variable on [talos-apply](modules/talos-apply) for custom schematics or dev builds
+- **Extensible firewall rules** — `rules` ([hcloud-apply](modules/hcloud-apply)) and `inbound_rules` ([scaleway-apply](modules/scaleway-apply)) for adding extra rules per pool; built-in rules now conditional (6443 and 50001 only on pools with control planes)
 
 ### changes
-- Upgraded to talos provider 0.12.x with new resource types (`talos_machine`, `talos_cluster`)
 - Cilium switched from direct routing to tunnel mode (netkit datapath)
-- All module resource files consolidated into `main.tf` per module
-- [scaleway-pool](modules/scaleway-pool) drops IPv4 IPs — instances boot IPv6-only
-- [scaleway-pool](modules/scaleway-pool) removes `network.interfaces.eth0.dhcp` patch — network configured statically by Talos platform code
-- Removed private network and load balancer resources from hcloud modules
-- Upgraded terraform providers (hcloud, scaleway, google)
-- Port 80/443 removed from default firewall rules — pass via `rules`/`inbound_rules` if needed
-- Port 10256 (kube-proxy healthz) removed — not applicable when using Cilium as kube-proxy replacement
+- All module resources consolidated into `main.tf` per module
+- Upgraded talos provider to 0.12.x, hcloud, scaleway, and google providers upgraded
 
 ### manifests
-- Added cert-manager, external-secrets manifests
-- Updated Cilium, ArgoCD and other manifest dependencies
+- [cilium](manifests/cilium-ipv6) renamed to `cilium-ipv6`; `cilium-ipv4` added
+- Added [cert-manager](manifests/cert-manager), [external-secrets](manifests/external-secrets), [scaleway-csi](manifests/scaleway-csi), [coroot](manifests/coroot) manifests
+- [hcloud-csi](manifests/hcloud-csi) and [scaleway-csi](manifests/scaleway-csi) node DaemonSets scoped to their respective `provider` node label
+- Cilium, ArgoCD, and other manifest dependencies updated
 
 ### docs
-- READMEs updated across all modules — complex types in subsections, module output inputs link to source module
-- New examples: [scaleway-lb.tf](examples/scaleway-lb.tf), [multi-cloud.tf](examples/multi-cloud.tf)
+- READMEs added or rewritten for all modules
+- New examples: [scaleway-lb.tf](examples/scaleway-lb.tf), [multi-cloud.tf](examples/multi-cloud.tf), [talos-ccm.tf](examples/talos-ccm.tf)
 - CHANGELOG switched to manual maintenance
 
 ## [v3.2.3](https://github.com/miran248/terraform-talos-modules/compare/v3.2.2...v3.2.3) — 2025-12-04

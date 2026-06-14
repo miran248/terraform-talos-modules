@@ -9,6 +9,10 @@ output "zone" {
   value = var.zone
 }
 
+output "mode" {
+  value = var.mode
+}
+
 output "ids" {
   value = local.ids
 }

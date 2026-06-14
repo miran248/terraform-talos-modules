@@ -7,7 +7,8 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 |---|---|---|
 | [argocd](argocd) | GitOps controller | no |
 | [cert-manager](cert-manager) | certificate management | no |
-| [cilium](cilium) | CNI - tunnel mode (netkit), BigTCP, BBR, Gateway API | yes |
+| [cilium-ipv6](cilium-ipv6) | CNI for IPv6 clusters - tunnel mode (netkit), BigTCP, BBR, Gateway API | yes |
+| [cilium-ipv4](cilium-ipv4) | CNI for IPv4 clusters - tunnel mode (netkit), BigTCP, BBR, Gateway API | yes |
 | [coroot](coroot) | observability | no |
 | [external-secrets](external-secrets) | sync secrets from external stores | no |
 | [gcp-wif-webhook](gcp-wif-webhook) | GCP Workload Identity Federation webhook | no |
@@ -25,7 +26,7 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 # render all manifests to .build/manifests/
 > just build
 
-# apply required components
-> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium.yaml
+# apply required components (use cilium-ipv4 for IPv4 clusters)
+> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium-ipv6.yaml
 > KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/namespaces.yaml
 ```

@@ -3,9 +3,9 @@ Modules in this repository help provision and maintain multi-region [Kubernetes]
 
 ## features
 - [Talos Linux](https://www.talos.dev) with KubeSpan, KubePrism and HostDNS
-- IPv6-only node connectivity (NAT64 for outbound IPv4)
-- Single-stack IPv6 internals (dual-stack possible with additional patches)
-- [Cilium](https://cilium.io) - tunnel mode (netkit), BigTCP and BBR
+- Single-stack IPv6 or IPv4 node connectivity - set `mode` on pool modules (`"ipv6"` default)
+- IPv6 mode: NAT64 for outbound IPv4, single-stack IPv6 internals
+- [Cilium](https://cilium.io) - tunnel mode (netkit), BigTCP and BBR; separate manifests for [IPv6](manifests/cilium-ipv6) and [IPv4](manifests/cilium-ipv4)
 - [talos-ccm](https://github.com/siderolabs/talos-cloud-controller-manager) - optional, node IPAM (CloudAllocator) and cloud metadata, requires additional patches (see [examples/talos-ccm.tf](examples/talos-ccm.tf))
 - [gcp-wif](modules/gcp-wif) + [gcp-wif-apply](modules/gcp-wif-apply) - optional GCP Workload Identity Federation integration
 
@@ -16,8 +16,8 @@ Allocate node resources (IPs, placement groups). Pass their outputs to `talos-cl
 
 | module | provider | description |
 |---|---|---|
-| [hcloud-pool](modules/hcloud-pool) | Hetzner Cloud | allocates IPv6 /64 blocks and a placement group |
-| [scaleway-pool](modules/scaleway-pool) | Scaleway | allocates routed IPv6 IPs and a placement group |
+| [hcloud-pool](modules/hcloud-pool) | Hetzner Cloud | allocates primary IPs (IPv6 /64 or IPv4 /32) and a placement group |
+| [scaleway-pool](modules/scaleway-pool) | Scaleway | allocates routed IPs (IPv6 or IPv4) and a placement group |
 
 ### cluster
 | module | description |
@@ -47,7 +47,7 @@ Provision servers. One apply module per pool.
 | [minimal.tf](examples/minimal.tf) | single Hetzner Cloud pool, single-region cluster |
 | [multi-region.tf](examples/multi-region.tf) | two Hetzner Cloud pools across regions |
 | [multi-cloud.tf](examples/multi-cloud.tf) | Scaleway control planes + Hetzner Cloud workers, Scaleway LB as cluster endpoint |
-| [scaleway-lb.tf](examples/scaleway-lb.tf) | IPv6-only Scaleway cluster with a load balancer frontend for Talos and Kubernetes APIs |
+| [scaleway-lb.tf](examples/scaleway-lb.tf) | Scaleway cluster with a load balancer frontend for Talos and Kubernetes APIs |
 | [talos-ccm.tf](examples/talos-ccm.tf) | talos-ccm integration with node IPAM and cloud metadata |
 
 ## diagram
@@ -92,7 +92,7 @@ graph TD
 ```
 4. Run `just` from the repo root to generate manifests from the [manifests](manifests) directory, then apply them
 ```shell
-> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium.yaml
+> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium-ipv6.yaml
 ```
 5. Verify with [k9s](https://k9scli.io/)
 ```shell

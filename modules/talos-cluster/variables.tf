@@ -18,11 +18,12 @@ variable "kubernetes_version" {
 variable "pools" {
   type = list(object({
     prefix = string
+    mode   = string
     nodes = map(object({
       kind    = string
       name    = string
       aliases = list(string)
-      ip_64   = string
+      ip_cidr = string
       patches = list(string)
     }))
   }))
@@ -30,6 +31,10 @@ variable "pools" {
   validation {
     condition     = length([for i, pool in var.pools : pool.prefix]) == length(distinct([for i, pool in var.pools : pool.prefix]))
     error_message = "pool prefixes must be unique"
+  }
+  validation {
+    condition     = length(distinct([for pool in var.pools : pool.mode])) <= 1
+    error_message = "all pools must have the same mode (ipv6 or ipv4)"
   }
 }
 

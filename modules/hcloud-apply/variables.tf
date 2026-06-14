@@ -3,16 +3,17 @@ variable "pool" {
     MODULE_NAME = string
     prefix      = string
     location    = string
+    mode        = string
     nodes = map(object({
       kind        = string
       name        = string
       server_type = string
       image       = number
-      ip_64       = string
+      ip_cidr     = string
     }))
     ids = object({
       group = number
-      ips   = object({ v6 = map(number) })
+      ips   = map(number)
     })
   })
   description = "hcloud-pool module outputs"
@@ -24,7 +25,7 @@ variable "pool" {
 variable "cluster" {
   type = object({
     MODULE_NAME = string
-    nodes       = map(object({ ip_64 = string }))
+    nodes       = map(object({ ip_cidr = string }))
     configs     = map(string)
   })
   description = "talos-cluster module outputs"

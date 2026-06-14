@@ -11,8 +11,7 @@ locals {
     ]
   }
 
-  # s1: merge control_planes and workers vars into one keyed map with kind
-  s1 = merge(
+  keyed_nodes = merge(
     { for i, node in var.control_planes :
       "${var.prefix}-control-plane-${i + 1}" => merge(node, { kind = "control-plane" }) if node.removed == false
     },
@@ -21,29 +20,26 @@ locals {
     },
   )
 
-  # s2: add derived fields (name, patches, ip_64)
-  s2 = { for key, node in local.s1 :
+  nodes = { for key, node in local.keyed_nodes :
     key => merge(node, {
       name    = key
       patches = flatten([local.patches.common, var.patches.common, node.kind == "control-plane" ? var.patches.control_planes : var.patches.workers, node.patches])
-      ip_64   = hcloud_primary_ip.this[key].ip_network
+      ip_cidr = var.mode == "ipv6" ? hcloud_primary_ip.this[key].ip_network : "${hcloud_primary_ip.this[key].ip_address}/32"
     })
   }
 
   ids = {
     group = hcloud_placement_group.this.id
-    ips   = { v6 = { for key, ip in hcloud_primary_ip.this : key => ip.id } }
+    ips   = { for key, ip in hcloud_primary_ip.this : key => ip.id }
   }
-
-  nodes = local.s2
 }
 
 # ips
 resource "hcloud_primary_ip" "this" {
-  for_each    = local.s1
+  for_each    = local.keyed_nodes
   name        = each.key
   location    = var.location
-  type        = "ipv6"
+  type        = var.mode
   auto_delete = false
 
   delete_protection = false

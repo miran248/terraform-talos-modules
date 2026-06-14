@@ -1,0 +1,35 @@
+cluster:
+  apiServer:
+    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+    extraArgs:
+      advertise-address: "0.0.0.0"
+      bind-address: "0.0.0.0"
+  controllerManager:
+    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
+    extraArgs:
+      allocate-node-cidrs: true
+      bind-address: "0.0.0.0"
+      node-cidr-mask-size-ipv4: 24
+  discovery:
+    enabled: true
+    registries:
+      service:
+        disabled: false
+  etcd:
+    # https://etcd.io/docs/v3.5/op-guide/configuration/
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:2381"
+  externalCloudProvider:
+    enabled: false
+  scheduler:
+    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
+    extraArgs:
+      bind-address: "0.0.0.0"
+machine:
+  features:
+    kubernetesTalosAPIAccess:
+      enabled: true
+      allowedRoles:
+        - "os:reader"
+      allowedKubernetesNamespaces:
+        - kube-system

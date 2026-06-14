@@ -5,6 +5,6 @@ charts
 # terraform
 .terraform
 current-plan
-talos-config
-kube-config
+talos-config*
+kube-config*
 support*

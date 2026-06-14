@@ -35,7 +35,7 @@ module "nuremberg_apply" {
   pool    = module.nuremberg_pool
   cluster = module.talos_cluster
 
-  # open http/https for ingress
+  # open http/https for ingress (use ["0.0.0.0/0"] for ipv4 pools)
   rules = [
     { direction = "in", protocol = "tcp", port = "443", source_ips = ["::/0"] },
     { direction = "in", protocol = "tcp", port = "80",  source_ips = ["::/0"] },

@@ -7,6 +7,16 @@ variable "zone" {
   description = "scaleway zone"
 }
 
+variable "mode" {
+  type        = string
+  description = "IP family for pool nodes"
+  default     = "ipv6"
+  validation {
+    condition     = contains(["ipv6", "ipv4"], var.mode)
+    error_message = "mode must be ipv6 or ipv4"
+  }
+}
+
 variable "control_planes" {
   type = list(object({
     type    = string

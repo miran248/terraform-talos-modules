@@ -1,6 +1,8 @@
 locals {
+  any_cidr = var.pool.mode == "ipv6" ? "::/0" : "0.0.0.0/0"
+
   nodes = { for key, node in var.pool.nodes : key => merge(node, {
-    ip = cidrhost(node.ip_64, 1)
+    ip = cidrhost(node.ip_cidr, var.pool.mode == "ipv6" ? 1 : 0)
   }) }
 }
 
@@ -27,7 +29,7 @@ resource "hcloud_firewall" "this" {
       direction   = "in"
       protocol    = "tcp"
       port        = "6443"
-      source_ips  = ["::/0"]
+      source_ips  = [local.any_cidr]
     }
   }
   # talos apid - opened on all nodes
@@ -36,7 +38,7 @@ resource "hcloud_firewall" "this" {
     direction   = "in"
     protocol    = "tcp"
     port        = "50000"
-    source_ips  = ["::/0"]
+    source_ips  = [local.any_cidr]
   }
   # talos trustd - only opened when pool contains control planes
   dynamic "rule" {
@@ -46,7 +48,7 @@ resource "hcloud_firewall" "this" {
       direction   = "in"
       protocol    = "tcp"
       port        = "50001"
-      source_ips  = ["::/0"]
+      source_ips  = [local.any_cidr]
     }
   }
 
@@ -57,7 +59,7 @@ resource "hcloud_firewall" "this" {
       direction  = "in"
       protocol   = rule.value
       port       = "any"
-      source_ips = [for _, node in var.cluster.nodes : node.ip_64]
+      source_ips = [for _, node in var.cluster.nodes : node.ip_cidr]
     }
   }
   dynamic "rule" {
@@ -65,7 +67,7 @@ resource "hcloud_firewall" "this" {
     content {
       direction  = "in"
       protocol   = rule.value
-      source_ips = [for _, node in var.cluster.nodes : node.ip_64]
+      source_ips = [for _, node in var.cluster.nodes : node.ip_cidr]
     }
   }
 
@@ -104,9 +106,10 @@ resource "hcloud_server" "this" {
   ]
 
   public_net {
-    ipv6_enabled = true
-    ipv6         = var.pool.ids.ips.v6[each.key]
-    ipv4_enabled = false
+    ipv6_enabled = var.pool.mode == "ipv6"
+    ipv6         = var.pool.mode == "ipv6" ? var.pool.ids.ips[each.key] : null
+    ipv4_enabled = var.pool.mode == "ipv4"
+    ipv4         = var.pool.mode == "ipv4" ? var.pool.ids.ips[each.key] : null
   }
 
   lifecycle {
