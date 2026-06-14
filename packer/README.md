@@ -24,7 +24,7 @@ Builds a Talos snapshot on Hetzner Cloud from the official factory image:
 Use a custom imager from `ghcr.io/<username>/talos-imager` to build a snapshot with your own Talos build. If the tag you need is already published, run the imager directly to produce the raw image:
 
 ```shell
-> docker run --rm -v /dev:/dev -v $(pwd)/_out/images:/out --privileged ghcr.io/<username>/talos-imager:<tag> hcloud --arch amd64
+> docker run --rm -v /dev:/dev -v $(pwd)/tmp:/out --privileged ghcr.io/<username>/talos-imager:<tag> hcloud --arch amd64
 ```
 
 To build from source and push a new tag:
@@ -49,7 +49,7 @@ Streams the official Talos image from factory.talos.dev, converts it to qcow2 an
 Use a custom imager from `ghcr.io/<username>/talos-imager` to build a qcow2 with your own Talos build. If the tag you need is already published, run the imager directly:
 
 ```shell
-> docker run --rm -v /dev:/dev -v $(pwd)/_out/images:/out --privileged ghcr.io/<username>/talos-imager:<tag> scaleway --arch amd64
+> docker run --rm -v /dev:/dev -v $(pwd)/tmp:/out --privileged ghcr.io/<username>/talos-imager:<tag> scaleway --arch amd64
 ```
 
 To build from source and push a new tag:

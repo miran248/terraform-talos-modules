@@ -33,22 +33,22 @@ imager-dev: installer-base-dev
   cd {{ TALOS_SRC }} && make target-imager REGISTRY=ghcr.io USERNAME={{ USERNAME }} TAG={{ DEV_IMAGE_TAG }} PLATFORM=linux/amd64 PUSH=false TARGET_ARGS='--output type=registry,name={{ TALOS_IMAGER }}'
 
 installer-dev:
-  mkdir -p {{ TMP_PATH }}/images
-  docker run --rm -v {{ TMP_PATH }}/images:/out {{ TALOS_IMAGER }} installer --arch amd64 --base-installer-image {{ TALOS_INSTALLER_BASE }}
-  docker load < {{ TMP_PATH }}/images/installer-amd64.tar | awk '{print $NF}' | xargs -I{} docker tag {} {{ TALOS_INSTALLER }}
+  mkdir -p {{ TMP_PATH }}
+  docker run --rm -v {{ TMP_PATH }}:/out {{ TALOS_IMAGER }} installer --arch amd64 --base-installer-image {{ TALOS_INSTALLER_BASE }}
+  docker load < {{ TMP_PATH }}/installer-amd64.tar | awk '{print $NF}' | xargs -I{} docker tag {} {{ TALOS_INSTALLER }}
   docker push {{ TALOS_INSTALLER }}
   rm -Rf {{ TMP_PATH }}
 
 hcloud-dev:
-  mkdir -p {{ TMP_PATH }}/images
-  docker run --rm -v /dev:/dev -v {{ TMP_PATH }}/images:/out --privileged {{ TALOS_IMAGER }} hcloud --arch amd64
-  packer build -var "tag={{ DEV_IMAGE_TAG }}" -var "images_path={{ TMP_PATH }}/images" hcloud-dev.pkr.hcl
+  mkdir -p {{ TMP_PATH }}
+  docker run --rm -v /dev:/dev -v {{ TMP_PATH }}:/out --privileged {{ TALOS_IMAGER }} hcloud --arch amd64
+  packer build -var "tag={{ DEV_IMAGE_TAG }}" -var "images_path={{ TMP_PATH }}" hcloud-dev.pkr.hcl
   rm -Rf {{ TMP_PATH }}
 
 scaleway-dev:
-  mkdir -p {{ TMP_PATH }}/images
-  docker run --rm -v /dev:/dev -v {{ TMP_PATH }}/images:/out --privileged {{ TALOS_IMAGER }} scaleway --arch amd64
-  zstd -d {{ TMP_PATH }}/images/scaleway-amd64.raw.zst -o {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.raw
-  qemu-img convert -f raw -O qcow2 {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.raw {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2
-  rclone copy {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2 scaleway:{{ SCALEWAY_BUCKET }}
+  mkdir -p {{ TMP_PATH }}
+  docker run --rm -v /dev:/dev -v {{ TMP_PATH }}:/out --privileged {{ TALOS_IMAGER }} scaleway --arch amd64
+  zstd -d {{ TMP_PATH }}/scaleway-amd64.raw.zst -o {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.raw
+  qemu-img convert -f raw -O qcow2 {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.raw {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2
+  rclone copy {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2 scaleway:{{ SCALEWAY_BUCKET }}
   rm -Rf {{ TMP_PATH }}

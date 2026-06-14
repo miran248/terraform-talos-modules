@@ -27,9 +27,16 @@ data "talos_machine_configuration" "this" {
   talos_version      = var.cluster.talos_version
   config_patches = concat(
     each.value.patches,
-    try(local.patches.static_hosts[each.key], []),
+    local.patches.static_hosts[each.key],
     [local.patches.cert_sans[each.key]],
   )
+}
+
+# not necessary but allows talos_machine resources to be created before talos_cluster finishes
+ephemeral "talos_cluster_kubeconfig" "drain" {
+  cluster_name    = var.cluster.name
+  machine_secrets = var.cluster.machine_secrets.machine_secrets
+  endpoint        = var.cluster.cluster_endpoint
 }
 
 resource "talos_machine" "control_planes" {
@@ -41,6 +48,7 @@ resource "talos_machine" "control_planes" {
   image                 = local.installer_image
   machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
   drain_on_upgrade      = var.drain_on_upgrade
+  kubeconfig_wo         = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
 }
 
 resource "talos_machine" "workers" {
@@ -52,6 +60,7 @@ resource "talos_machine" "workers" {
   image                 = local.installer_image
   machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
   drain_on_upgrade      = var.drain_on_upgrade
+  kubeconfig_wo         = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
 
   depends_on = [talos_machine.control_planes]
 }
@@ -59,8 +68,8 @@ resource "talos_machine" "workers" {
 resource "talos_cluster" "this" {
   client_configuration = var.cluster.machine_secrets.client_configuration
   endpoint             = var.cluster.endpoint
-  node                 = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })[0]
   control_plane_nodes  = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })
+  node                 = values({ for k, n in local.nodes : k => n.ip if n.kind == "control-plane" })[0]
   kubernetes_version   = var.cluster.kubernetes_version
 }
 

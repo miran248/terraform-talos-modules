@@ -21,6 +21,8 @@ module "paris_pool" {
   ]
   workers = [
     { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
+    { type = "DEV1-M", image = module.scaleway_image["fr-par-1"].ids.image },
   ]
 }
 
@@ -70,6 +72,38 @@ resource "scaleway_lb_frontend" "k8s" {
   backend_id   = scaleway_lb_backend.k8s.id
   name         = "k8s"
   inbound_port = 6443
+}
+
+resource "scaleway_lb_backend" "http" {
+  lb_id            = scaleway_lb.this.id
+  name             = "http"
+  forward_protocol = "tcp"
+  forward_port     = 80
+  proxy_protocol   = "none"
+  server_ips       = [for k, n in module.paris_apply.nodes : n.ip if n.kind == "worker"]
+}
+
+resource "scaleway_lb_frontend" "http" {
+  lb_id        = scaleway_lb.this.id
+  backend_id   = scaleway_lb_backend.http.id
+  name         = "http"
+  inbound_port = 80
+}
+
+resource "scaleway_lb_backend" "https" {
+  lb_id            = scaleway_lb.this.id
+  name             = "https"
+  forward_protocol = "tcp"
+  forward_port     = 443
+  proxy_protocol   = "none"
+  server_ips       = [for k, n in module.paris_apply.nodes : n.ip if n.kind == "worker"]
+}
+
+resource "scaleway_lb_frontend" "https" {
+  lb_id        = scaleway_lb.this.id
+  backend_id   = scaleway_lb_backend.https.id
+  name         = "https"
+  inbound_port = 443
 }
 
 module "talos_cluster" {
