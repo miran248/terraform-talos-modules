@@ -34,6 +34,10 @@ resource "scaleway_lb" "this" {
   zone   = "fr-par-1"
   name   = "example"
   type   = "LB-S"
+
+  lifecycle {
+    ignore_changes = [ip_ids]
+  }
 }
 
 resource "scaleway_lb_backend" "talos" {

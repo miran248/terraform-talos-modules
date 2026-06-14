@@ -1,4 +1,16 @@
 locals {
+  patches = {
+    common = [
+      <<-EOF
+        machine:
+          nodeLabels:
+            provider: hcloud
+            topology.kubernetes.io/zone: ${var.location}
+            topology.kubernetes.io/region: ${var.location}
+      EOF
+    ]
+  }
+
   # s1: merge control_planes and workers vars into one keyed map with kind
   s1 = merge(
     { for i, node in var.control_planes :
@@ -13,7 +25,7 @@ locals {
   s2 = { for key, node in local.s1 :
     key => merge(node, {
       name    = key
-      patches = flatten([var.patches.common, node.kind == "control-plane" ? var.patches.control_planes : var.patches.workers, node.patches])
+      patches = flatten([local.patches.common, var.patches.common, node.kind == "control-plane" ? var.patches.control_planes : var.patches.workers, node.patches])
       ip_64   = hcloud_primary_ip.this[key].ip_network
     })
   }

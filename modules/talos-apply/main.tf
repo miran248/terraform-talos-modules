@@ -40,7 +40,7 @@ resource "talos_machine" "control_planes" {
   node                  = each.value.ip
   image                 = local.installer_image
   machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
-  drain_on_upgrade      = false
+  drain_on_upgrade      = var.drain_on_upgrade
 }
 
 resource "talos_machine" "workers" {
@@ -51,7 +51,7 @@ resource "talos_machine" "workers" {
   node                  = each.value.ip
   image                 = local.installer_image
   machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
-  drain_on_upgrade      = false
+  drain_on_upgrade      = var.drain_on_upgrade
 
   depends_on = [talos_machine.control_planes]
 }

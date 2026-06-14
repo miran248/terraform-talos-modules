@@ -1,6 +1,6 @@
 locals {
   dev1_image_ids = {
-    hcloud = data.hcloud_image.v1_13_3_amd64.id
+    hcloud = data.hcloud_image.v1_14_0_alpha_1_dev_7_amd64.id
     # scaleway = module.scaleway_image["fr-par-1"].ids.image
     scaleway = module.scaleway_image_dev["fr-par-1"].ids.image
   }
@@ -22,18 +22,18 @@ module "dev1_paris_pool" {
   ]
 }
 
-# module "dev1_nuremberg_pool" {
-#   source = "../modules/hcloud-pool"
-#
-#   prefix   = "dev1-nbg"
-#   location = data.hcloud_location.nuremberg.name
-#
-#   workers = [
-#     { server_type = "cx23", image = data.hcloud_image.v1_14_0_alpha_1_amd64.id },
-#     { server_type = "cx23", image = data.hcloud_image.v1_14_0_alpha_1_amd64.id },
-#     { server_type = "cx23", image = data.hcloud_image.v1_14_0_alpha_1_amd64.id },
-#   ]
-# }
+module "dev1_nuremberg_pool" {
+  source = "../modules/hcloud-pool"
+
+  prefix   = "dev1-nbg"
+  location = data.hcloud_location.nuremberg.name
+
+  workers = [
+    { server_type = "cx23", image = local.dev1_image_ids.hcloud },
+    { server_type = "cx23", image = local.dev1_image_ids.hcloud },
+    { server_type = "cx23", image = local.dev1_image_ids.hcloud },
+  ]
+}
 
 resource "scaleway_lb_ip" "dev1" {
   zone    = data.scaleway_availability_zones.paris.zones[0]
@@ -45,6 +45,10 @@ resource "scaleway_lb" "dev1" {
   zone   = data.scaleway_availability_zones.paris.zones[0]
   name   = "dev1"
   type   = "LB-S"
+
+  lifecycle {
+    ignore_changes = [ip_ids]
+  }
 }
 
 resource "scaleway_lb_backend" "dev1_talos" {
@@ -89,7 +93,7 @@ module "dev1_talos_cluster" {
 
   pools = [
     module.dev1_paris_pool,
-    # module.dev1_nuremberg_pool,
+    module.dev1_nuremberg_pool,
   ]
 
   patches = {
@@ -141,20 +145,19 @@ module "dev1_paris_apply" {
   ]
 }
 
-# module "dev1_nuremberg_apply" {
-#   source = "../modules/hcloud-apply"
-#
-#   pool    = module.dev1_nuremberg_pool
-#   cluster = module.dev1_talos_cluster
-# }
+module "dev1_nuremberg_apply" {
+  source = "../modules/hcloud-apply"
+
+  pool    = module.dev1_nuremberg_pool
+  cluster = module.dev1_talos_cluster
+}
 
 module "dev1_talos_apply" {
   source = "../modules/talos-apply"
 
   cluster         = module.dev1_talos_cluster
-  applies         = [module.dev1_paris_apply]
-  # applies       = [module.dev1_paris_apply, module.dev1_nuremberg_apply]
-  installer_image = "ghcr.io/siderolabs/installer:v1.14.0-alpha.1-dev.7"
+  applies         = [module.dev1_paris_apply, module.dev1_nuremberg_apply]
+  installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-alpha.1-dev.7"
 }
 
 module "dev1_gcp_wif_apply" {

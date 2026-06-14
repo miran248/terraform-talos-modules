@@ -13,6 +13,7 @@ Control planes are configured before workers, enabling rolling upgrades when `ku
 |---|---|---|---|
 | `cluster` | [talos-cluster](../talos-cluster) outputs | yes | |
 | `applies` | `list(`[hcloud-apply](../hcloud-apply) or [scaleway-apply](../scaleway-apply) outputs`)` | yes | |
+| `drain_on_upgrade` | `bool` | no | drain nodes before upgrading (default: `true`) |
 | `installer_image` | `string` | no | Talos installer image for OS upgrades. Defaults to `ghcr.io/siderolabs/installer:<talos_version>`. Override for custom schematics or dev builds. |
 
 ## outputs

@@ -32,6 +32,12 @@ variable "applies" {
   description = "list of apply module outputs (e.g. hcloud-apply, scaleway-apply)"
 }
 
+variable "drain_on_upgrade" {
+  type        = bool
+  default     = true
+  description = "drain nodes before upgrading"
+}
+
 variable "installer_image" {
   type        = string
   default     = null

@@ -1,28 +1,33 @@
 locals {
-  # s1: base patches applied to every node in this pool
-  s1 = [
-    <<-EOF
-      machine:
-        install:
-          disk: /dev/vdb
-          wipe: true
-    EOF
-    ,
-    <<-EOF
-      apiVersion: v1alpha1
-      kind: VolumeConfig
-      name: EPHEMERAL
-      provisioning:
-        diskSelector:
-          match: disk.dev_path == "/dev/vdb"
-        maxSize: 40GiB
-        minSize: 2GiB
-    EOF
-    ,
-  ]
+  patches = {
+    common = [
+      <<-EOF
+        machine:
+          install:
+            disk: /dev/vdb
+            wipe: true
+          nodeLabels:
+            provider: scaleway
+            topology.kubernetes.io/zone: ${var.zone}
+            topology.kubernetes.io/region: ${replace(var.zone, "/-[0-9]+$/", "")}
+      EOF
+      ,
+      <<-EOF
+        apiVersion: v1alpha1
+        kind: VolumeConfig
+        name: EPHEMERAL
+        provisioning:
+          diskSelector:
+            match: disk.dev_path == "/dev/vdb"
+          maxSize: 40GiB
+          minSize: 2GiB
+      EOF
+      ,
+    ]
+  }
 
-  # s2: merge control_planes and workers vars into one keyed map with kind
-  s2 = merge(
+  # s1: merge control_planes and workers vars into one keyed map with kind
+  s1 = merge(
     { for i, node in var.control_planes :
       "${var.prefix}-control-plane-${i + 1}" => merge(node, { kind = "control-plane" }) if node.removed == false
     },
@@ -31,11 +36,11 @@ locals {
     },
   )
 
-  # s3: add derived fields (name, patches, ip_64)
-  s3 = { for key, node in local.s2 :
+  # s2: add derived fields (name, patches, ip_64)
+  s2 = { for key, node in local.s1 :
     key => merge(node, {
       name    = key
-      patches = flatten([local.s1, var.patches.common, node.kind == "control-plane" ? var.patches.control_planes : var.patches.workers, node.patches])
+      patches = flatten([local.patches.common, var.patches.common, node.kind == "control-plane" ? var.patches.control_planes : var.patches.workers, node.patches])
       ip_64   = scaleway_instance_ip.this[key].prefix
     })
   }
@@ -47,12 +52,12 @@ locals {
     }
   }
 
-  nodes = local.s3
+  nodes = local.s2
 }
 
 # ips
 resource "scaleway_instance_ip" "this" {
-  for_each = local.s2
+  for_each = local.s1
   zone     = var.zone
   type     = "routed_ipv6"
 }

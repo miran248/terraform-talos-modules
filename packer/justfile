@@ -4,29 +4,51 @@ init:
 hcloud:
   packer build hcloud.pkr.hcl
 
-TMP_FILE_PATH := "./tmp-scaleway/talos-1.13.3-amd64"
+TMP_PATH := justfile_directory() + "/tmp"
 
+SCALEWAY_VERSION := "v1.13.3"
+SCALEWAY_SCHEMATIC := "18d0321d7fb289f707a76e1deeaa5c97e62209722cbf4bc533a5d51eb666885f"
+SCALEWAY_BUCKET := "miran248-terraform-talos-modules-dev-images"
 scaleway:
-  # https://docs.siderolabs.com/talos/v1.13/platform-specific-installations/cloud-platforms/scaleway
-  # https://factory.talos.dev/?arch=amd64&platform=scaleway&schematic-id=18d0321d7fb289f707a76e1deeaa5c97e62209722cbf4bc533a5d51eb666885f&target=cloud&version=1.13.3
-  mkdir -p ./tmp-scaleway
-  wget "https://factory.talos.dev/image/18d0321d7fb289f707a76e1deeaa5c97e62209722cbf4bc533a5d51eb666885f/v1.13.3/scaleway-amd64.raw.zst" -O {{ TMP_FILE_PATH }}.raw.zst
-  zstd -d {{ TMP_FILE_PATH }}.raw.zst -o {{ TMP_FILE_PATH }}.raw
-  qemu-img convert -O qcow2 {{ TMP_FILE_PATH }}.raw {{ TMP_FILE_PATH }}.qcow2
-  rclone copy {{ TMP_FILE_PATH }}.qcow2 scaleway:miran248-terraform-talos-modules-dev-images
+  mkdir -p {{ TMP_PATH }}
+  # https://factory.talos.dev/?arch=amd64&platform=scaleway&schematic-id={{ SCALEWAY_SCHEMATIC }}&target=cloud&version={{ SCALEWAY_VERSION }}
+  wget "https://factory.talos.dev/image/{{ SCALEWAY_SCHEMATIC }}/{{ SCALEWAY_VERSION }}/scaleway-amd64.raw.zst" -O {{ TMP_PATH }}/talos-{{ SCALEWAY_VERSION }}-amd64.raw.zst
+  zstd -d {{ TMP_PATH }}/talos-{{ SCALEWAY_VERSION }}-amd64.raw.zst -o {{ TMP_PATH }}/talos-{{ SCALEWAY_VERSION }}-amd64.raw
+  qemu-img convert -f raw -O qcow2 {{ TMP_PATH }}/talos-{{ SCALEWAY_VERSION }}-amd64.raw {{ TMP_PATH }}/talos-{{ SCALEWAY_VERSION }}-amd64.qcow2
+  rclone copy {{ TMP_PATH }}/talos-{{ SCALEWAY_VERSION }}-amd64.qcow2 scaleway:{{ SCALEWAY_BUCKET }}
+  rm -Rf {{ TMP_PATH }}
 
 TALOS_SRC := "/Users/miran/projects/github/talos"
-DEV_IMAGE_SRC := TALOS_SRC + "/_out/scaleway-amd64.raw.zst"
 DEV_IMAGE_TAG := "v1.14.0-alpha.1-dev.7"
-TMP_DEV_FILE_PATH := "./tmp-scaleway/v1.14.0-alpha.1-dev.7"
+USERNAME := "miran248"
+
+TALOS_INSTALLER_BASE := "ghcr.io/" + USERNAME + "/talos-installer-base:" + DEV_IMAGE_TAG
+TALOS_IMAGER := "ghcr.io/" + USERNAME + "/talos-imager:" + DEV_IMAGE_TAG
+TALOS_INSTALLER := "ghcr.io/" + USERNAME + "/talos-installer:" + DEV_IMAGE_TAG
+
+installer-base-dev:
+  cd {{ TALOS_SRC }} && make target-installer-base REGISTRY=ghcr.io USERNAME={{ USERNAME }} TAG={{ DEV_IMAGE_TAG }} PLATFORM=linux/amd64 PUSH=false TARGET_ARGS='--output type=registry,name={{ TALOS_INSTALLER_BASE }}'
+
+imager-dev: installer-base-dev
+  cd {{ TALOS_SRC }} && make target-imager REGISTRY=ghcr.io USERNAME={{ USERNAME }} TAG={{ DEV_IMAGE_TAG }} PLATFORM=linux/amd64 PUSH=false TARGET_ARGS='--output type=registry,name={{ TALOS_IMAGER }}'
+
+installer-dev:
+  mkdir -p {{ TMP_PATH }}/images
+  docker run --rm -v {{ TMP_PATH }}/images:/out {{ TALOS_IMAGER }} installer --arch amd64 --base-installer-image {{ TALOS_INSTALLER_BASE }}
+  docker load < {{ TMP_PATH }}/images/installer-amd64.tar | awk '{print $NF}' | xargs -I{} docker tag {} {{ TALOS_INSTALLER }}
+  docker push {{ TALOS_INSTALLER }}
+  rm -Rf {{ TMP_PATH }}
+
+hcloud-dev:
+  mkdir -p {{ TMP_PATH }}/images
+  docker run --rm -v /dev:/dev -v {{ TMP_PATH }}/images:/out --privileged {{ TALOS_IMAGER }} hcloud --arch amd64
+  packer build -var "tag={{ DEV_IMAGE_TAG }}" -var "images_path={{ TMP_PATH }}/images" hcloud-dev.pkr.hcl
+  rm -Rf {{ TMP_PATH }}
 
 scaleway-dev:
-  cd {{ TALOS_SRC }} && make docker-imager USERNAME=miran TAG={{ DEV_IMAGE_TAG }} DEST=_out PUSH=false TARGET_ARGS="--no-cache"
-  docker rmi ghcr.io/miran/imager:{{ DEV_IMAGE_TAG }} 2>/dev/null || true
-  docker load --input {{ TALOS_SRC }}/_out/imager.tar
-  rm -f {{ DEV_IMAGE_SRC }} {{ TMP_DEV_FILE_PATH }}.raw {{ TMP_DEV_FILE_PATH }}.qcow2
-  docker run --rm -v /dev:/dev -v {{ TALOS_SRC }}/_out:/out --privileged ghcr.io/miran/imager:{{ DEV_IMAGE_TAG }} scaleway --arch amd64
-  mkdir -p ./tmp-scaleway
-  zstd -d {{ DEV_IMAGE_SRC }} -o {{ TMP_DEV_FILE_PATH }}.raw
-  qemu-img convert -O qcow2 {{ TMP_DEV_FILE_PATH }}.raw {{ TMP_DEV_FILE_PATH }}.qcow2
-  rclone copy {{ TMP_DEV_FILE_PATH }}.qcow2 scaleway:miran248-terraform-talos-modules-dev-images
+  mkdir -p {{ TMP_PATH }}/images
+  docker run --rm -v /dev:/dev -v {{ TMP_PATH }}/images:/out --privileged {{ TALOS_IMAGER }} scaleway --arch amd64
+  zstd -d {{ TMP_PATH }}/images/scaleway-amd64.raw.zst -o {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.raw
+  qemu-img convert -f raw -O qcow2 {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.raw {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2
+  rclone copy {{ TMP_PATH }}/images/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2 scaleway:{{ SCALEWAY_BUCKET }}
+  rm -Rf {{ TMP_PATH }}

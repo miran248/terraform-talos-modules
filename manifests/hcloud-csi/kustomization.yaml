@@ -62,6 +62,9 @@ helmCharts:
                 topologyKey: "kubernetes.io/hostname"
       node:
         priorityClassName: "system-node-critical"
+        nodeSelector:
+          kubernetes.io/os: linux
+          provider: hcloud
         resources:
           csiNodeDriverRegistrar:
             limits:

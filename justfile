@@ -9,6 +9,7 @@
   just build-helm manifests/hcloud-ccm
   just build-helm manifests/hcloud-csi
   just build-helm manifests/iperf
+  just build-helm manifests/scaleway-csi
   just build-helm manifests/talos-ccm
 
 build-helm NAME:
