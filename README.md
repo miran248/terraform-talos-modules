@@ -83,18 +83,5 @@ graph TD
     TA --> WIFA
 ```
 
-## try it out
-1. Clone the repo
-2. Navigate to the [dev](dev) folder and run [just](https://github.com/casey/just) to deploy the cluster
-3. Open the Talos dashboard and wait for nodes to become ready
-```shell
-> TALOSCONFIG=talos-config talosctl -n c1 dashboard
-```
-4. Run `just` from the repo root to generate manifests from the [manifests](manifests) directory, then apply them
-```shell
-> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium-ipv6.yaml
-```
-5. Verify with [k9s](https://k9scli.io/)
-```shell
-> KUBECONFIG=kube-config k9s
-```
+## development
+See the [dev](dev) folder for a reference deployment used for testing.
