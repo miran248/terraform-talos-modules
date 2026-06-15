@@ -29,10 +29,8 @@ machine:
 ---
 apiVersion: v1alpha1
 kind: ResolverConfig
-# hostDNS disabled — listens on 127.0.0.53:53 which conflicts with CoreDNS hostNetwork: true
-# TODO: re-enable once a better solution is found for cross-cloud DNS via KubeSpan
 hostDNS:
-  enabled: false
+  enabled: true
   forwardKubeDNSToHost: false
 ---
 apiVersion: v1alpha1

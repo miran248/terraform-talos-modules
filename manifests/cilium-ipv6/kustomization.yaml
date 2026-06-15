@@ -52,6 +52,7 @@ helmCharts:
       # enableTunnelBIGTCP: true
       bpf:
         datapathMode: netkit
+        hostLegacyRouting: true # workaround for BPF masquerade skipping DNAT on kubespan for established flows
         masquerade: true
         distributedLRU:
           enabled: true
@@ -59,7 +60,7 @@ helmCharts:
       bpfClockProbe: true
       bandwidthManager:
         enabled: true
-        bbr: true
+        bbr: false # incompatible with hostLegacyRouting
 
       # --- traffic ---
       externalIPs:
