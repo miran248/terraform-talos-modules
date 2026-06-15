@@ -25,14 +25,14 @@
 ### manifests
 - [cilium](manifests/cilium-ipv6) renamed to `cilium-ipv6`; `cilium-ipv4` added
 - Added [cert-manager](manifests/cert-manager), [external-secrets](manifests/external-secrets), [scaleway-csi](manifests/scaleway-csi), [coroot](manifests/coroot) manifests
-- Added [coredns-ipv4](manifests/coredns-ipv4) and [coredns-ipv6](manifests/coredns-ipv6) — CoreDNS with `hostNetwork: true` and explicit upstream nameservers; required workaround for Cilium BPF masquerade skipping DNAT on KubeSpan for established flows in cross-cloud clusters
+- Added [coredns-ipv4](manifests/coredns-ipv4) and [coredns-ipv6](manifests/coredns-ipv6) — CoreDNS with `hostNetwork: true` and explicit upstream nameservers (legacy workaround, kept for reference)
 - [hcloud-csi](manifests/hcloud-csi) and [scaleway-csi](manifests/scaleway-csi) node DaemonSets scoped to their respective `provider` node label
-- Cilium BigTCP (`enableTunnelBIGTCP`), socketLB, and BPF masquerade enabled
+- Cilium socketLB and BPF masquerade enabled; `bpf.hostLegacyRouting: true` fixes Cilium BPF masquerade skipping DNAT on KubeSpan for established TCP flows in cross-cloud clusters
+- BigTCP disabled — requires pending kernel support in VXLAN tunnel mode
+- BBR disabled — incompatible with `bpf.hostLegacyRouting: true`
 - Cilium, ArgoCD, and other manifest dependencies updated
 
 ### breaking changes (continued)
-- Talos-managed CoreDNS disabled (`cluster.coreDNS.disabled: true`) — deploy `coredns-ipv4` / `coredns-ipv6` manifest instead
-- Talos hostDNS disabled (`ResolverConfig hostDNS.enabled: false`) — required to free port 53 for CoreDNS `hostNetwork: true`
 - Firewall rules for ports 51820/4240/8472 removed from hcloud-apply and scaleway-apply — covered by intra-cluster dynamic rules
 
 ### docs
