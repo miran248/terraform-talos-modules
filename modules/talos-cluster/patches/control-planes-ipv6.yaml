@@ -13,6 +13,11 @@ cluster:
       # cloud-provider: external
       # controllers: "*,tokencleaner,-node-ipam-controller"
       node-cidr-mask-size-ipv6: 112
+  coreDNS:
+    # disabled — managed via manifests/coredns-ipv6 with hostNetwork: true as workaround for
+    # Cilium BPF masquerade skipping DNAT on kubespan for established flows
+    # TODO: re-enable once upstream fix is available
+    disabled: true
   discovery:
     enabled: true
     registries:

@@ -18,34 +18,24 @@ resource "scaleway_instance_security_group" "this" {
   stateful                = true
   enable_default_security = true
 
-  # kubernetes apiserver - only opened when pool contains control planes
-  dynamic "inbound_rule" {
-    for_each = anytrue([for n in var.pool.nodes : n.kind == "control-plane"]) ? [1] : []
-    content {
-      action   = "accept"
-      protocol = "TCP"
-      port     = "6443"
-      ip_range = local.any_cidr
-    }
+  inbound_rule {
+    action   = "accept"
+    protocol = "TCP"
+    port     = "6443"
+    ip_range = local.any_cidr
   }
-  # talos apid - opened on all nodes
   inbound_rule {
     action   = "accept"
     protocol = "TCP"
     port     = "50000"
     ip_range = local.any_cidr
   }
-  # talos trustd - only opened when pool contains control planes
-  dynamic "inbound_rule" {
-    for_each = anytrue([for n in var.pool.nodes : n.kind == "control-plane"]) ? [1] : []
-    content {
-      action   = "accept"
-      protocol = "TCP"
-      port     = "50001"
-      ip_range = local.any_cidr
-    }
+  inbound_rule {
+    action   = "accept"
+    protocol = "TCP"
+    port     = "50001"
+    ip_range = local.any_cidr
   }
-
   # full intra-cluster access across all pools
   dynamic "inbound_rule" {
     for_each = var.cluster.nodes

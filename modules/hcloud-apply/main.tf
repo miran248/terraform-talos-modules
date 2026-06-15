@@ -21,18 +21,13 @@ resource "hcloud_firewall" "deny_all" {
 resource "hcloud_firewall" "this" {
   name = var.pool.prefix
 
-  # kubernetes apiserver - only opened when pool contains control planes
-  dynamic "rule" {
-    for_each = anytrue([for n in var.pool.nodes : n.kind == "control-plane"]) ? [1] : []
-    content {
-      description = "apiserver"
-      direction   = "in"
-      protocol    = "tcp"
-      port        = "6443"
-      source_ips  = [local.any_cidr]
-    }
+  rule {
+    description = "apiserver"
+    direction   = "in"
+    protocol    = "tcp"
+    port        = "6443"
+    source_ips  = [local.any_cidr]
   }
-  # talos apid - opened on all nodes
   rule {
     description = "talos apid"
     direction   = "in"
@@ -40,18 +35,13 @@ resource "hcloud_firewall" "this" {
     port        = "50000"
     source_ips  = [local.any_cidr]
   }
-  # talos trustd - only opened when pool contains control planes
-  dynamic "rule" {
-    for_each = anytrue([for n in var.pool.nodes : n.kind == "control-plane"]) ? [1] : []
-    content {
-      description = "talos trustd"
-      direction   = "in"
-      protocol    = "tcp"
-      port        = "50001"
-      source_ips  = [local.any_cidr]
-    }
+  rule {
+    description = "talos trustd"
+    direction   = "in"
+    protocol    = "tcp"
+    port        = "50001"
+    source_ips  = [local.any_cidr]
   }
-
   # full intra-cluster access across all pools
   dynamic "rule" {
     for_each = toset(["tcp", "udp"])

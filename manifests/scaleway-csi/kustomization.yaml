@@ -1,5 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: kube-system
 helmCharts:
   - name: scaleway-csi
     repo: https://helm.scw.cloud/
@@ -20,3 +21,44 @@ helmCharts:
         nodeSelector:
           kubernetes.io/os: linux
           provider: scaleway
+# patches:
+#   - patch: |-
+#       - op: add
+#         path: /metadata/namespace
+#         value: kube-system
+#     target:
+#       kind: ServiceAccount
+#   - patch: |-
+#       - op: add
+#         path: /metadata/namespace
+#         value: kube-system
+#     target:
+#       kind: Role
+#   - patch: |-
+#       - op: add
+#         path: /metadata/namespace
+#         value: kube-system
+#     target:
+#       kind: Deployment
+#   - patch: |-
+#       - op: add
+#         path: /metadata/namespace
+#         value: kube-system
+#     target:
+#       kind: DaemonSet
+#   - patch: |-
+#       apiVersion: apps/v1
+#       kind: DaemonSet
+#       metadata:
+#         name: scaleway-csi-node
+#       spec:
+#         template:
+#           spec:
+#             containers:
+#               - name: scaleway-csi-plugin
+#                 env:
+#                   - name: SCW_DEFAULT_ZONE
+#                     valueFrom:
+#                       secretKeyRef:
+#                         name: scaleway
+#                         key: SCW_DEFAULT_ZONE

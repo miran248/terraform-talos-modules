@@ -18,15 +18,15 @@ module "dev1_ipv6_paris_pool" {
     { type = "DEV1-M", image = local.dev1_ipv6_image_ids.scaleway },
   ]
   workers = [
-    # { type = "DEV1-M", image = local.dev1_ipv6_image_ids.scaleway },
+    { type = "DEV1-M", image = local.dev1_ipv6_image_ids.scaleway },
   ]
 }
 
-module "dev1_ipv6_nuremberg_pool" {
+module "dev1_ipv6_falkenstein_pool" {
   source = "../modules/hcloud-pool"
 
-  prefix   = "dev1-ipv6-nbg"
-  location = data.hcloud_location.nuremberg.name
+  prefix   = "dev1-ipv6-fsn"
+  location = data.hcloud_location.falkenstein.name
 
   workers = [
     { server_type = "cx23", image = local.dev1_ipv6_image_ids.hcloud },
@@ -93,18 +93,11 @@ module "dev1_ipv6_talos_cluster" {
 
   pools = [
     module.dev1_ipv6_paris_pool,
-    module.dev1_ipv6_nuremberg_pool,
+    module.dev1_ipv6_falkenstein_pool,
   ]
 
   patches = {
     common = [
-      <<-EOF
-        cluster:
-          network:
-            cni:
-              name: none
-      EOF
-      ,
       <<-EOF
         apiVersion: v1alpha1
         kind: TimeSyncConfig
@@ -145,10 +138,10 @@ module "dev1_ipv6_paris_apply" {
   ]
 }
 
-module "dev1_ipv6_nuremberg_apply" {
+module "dev1_ipv6_falkenstein_apply" {
   source = "../modules/hcloud-apply"
 
-  pool    = module.dev1_ipv6_nuremberg_pool
+  pool    = module.dev1_ipv6_falkenstein_pool
   cluster = module.dev1_ipv6_talos_cluster
 }
 
@@ -156,7 +149,7 @@ module "dev1_ipv6_talos_apply" {
   source = "../modules/talos-apply"
 
   cluster         = module.dev1_ipv6_talos_cluster
-  applies         = [module.dev1_ipv6_paris_apply, module.dev1_ipv6_nuremberg_apply]
+  applies         = [module.dev1_ipv6_paris_apply, module.dev1_ipv6_falkenstein_apply]
   installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-alpha.1-dev.7"
 }
 

@@ -2,10 +2,11 @@
 Modules in this repository help provision and maintain multi-region [Kubernetes](https://kubernetes.io) clusters on [Hetzner Cloud](https://www.hetzner.com) and [Scaleway](https://www.scaleway.com).
 
 ## features
-- [Talos Linux](https://www.talos.dev) with KubeSpan, KubePrism and HostDNS
+- [Talos Linux](https://www.talos.dev) with KubeSpan and KubePrism
 - Single-stack IPv6 or IPv4 node connectivity - set `mode` on pool modules (`"ipv6"` default)
 - IPv6 mode: NAT64 for outbound IPv4, single-stack IPv6 internals
 - [Cilium](https://cilium.io) - tunnel mode (netkit), BigTCP and BBR; separate manifests for [IPv6](manifests/cilium-ipv6) and [IPv4](manifests/cilium-ipv4)
+- [CoreDNS](manifests/coredns-ipv6) with `hostNetwork: true` — deployed via [manifests](manifests/README.md) separately from Talos bootstrap (see manifests note for rationale)
 - [talos-ccm](https://github.com/siderolabs/talos-cloud-controller-manager) - optional, node IPAM (CloudAllocator) and cloud metadata, requires additional patches (see [examples/talos-ccm.tf](examples/talos-ccm.tf))
 - [gcp-wif](modules/gcp-wif) + [gcp-wif-apply](modules/gcp-wif-apply) - optional GCP Workload Identity Federation integration
 

@@ -4,6 +4,8 @@
   just build-helm manifests/cert-manager
   just build-helm manifests/cilium-ipv6
   just build-helm manifests/cilium-ipv4
+  just build-helm manifests/coredns-ipv4
+  just build-helm manifests/coredns-ipv6
   just build-helm manifests/coroot
   just build-helm manifests/external-secrets
   just build-helm manifests/gcp-wif-webhook

@@ -7,9 +7,17 @@ cluster:
   controllerManager:
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
     extraArgs:
+      # allocate-node-cidrs: false
       allocate-node-cidrs: true
       bind-address: "0.0.0.0"
+      # cloud-provider: external
+      # controllers: "*,tokencleaner,-node-ipam-controller"
       node-cidr-mask-size-ipv4: 24
+  coreDNS:
+    # disabled — managed via manifests/coredns-ipv4 with hostNetwork: true as workaround for
+    # Cilium BPF masquerade skipping DNAT on kubespan for established flows
+    # TODO: re-enable once upstream fix is available
+    disabled: true
   discovery:
     enabled: true
     registries:
@@ -20,6 +28,7 @@ cluster:
     extraArgs:
       listen-metrics-urls: "http://0.0.0.0:2381"
   externalCloudProvider:
+    # enabled: true
     enabled: false
   scheduler:
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/

@@ -1,6 +1,9 @@
 data "hcloud_location" "nuremberg" {
   name = "nbg1"
 }
+data "hcloud_location" "falkenstein" {
+  name = "fsn1"
+}
 data "hcloud_location" "helsinki" {
   name = "hel1"
 }

@@ -14,10 +14,6 @@ machine:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
     rbac: true
-    hostDNS:
-      enabled: true
-      forwardKubeDNSToHost: true
-      resolveMemberNames: true
     kubePrism:
       enabled: true
   kubelet:
@@ -32,12 +28,20 @@ machine:
     net.ipv4.ip_forward: 1
 ---
 apiVersion: v1alpha1
+kind: ResolverConfig
+# hostDNS disabled — listens on 127.0.0.53:53 which conflicts with CoreDNS hostNetwork: true
+# TODO: re-enable once a better solution is found for cross-cloud DNS via KubeSpan
+hostDNS:
+  enabled: false
+  forwardKubeDNSToHost: false
+---
+apiVersion: v1alpha1
 kind: KubeSpanConfig
 enabled: true
 advertiseKubernetesNetworks: false
 allowDownPeerBypass: false
 harvestExtraEndpoints: false
 mtu: 1420
-filters:
-  endpoints:
-    - "0.0.0.0/0"
+# filters:
+#   endpoints:
+#     - "0.0.0.0/0"

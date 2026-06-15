@@ -1,12 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
+  # - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
   # - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/standard-install.yaml
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: v1.19.2
+    version: v1.19.4
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -25,53 +26,52 @@ helmCharts:
             enabled: false
             interval: 60s
 
+      # --- service connectivity ---
       k8sServiceHost: localhost
       k8sServicePort: 7445
+      kubeProxyReplacement: true
+      kubeProxyReplacementHealthzBindAddr: "[::]:10256"
 
+      # --- ip stack ---
       ipam:
         mode: kubernetes
-
-      kubeProxyReplacement: true
-
       ipv6:
         enabled: *ipv6
       ipv4:
         enabled: *ipv4
-
       k8s:
         requireIPv6PodCIDR: *ipv6
         requireIPv4PodCIDR: *ipv4
-
-      enableIPv6BIGTCP: *ipv6
-      enableIPv4BIGTCP: *ipv4
-      enableTunnelBIGTCP: true
-
       underlayProtocol: ipv6
+      preferIpv6: *ipv6
 
-      externalIPs:
-        enabled: true
-
-      nodePort:
-        enabled: true
-        bindProtection: false
-
-      hostPort:
-        enabled: true
-
-      l7Proxy: true
-
+      # --- network tuning ---
+      MTU: 1340
+      # enableIPv6BIGTCP: *ipv6  # BIG TCP in tunnel mode requires pending kernel support
+      # enableIPv4BIGTCP: *ipv4
+      # enableTunnelBIGTCP: true
       bpf:
         datapathMode: netkit
         masquerade: true
         distributedLRU:
           enabled: true
         mapDynamicSizeRatio: 0.08
-
       bpfClockProbe: true
-
       bandwidthManager:
         enabled: true
         bbr: true
+
+      # --- traffic ---
+      externalIPs:
+        enabled: true
+      nodePort:
+        enabled: true
+        bindProtection: false
+      hostPort:
+        enabled: true
+      socketLB:
+        enabled: true
+      l7Proxy: true
 
       # native causes the following error
       # interface kubespan: attaching program cil_xdp_entry using bpf_link: create link: operation not supported
@@ -82,18 +82,18 @@ helmCharts:
       # loadBalancer:
       #   acceleration: best-effort
 
+      # --- gateway api ---
       gatewayAPI:
         enabled: true
+        enableAlpn: true
+        enableAppProtocol: true
         hostNetwork:
           enabled: true
 
-      socketLB:
-        enabled: true
-
-      kubeProxyReplacementHealthzBindAddr: "[::]:10256"
-
+      # --- rollout ---
       rollOutCiliumPods: *rollout
 
+      # --- operator ---
       operator:
         replicas: 1
         rollOutPods: *rollout
@@ -101,6 +101,7 @@ helmCharts:
           enabled: true
           <<: *serviceMonitor
 
+      # --- hubble ---
       hubble:
         enabled: *hubble
         enableOpenMetrics: true
@@ -131,6 +132,8 @@ helmCharts:
             server:
               ipv6:
                 enabled: *ipv6
+
+      # --- envoy ---
       envoy:
         enabled: true
         rollOutPods: *rollout
@@ -145,10 +148,12 @@ helmCharts:
               - SYS_ADMIN
               - BPF
 
+      # --- prometheus ---
       prometheus:
         enabled: true
         <<: *serviceMonitor
 
+      # --- security ---
       securityContext:
         privileged: true
         capabilities:
