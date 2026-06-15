@@ -19,21 +19,18 @@
 
 ### changes
 - Cilium switched from direct routing to tunnel mode (netkit datapath)
+- Cilium `bpf.hostLegacyRouting: true` — fixes DNAT being skipped on the KubeSpan interface for established TCP flows in cross-cloud clusters
+- Cilium BigTCP disabled — requires pending kernel support in VXLAN tunnel mode
+- Cilium BBR disabled — incompatible with `bpf.hostLegacyRouting: true`
 - All module resources consolidated into `main.tf` per module
 - Upgraded talos provider to 0.12.x, hcloud, scaleway, and google providers upgraded
 
 ### manifests
 - [cilium](manifests/cilium-ipv6) renamed to `cilium-ipv6`; `cilium-ipv4` added
 - Added [cert-manager](manifests/cert-manager), [external-secrets](manifests/external-secrets), [scaleway-csi](manifests/scaleway-csi), [coroot](manifests/coroot) manifests
-- Added [coredns-ipv4](manifests/coredns-ipv4) and [coredns-ipv6](manifests/coredns-ipv6) — CoreDNS with `hostNetwork: true` and explicit upstream nameservers (legacy workaround, kept for reference)
+- Added [coredns-ipv4](manifests/coredns-ipv4) and [coredns-ipv6](manifests/coredns-ipv6) — CoreDNS with `hostNetwork: true` workaround (kept for reference, no longer required)
 - [hcloud-csi](manifests/hcloud-csi) and [scaleway-csi](manifests/scaleway-csi) node DaemonSets scoped to their respective `provider` node label
-- Cilium socketLB and BPF masquerade enabled; `bpf.hostLegacyRouting: true` fixes Cilium BPF masquerade skipping DNAT on KubeSpan for established TCP flows in cross-cloud clusters
-- BigTCP disabled — requires pending kernel support in VXLAN tunnel mode
-- BBR disabled — incompatible with `bpf.hostLegacyRouting: true`
 - Cilium, ArgoCD, and other manifest dependencies updated
-
-### breaking changes (continued)
-- Firewall rules for ports 51820/4240/8472 removed from hcloud-apply and scaleway-apply — covered by intra-cluster dynamic rules
 
 ### docs
 - READMEs added or rewritten for all modules
