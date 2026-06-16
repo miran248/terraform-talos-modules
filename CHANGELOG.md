@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [v4.0.0](https://github.com/miran248/terraform-talos-modules/compare/v3.2.3...v4.0.0) — 2026-06-16
 
 ### breaking changes
 - [talos-apply](modules/talos-apply) replaces `talos_machine_configuration_apply` + `talos_machine_bootstrap` with `talos_machine` + `talos_cluster` — existing state requires resource recreation on first apply
