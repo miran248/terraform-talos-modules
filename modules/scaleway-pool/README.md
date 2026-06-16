@@ -44,7 +44,7 @@ Allocates Scaleway resources for a node pool: one routed IP per node (IPv6 or IP
 
 ```hcl
 module "paris_pool" {
-  source = "github.com/miran248/terraform-talos-modules//modules/scaleway-pool?ref=v3.2.3"
+  source = "github.com/miran248/terraform-talos-modules//modules/scaleway-pool?ref=v4.0.0"
 
   prefix = "par1"
   zone   = "fr-par-1"
