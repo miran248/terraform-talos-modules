@@ -33,7 +33,7 @@ See [scaleway-lb.tf](../../examples/scaleway-lb.tf) for a full example including
 
 ```hcl
 module "paris_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/scaleway-apply?ref=v4.0.0"
+  source = "github.com/miran248/terraform-talos-modules//modules/scaleway-apply?ref=v4.0.1"
 
   pool    = module.paris_pool
   cluster = module.talos_cluster

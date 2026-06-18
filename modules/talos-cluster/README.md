@@ -38,7 +38,7 @@ Generates Talos machine secrets, computes per-node config patches (cert SANs, et
 
 ```hcl
 module "talos_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.0.0"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.0.1"
 
   name               = "prod"
   endpoint           = "prod.example.com"
