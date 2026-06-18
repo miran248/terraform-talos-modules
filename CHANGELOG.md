@@ -1,5 +1,11 @@
 # Changelog
 
+## [v4.0.1](https://github.com/miran248/terraform-talos-modules/compare/v4.0.0...v4.0.1) — 2026-06-18
+
+- **hcloud-csi** — removed hardcoded `hcloudVolumeDefaultLocation`; the CSI controller now auto-detects location from the node it runs on, supporting multi-region clusters without per-cluster config overrides
+- Manifest dependency updates (coroot, gcp-wif-webhook, scaleway-csi)
+- Release workflow renamed to `release.yaml`
+
 ## [v4.0.0](https://github.com/miran248/terraform-talos-modules/compare/v3.2.3...v4.0.0) — 2026-06-16
 
 ### breaking changes
