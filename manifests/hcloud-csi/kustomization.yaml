@@ -12,7 +12,6 @@ helmCharts:
         enableProvidedByTopology: true
       controller:
         replicaCount: 1
-        hcloudVolumeDefaultLocation: nbg1
         priorityClassName: "system-cluster-critical"
         resources:
           csiAttacher:

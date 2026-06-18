@@ -5,7 +5,7 @@ patches:
 helmCharts:
   - name: gcp-workload-identity-federation-webhook
     repo: https://pfnet-research.github.io/gcp-workload-identity-federation-webhook
-    version: 0.5.2
+    version: 0.6.0
     releaseName: gcp-wif-webhook
     namespace: gcp-wif-webhook-system
     includeCRDs: true
@@ -15,3 +15,7 @@ helmCharts:
         manager:
           args:
             - --token-default-mode=0444
+        kubeRbacProxy:
+          image:
+            repository: registry.k8s.io/kubebuilder/kube-rbac-proxy
+            tag: v0.15.0
