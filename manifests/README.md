@@ -22,7 +22,7 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 
 [namespaces.yaml](namespaces.yaml) creates the namespaces shared across components.
 
-> **Note:** Talos-managed CoreDNS and hostDNS are both enabled. `bpf.hostLegacyRouting: true` in the Cilium manifests is the fix for a Cilium BPF masquerade bug that skips DNAT on the KubeSpan interface for established TCP flows in cross-cloud clusters. The `coredns-ipv4` / `coredns-ipv6` manifests (`hostNetwork: true` workaround) are kept for reference but are no longer required.
+> **Note:** The Cilium manifests use eBPF host routing (`bpf.hostLegacyRouting: false`) so pod traffic bypasses the host netfilter/iptables stack. Talos hostDNS remains enabled, but forwarding Kubernetes DNS to hostDNS is explicitly disabled in the cluster patches because that feature is incompatible with Cilium eBPF host routing. The `coredns-ipv4` / `coredns-ipv6` manifests (`hostNetwork: true` workaround) are kept for reference but are no longer required.
 
 ## usage
 

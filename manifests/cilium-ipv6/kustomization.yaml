@@ -7,7 +7,7 @@ resources:
 helmCharts:
   - name: cilium
     repo: https://helm.cilium.io
-    version: v1.19.4
+    version: v1.19.6
     releaseName: cilium
     namespace: kube-system
     includeCRDs: true
@@ -52,7 +52,8 @@ helmCharts:
       # enableTunnelBIGTCP: true
       bpf:
         datapathMode: netkit
-        hostLegacyRouting: true # workaround for BPF masquerade skipping DNAT on kubespan for established flows
+        # Route directly from eBPF and bypass the host netfilter/iptables stack.
+        hostLegacyRouting: false
         masquerade: true
         distributedLRU:
           enabled: true
@@ -60,7 +61,7 @@ helmCharts:
       bpfClockProbe: true
       bandwidthManager:
         enabled: true
-        bbr: false # incompatible with hostLegacyRouting
+        bbr: false
 
       # --- traffic ---
       externalIPs:
