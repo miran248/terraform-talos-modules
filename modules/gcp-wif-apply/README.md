@@ -13,7 +13,7 @@ Fetches OIDC discovery documents (`openid-configuration` and `jwks`) from the ru
 
 ```hcl
 module "gcp_wif_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/gcp-wif-apply?ref=v4.0.1"
+  source = "github.com/miran248/terraform-talos-modules//modules/gcp-wif-apply?ref=v4.1.0"
 
   identities = module.gcp_wif
   cluster    = module.talos_cluster

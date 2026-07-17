@@ -29,7 +29,7 @@ Control planes are configured before workers, enabling rolling upgrades when `ku
 
 ```hcl
 module "talos_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v4.0.1"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v4.1.0"
 
   cluster = module.talos_cluster
   applies = [module.nuremberg_apply, module.helsinki_apply]
