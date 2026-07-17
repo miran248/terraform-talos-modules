@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.1.0](https://github.com/miran248/terraform-talos-modules/compare/v4.0.1...v4.1.0) — 2026-07-17
+
+### networking
+
+- Updated Cilium from `v1.19.4` to `v1.19.6`
+- Enabled eBPF host routing for IPv4 and IPv6 clusters; pod traffic now bypasses the host netfilter/iptables stack while retaining eBPF masquerading, kube-proxy replacement, and the netkit datapath
+- Documented the Talos hostDNS requirement: Kubernetes DNS forwarding to hostDNS must remain disabled with Cilium eBPF host routing
+
+### docs
+
+- Added a hierarchical DOX `AGENTS.md` tree covering repository ownership, local contracts, workflows, and verification for modules, manifests, development environments, examples, local tooling, and image builds
+
 ## [v4.0.1](https://github.com/miran248/terraform-talos-modules/compare/v4.0.0...v4.0.1) — 2026-06-18
 
 - **hcloud-csi** — removed hardcoded `hcloudVolumeDefaultLocation`; the CSI controller now auto-detects location from the node it runs on, supporting multi-region clusters without per-cluster config overrides
