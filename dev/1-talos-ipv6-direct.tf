@@ -19,18 +19,6 @@ module "dev1_ipv6_paris_pool" {
     { type = "DEV1-M", image = local.dev1_ipv6_image_ids.scaleway },
   ]
 
-  patches = {
-    common = [
-      yamlencode({
-        apiVersion = "v1alpha1"
-        kind       = "LinkConfig"
-        name       = "kubespan"
-        routes = [
-          { destination = "fc00:1::/96", mtu = 1420 },
-        ]
-      })
-    ]
-  }
 }
 
 resource "scaleway_lb_ip" "dev1_ipv6" {
@@ -104,6 +92,13 @@ module "dev1_ipv6_talos_cluster" {
         allowDownPeerBypass: false
         harvestExtraEndpoints: false
         mtu: 1420
+        ---
+        apiVersion: v1alpha1
+        kind: LinkConfig
+        name: kubespan
+        routes:
+          - destination: fc00:1::/96
+            mtu: 1420
         ---
         apiVersion: v1alpha1
         kind: ResolverConfig
