@@ -5,7 +5,7 @@ Modules in this repository help provision and maintain multi-region [Kubernetes]
 - [Talos Linux](https://www.talos.dev) with KubeSpan and KubePrism
 - Single-stack IPv6 or IPv4 node connectivity - set `mode` on pool modules (`"ipv6"` default)
 - IPv6 mode: NAT64 for outbound IPv4, single-stack IPv6 internals
-- [Cilium](https://cilium.io) - tunnel mode (netkit), bandwidth manager; separate manifests for [IPv6](manifests/cilium-ipv6) and [IPv4](manifests/cilium-ipv4)
+- [Cilium](https://cilium.io) - tunnel mode for [IPv6](manifests/cilium-ipv6) and [IPv4](manifests/cilium-ipv4), plus [IPv6 native routing over KubeSpan](manifests/cilium-ipv6-direct)
 - [talos-ccm](https://github.com/siderolabs/talos-cloud-controller-manager) - optional, node IPAM (CloudAllocator) and cloud metadata, requires additional patches (see [examples/talos-ccm.tf](examples/talos-ccm.tf))
 - [gcp-wif](modules/gcp-wif) + [gcp-wif-apply](modules/gcp-wif-apply) - optional GCP Workload Identity Federation integration
 
@@ -49,6 +49,17 @@ Provision servers. One apply module per pool.
 | [multi-cloud.tf](examples/multi-cloud.tf) | Scaleway control planes + Hetzner Cloud workers, Scaleway LB as cluster endpoint |
 | [scaleway-lb.tf](examples/scaleway-lb.tf) | Scaleway cluster with a load balancer frontend for Talos and Kubernetes APIs |
 | [talos-ccm.tf](examples/talos-ccm.tf) | talos-ccm integration with node IPAM and cloud metadata |
+| [talos-direct-routing.tf](examples/talos-direct-routing.tf) | IPv6 Cilium native routing with PodCIDRs and node traffic carried by KubeSpan WireGuard |
+
+The direct-routing profile uses `fc00:1::/96` for PodCIDRs and advertises them
+through KubeSpan. Because Cilium eBPF host routing bypasses Talos packet marks,
+pod-to-node traffic also requires destination-scoped `RoutingRuleConfig`
+documents: match `fc00:1::/96` as the source, each node public allocation as
+the destination, and select KubeSpan routing table `180`. This keeps node-bound
+pod traffic, including Kubernetes API Service backends, inside WireGuard while
+unrelated public traffic continues through the normal underlay. Do not add node
+public routes to the main table because they can recursively capture KubeSpan's
+WireGuard endpoints.
 
 ## diagram
 The following [Mermaid](https://github.com/mermaid-js/mermaid) flowchart outlines the order of operations between modules for a cluster spanning two regions.

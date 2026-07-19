@@ -40,8 +40,21 @@ Run `just` from the repo root to render manifests, then apply CNI and namespaces
 ```
 
 The IPv6 development composition enables the KubeSpan patches required by
-native routing. Apply `.build/manifests/cilium-ipv6-direct.yaml` instead of
-`cilium-ipv6.yaml` to test encrypted direct pod routing without VXLAN.
+native routing. It also installs source-and-destination policy rules that send
+pod traffic for every node public allocation through KubeSpan table `180`.
+Apply `.build/manifests/cilium-ipv6-direct.yaml` instead of `cilium-ipv6.yaml`
+to test encrypted direct pod and pod-to-node routing without VXLAN.
+
+Run the repeatable direct-routing smoke suite before destroying the cluster:
+
+```shell
+> just verify-ipv6-direct
+```
+
+The inline just recipe checks Cilium health from every node, KubeSpan peers and
+policy rules, worker-pod access to DNS, every API backend, public IPv6 and
+NAT64, plus a temporary Gateway API HTTP route. Temporary resources are removed
+on exit.
 
 ## destroy
 

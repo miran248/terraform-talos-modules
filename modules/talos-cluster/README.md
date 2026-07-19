@@ -1,6 +1,11 @@
 # talos-cluster
 Generates Talos machine secrets, computes per-node config patches (cert SANs, etcd advertised subnets, hostname, aliases), and produces `user_data` configs for each node. Provider-agnostic - accepts outputs from any pool module.
 
+The built-in control-plane patches bind kube-apiserver on all addresses but let
+Talos select its concrete advertise address. Do not set `advertise-address` to
+`0.0.0.0` or `::`; Kubernetes may publish an empty or wrong-family API
+EndpointSlice.
+
 ## inputs
 
 | name | type | required | description |

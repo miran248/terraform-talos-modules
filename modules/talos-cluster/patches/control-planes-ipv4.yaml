@@ -2,7 +2,6 @@ cluster:
   apiServer:
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
     extraArgs:
-      advertise-address: "0.0.0.0"
       bind-address: "0.0.0.0"
   etcd:
     # https://etcd.io/docs/v3.5/op-guide/configuration/

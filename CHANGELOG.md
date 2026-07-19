@@ -1,5 +1,30 @@
 # Changelog
 
+## [v4.2.1](https://github.com/miran248/terraform-talos-modules/compare/v4.2.0...v4.2.1) — 2026-07-19
+
+### networking
+
+- Added destination-scoped Talos `RoutingRuleConfig` patches to the IPv6 direct-routing development composition and example; pod traffic from `fc00:1::/96` to each node public allocation now selects KubeSpan table `180`
+- Verified that worker pods can reach the Kubernetes API Service and control-plane public addresses through KubeSpan WireGuard while unrelated public IPv6 traffic continues through the normal underlay
+- Kept Cilium remote-node masquerading disabled because IPv6 BPF masquerading dropped pod-to-node traffic as `Invalid source ip` before Talos policy routing
+- Preserved the aggregate `fc00:1::/96` KubeSpan route for pod-to-pod traffic and retained the warning against main-table node `/128` routes, which can recursively capture WireGuard endpoints
+
+### Talos configuration
+
+- Removed wildcard kube-apiserver `advertise-address` values from the built-in IPv4, built-in IPv6, and local control-plane patches; Talos now selects a concrete address so Kubernetes publishes usable API endpoints
+- Removed redundant local KubeSpan endpoint filters and retained fail-closed KubeSpan behavior
+
+### examples and documentation
+
+- Updated the encrypted direct-routing example with per-pool policy rules for pod-to-node traffic
+- Added a self-cleaning inline development just recipe for all-node Cilium/KubeSpan health, worker API/DNS/NAT64 connectivity, and Gateway API traffic
+- Documented the verified routing split, Kubernetes API/CoreDNS behavior, KubeSpan table selection, and advertise-address requirement across repository guidance
+
+### compatibility
+
+- No public module inputs or outputs changed
+- Existing tunneled `cilium-ipv4` and `cilium-ipv6` profiles are unchanged
+
 ## [v4.2.0](https://github.com/miran248/terraform-talos-modules/compare/v4.1.0...v4.2.0) — 2026-07-19
 
 ### networking

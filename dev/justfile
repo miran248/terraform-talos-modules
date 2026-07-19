@@ -10,3 +10,156 @@ apply:
 destroy:
   rm -f ../talos-config-ipv6 ../kube-config-ipv6 ../talos-config-ipv4 ../kube-config-ipv4
   terraform destroy -auto-approve
+
+verify-ipv6-direct:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  kubeconfig=${KUBECONFIG:-../kube-config-ipv6}
+  talosconfig=${TALOSCONFIG:-../talos-config-ipv6}
+  probe_namespace=direct-routing-smoke
+  probe_pod=worker-network-probe
+  export KUBECONFIG=${kubeconfig}
+  export TALOSCONFIG=${talosconfig}
+  cleanup() {
+    kubectl delete pod "${probe_pod}" --ignore-not-found --wait=false >/dev/null 2>&1 || true
+    kubectl delete namespace "${probe_namespace}" --ignore-not-found --wait=false >/dev/null 2>&1 || true
+  }
+  trap cleanup EXIT
+  worker=$(kubectl get nodes -o json | jq -r '[.items[] | select(.metadata.labels["node-role.kubernetes.io/control-plane"] == null) | .metadata.name][0] // empty')
+  if [[ -z ${worker} ]]; then
+    echo "no worker node found" >&2
+    exit 1
+  fi
+  node_ips=()
+  while IFS= read -r node_ip; do
+    node_ips+=("${node_ip}")
+  done < <(kubectl get nodes -o json | jq -r '.items[].status.addresses[] | select(.type == "InternalIP") | .address')
+  control_plane_ips=()
+  while IFS= read -r node_ip; do
+    control_plane_ips+=("${node_ip}")
+  done < <(kubectl get nodes -o json | jq -r '.items[] | select(.metadata.labels["node-role.kubernetes.io/control-plane"] != null) | .status.addresses[] | select(.type == "InternalIP") | .address')
+  expected_nodes=${#node_ips[@]}
+  echo "Checking Cilium health from every node"
+  while IFS= read -r pod; do
+    health=$(kubectl -n kube-system exec "${pod}" -- cilium-health status)
+    grep -Fq "${expected_nodes}/${expected_nodes} reachable" <<<"${health}"
+    status=$(kubectl -n kube-system exec "${pod}" -- cilium-dbg status)
+    grep -Fq "Routing:                 Network: Native   Host: BPF" <<<"${status}"
+  done < <(kubectl -n kube-system get pods -l k8s-app=cilium -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
+  echo "Checking KubeSpan peers and pod-to-node policy rules"
+  for node_ip in "${node_ips[@]}"; do
+    peer_status=$(talosctl -n "${node_ip}" get kubespanpeerstatus)
+    peer_count=$(awk 'NR > 1 && $0 ~ /[[:space:]]up[[:space:]]/ { count++ } END { print count + 0 }' <<<"${peer_status}")
+    [[ ${peer_count} -eq $((expected_nodes - 1)) ]]
+    routing_rules=$(talosctl -n "${node_ip}" get routingrules -o yaml)
+    source_count=$(grep -c 'src: fc00:1::/96' <<<"${routing_rules}")
+    [[ ${source_count} -eq ${expected_nodes} ]]
+  done
+  echo "Checking API, DNS, public IPv6, and NAT64 from ${worker}"
+  kubectl run "${probe_pod}" \
+    --image=curlimages/curl:8.16.0 \
+    --restart=Never \
+    --overrides="$(jq -nc --arg node "${worker}" --arg name "${probe_pod}" '{spec:{nodeName:$node,securityContext:{seccompProfile:{type:"RuntimeDefault"}},containers:[{name:$name,image:"curlimages/curl:8.16.0",command:["sleep","600"],securityContext:{allowPrivilegeEscalation:false,runAsNonRoot:true,runAsUser:100,capabilities:{drop:["ALL"]}}}]}}')" >/dev/null
+  kubectl wait --for=condition=Ready "pod/${probe_pod}" --timeout=90s >/dev/null
+  probe_curl() {
+    kubectl exec "${probe_pod}" -- curl -gksS --connect-timeout 5 --max-time 15 "$@"
+  }
+  probe_curl -o /dev/null https://[fc00::1]:443/version
+  for node_ip in "${control_plane_ips[@]}"; do
+    probe_curl -o /dev/null "https://[${node_ip}]:6443/version"
+  done
+  probe_curl -o /dev/null https://[2606:4700:4700::1111]:443
+  probe_curl -o /dev/null https://ipv4.google.com
+  kubectl exec "${probe_pod}" -- getent hosts kubernetes.default.svc.cluster.local >/dev/null
+  nat64_host=$(kubectl exec "${probe_pod}" -- getent hosts ipv4.google.com)
+  grep -q ':' <<<"${nat64_host}"
+  echo "Checking Gateway API data plane"
+  kubectl create namespace "${probe_namespace}" >/dev/null
+  kubectl apply -f - >/dev/null <<EOF
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: echo
+    namespace: ${probe_namespace}
+  spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        app: echo
+    template:
+      metadata:
+        labels:
+          app: echo
+      spec:
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        containers:
+          - name: echo
+            image: registry.k8s.io/e2e-test-images/agnhost:2.53
+            args: ["netexec", "--http-port=8080"]
+            ports:
+              - containerPort: 8080
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+              capabilities:
+                drop: ["ALL"]
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: echo
+    namespace: ${probe_namespace}
+  spec:
+    selector:
+      app: echo
+    ports:
+      - port: 80
+        targetPort: 8080
+  ---
+  apiVersion: gateway.networking.k8s.io/v1
+  kind: Gateway
+  metadata:
+    name: smoke
+    namespace: ${probe_namespace}
+  spec:
+    gatewayClassName: cilium
+    listeners:
+      - name: http
+        protocol: HTTP
+        port: 80
+        allowedRoutes:
+          namespaces:
+            from: Same
+  ---
+  apiVersion: gateway.networking.k8s.io/v1
+  kind: HTTPRoute
+  metadata:
+    name: smoke
+    namespace: ${probe_namespace}
+  spec:
+    parentRefs:
+      - name: smoke
+    rules:
+      - backendRefs:
+          - name: echo
+            port: 80
+  EOF
+  kubectl -n "${probe_namespace}" rollout status deployment/echo --timeout=120s >/dev/null
+  kubectl -n "${probe_namespace}" wait --for=condition=Programmed gateway/smoke --timeout=120s >/dev/null
+  gateway_ip=$(kubectl -n "${probe_namespace}" get gateway smoke -o jsonpath='{.status.addresses[0].value}')
+  gateway_ok=false
+  for _ in {1..30}; do
+    if curl -gfsS --connect-timeout 5 --max-time 10 "http://[${gateway_ip}]/hostname" >/dev/null 2>&1; then
+      gateway_ok=true
+      break
+    fi
+    sleep 2
+  done
+  if [[ ${gateway_ok} != true ]]; then
+    echo "Gateway API data-plane request failed through ${gateway_ip}" >&2
+    exit 1
+  fi
+  echo "IPv6 direct-routing verification passed"

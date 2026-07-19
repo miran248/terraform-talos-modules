@@ -13,6 +13,7 @@ Create, patch, and destroy a disposable Docker-backed Talos cluster for local ex
 - `.talos/`, `talos-config`, and `kube-config` are generated local state and credentials.
 - Keep common and control-plane patch responsibilities separated.
 - Use Kubernetes built-in node CIDR allocation; the local workflow does not deploy an external cloud controller.
+- Let Talos select the API server's concrete advertise address; use the IPv6 wildcard only for `bind-address`.
 - Use `talosctl patch machineconfig` for updates to running local nodes.
 - Keep the Docker workflow compatible with the stable Talos CLI; Docker clusters have one control plane.
 - Destructive recipes must target the named local Docker cluster only.

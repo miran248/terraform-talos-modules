@@ -2,7 +2,6 @@ cluster:
   apiServer:
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
     extraArgs:
-      advertise-address: "::"
       bind-address: "::"
   controllerManager:
     # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/

@@ -14,6 +14,7 @@ Generate provider-neutral Talos secrets, per-node patches, machine configuration
 - Reject mixed address-family pools; select one complete family-specific patch set.
 - Preserve patch precedence from built-in through cluster, pool, role, and node scopes.
 - Use Talos document resources for settings migrated out of the legacy machine config; do not set the same subsystem in both formats.
+- Let Talos select each API server's concrete advertise address; wildcard addresses are only valid for `bind-address` and can produce an empty or wrong-family Kubernetes EndpointSlice.
 - Never expose machine secrets or Talos client configuration as non-sensitive outputs.
 - Keep outputs provider-neutral for both cloud apply modules.
 

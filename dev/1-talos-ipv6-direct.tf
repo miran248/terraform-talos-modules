@@ -80,7 +80,7 @@ module "dev1_ipv6_talos_cluster" {
   pools = [module.dev1_ipv6_paris_pool]
 
   patches = {
-    common = [
+    common = concat([
       # Native Cilium routing relies on KubeSpan to advertise each node's
       # predefined PodCIDR and carry it over WireGuard. Disabling bypass makes loss of
       # encryption fail closed.
@@ -114,7 +114,22 @@ module "dev1_ipv6_talos_cluster" {
             - /dev/ptp0
       EOF
       ,
-    ]
+      ], [
+      # Send only pod-to-node-pool traffic through KubeSpan's policy-routing
+      # table. Matching the pod source avoids recursively routing WireGuard's
+      # outer packets back into the tunnel.
+      for index, cidr in sort(distinct([
+        for _, node in module.dev1_ipv6_paris_pool.nodes : node.ip_cidr
+      ])) : <<-EOF
+          apiVersion: v1alpha1
+          kind: RoutingRuleConfig
+          name: "${1000 + index}"
+          src: fc00:1::/96
+          dst: ${cidr}
+          table: "180"
+          action: unicast
+        EOF
+    ])
     control_planes = flatten([
       module.gcp_wif.patches.control_planes,
       <<-EOF

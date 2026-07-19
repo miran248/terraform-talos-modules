@@ -15,8 +15,9 @@ Maintain Kustomize overlays and Helm values for required and optional Kubernetes
 - Keep IPv4 and IPv6 Cilium configurations behaviorally aligned except for address-family-specific values.
 - Keep `cilium-ipv6` as the VXLAN variant and `cilium-ipv6-direct` as the KubeSpan-encrypted native-routing variant.
 - Keep `cilium-ipv6-direct` native routing scoped to `fc00:1::/96` and enable BPF IPv6 masquerading for off-cluster traffic.
+- Keep remote-node masquerading disabled in `cilium-ipv6-direct`; with IPv6 BPF masquerading it drops pod-to-node traffic as an invalid source before Talos policy routing can select KubeSpan.
 - Keep `cilium-ipv6-direct` on eBPF host routing and explicitly select `kubespan` as Cilium's direct-routing device.
-- Treat pod-to-remote-node-public-IP traffic as unsupported; never add node public `/128` routes to `kubespan`, because they recursively capture WireGuard peer endpoints.
+- Require destination-scoped Talos policy-routing rules from the Pod CIDR to every node public allocation through KubeSpan table `180` when pods must reach remote node addresses. Never add node public `/128` routes to the main table, because they recursively capture WireGuard peer endpoints.
 - Cilium must remain compatible with kube-proxy-disabled Talos patches and the selected DNS/KubeSpan behavior.
 - Rendered output belongs in `.build/manifests/` and must not become the source of truth.
 - Keep chart and remote resource versions explicit and reproducible.

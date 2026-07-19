@@ -31,15 +31,18 @@ every node. It keeps eBPF host routing enabled, routes the predefined
 `fc00:1::/96` Pod CIDR natively, and applies BPF IPv6 masquerading only to
 off-cluster traffic. Cilium explicitly uses `kubespan` as its direct-routing
 device because eBPF host routing bypasses Talos' nftables route marking. Its
-1420-byte MTU assumes a 1500-byte physical underlay.
+1420-byte MTU assumes a 1500-byte physical underlay. Remote-node masquerading
+is deliberately disabled: with IPv6 BPF masquerading it drops pod-to-node
+traffic before Talos policy routing can select KubeSpan.
 
-Pod traffic must not address a remote node by its public IP in this profile.
-Cilium's eBPF host routing bypasses Talos' KubeSpan packet marking for that
-path, so it is not carried by WireGuard and may be unreachable. Use ClusterIP
-Services for workloads and `hostNetwork` DaemonSets or service proxies for
-node-local endpoints such as kubelet metrics. Do not add node public `/128`
-routes to `kubespan`: those routes can recursively capture WireGuard peer
-endpoints and break node-to-node traffic, including etcd.
+Cilium's eBPF host routing bypasses Talos' KubeSpan packet marking for traffic
+from pods to remote node addresses. Configure destination-scoped Talos
+`RoutingRuleConfig` documents that match the Pod CIDR as `src`, each node
+public allocation as `dst`, and select KubeSpan table `180`. This carries both
+direct pod-to-node connections and Services backed by node addresses, including
+the Kubernetes API, through WireGuard. Do not add node public `/128` routes to
+the main table: those routes can recursively capture WireGuard peer endpoints
+and break node-to-node traffic, including etcd.
 
 ## usage
 
