@@ -30,7 +30,7 @@ Provisions Hetzner Cloud servers with Talos `user_data` and sets up firewalls. A
 
 ```hcl
 module "nuremberg_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v4.2.0"
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v4.2.1"
 
   pool    = module.nuremberg_pool
   cluster = module.talos_cluster

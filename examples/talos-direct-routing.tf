@@ -5,7 +5,7 @@
 # KubeSpan table 180. Do not add node public routes to the main table; doing so
 # can recursively capture WireGuard endpoints.
 module "talos_direct_routing_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.0"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.1"
 
   # ... other inputs ...
 
