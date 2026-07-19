@@ -3,6 +3,7 @@
   just build-helm manifests/argocd
   just build-helm manifests/cert-manager
   just build-helm manifests/cilium-ipv6
+  just build-helm manifests/cilium-ipv6-direct
   just build-helm manifests/cilium-ipv4
   just build-helm manifests/coredns-ipv4
   just build-helm manifests/coredns-ipv6

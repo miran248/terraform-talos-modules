@@ -4,8 +4,8 @@ apply:
   rm -f ../talos-config-ipv6 ../kube-config-ipv6 ../talos-config-ipv4 ../kube-config-ipv4
   terraform output --raw talos_config_ipv6 > ../talos-config-ipv6
   TALOSCONFIG=../talos-config-ipv6 talosctl -n c1 kubeconfig ../kube-config-ipv6
-  terraform output --raw talos_config_ipv4 > ../talos-config-ipv4
-  TALOSCONFIG=../talos-config-ipv4 talosctl -n c1 kubeconfig ../kube-config-ipv4
+  # terraform output --raw talos_config_ipv4 > ../talos-config-ipv4
+  # TALOSCONFIG=../talos-config-ipv4 talosctl -n c1 kubeconfig ../kube-config-ipv4
 
 destroy:
   rm -f ../talos-config-ipv6 ../kube-config-ipv6 ../talos-config-ipv4 ../kube-config-ipv4

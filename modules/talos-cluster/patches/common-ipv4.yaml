@@ -19,9 +19,15 @@ machine:
   kubelet:
     clusterDNS:
       - "10.96.0.10"
+    # https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
+    # extraArgs:
+    #   cloud-provider: external
+    #   rotate-server-certificates: true
+    # https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/#kubelet-config-k8s-io-v1beta1-KubeletConfiguration
     extraConfig:
       address: "0.0.0.0"
       healthzBindAddress: "0.0.0.0"
+      # rotateCertificates: true # already true and can't be set again
   sysctls:
     net.core.somaxconn: 65535
     net.core.netdev_max_backlog: 4096

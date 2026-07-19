@@ -39,6 +39,10 @@ Run `just` from the repo root to render manifests, then apply CNI and namespaces
 > KUBECONFIG=kube-config-ipv4 kubectl apply --server-side=true -f .build/manifests/namespaces.yaml
 ```
 
+The IPv6 development composition enables the KubeSpan patches required by
+native routing. Apply `.build/manifests/cilium-ipv6-direct.yaml` instead of
+`cilium-ipv6.yaml` to test encrypted direct pod routing without VXLAN.
+
 ## destroy
 
 ```shell

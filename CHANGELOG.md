@@ -1,5 +1,45 @@
 # Changelog
 
+## [v4.2.0](https://github.com/miran248/terraform-talos-modules/compare/v4.1.0...v4.2.0) — 2026-07-19
+
+### networking
+
+- Added the optional [`cilium-ipv6-direct`](manifests/cilium-ipv6-direct) profile for encrypted IPv6 native routing over KubeSpan WireGuard without VXLAN or an external cloud controller
+- The direct-routing profile uses Kubernetes node IPAM to allocate per-node `/112` PodCIDRs from `fc00:1::/96`, advertises them through KubeSpan, and installs an MTU-1420 main-table route for the aggregate Pod CIDR
+- Kept the netkit datapath and eBPF host routing, explicitly selected `kubespan` as Cilium's direct-routing device, and enabled BPF IPv6 masquerading only for traffic outside `fc00:1::/96`
+- Retained Gateway API, L7 proxy, Envoy, kube-proxy replacement, NodePort, hostPort, bandwidth manager, and BBR support in the direct-routing profile
+- Documented that pods must use Services instead of remote node public IPs: that path bypasses Talos' KubeSpan marking, while routing node public `/128`s through `kubespan` can recursively capture WireGuard endpoints and break node traffic such as etcd
+
+### Talos configuration
+
+- Migrated resolver/hostDNS, KubeSpan, time sync, controller manager, and scheduler settings to Talos' document-based `ResolverConfig`, `KubeSpanConfig`, `TimeSyncConfig`, `KubeControllerManagerConfig`, and `KubeSchedulerConfig` formats
+- Kept remaining machine and cluster settings in the legacy `v1alpha1` document where required for compatibility with Terraform Talos provider `0.12.0-alpha.5`
+- Preserved built-in IPv4 and IPv6 node CIDR allocation and made the predefined IPv6 `fc00:1::/96` Pod subnet usable without Talos CCM
+- Updated the local Talos patches and the Talos CCM example to the same supported document formats
+
+### manifests
+
+- Updated Argo CD to `10.1.4`, cert-manager to `1.21.0`, Coroot Operator to `0.9.7`, External Secrets to `2.7.0`, Hetzner Cloud Controller Manager to `1.34.0`, Hetzner CSI to `2.22.0`, and Talos Cloud Controller Manager to `0.5.5`
+- Added `cilium-ipv6-direct` to the root manifest build
+
+### providers and development
+
+- Updated the development Talos provider from `0.12.0-alpha.4` to `0.12.0-alpha.5`, Google provider from `7.36.0` to `7.40.0`, Hetzner Cloud provider from `1.65.0` to `1.66.1`, and Scaleway provider from `2.76.0` to `2.79.0`
+- Added a dedicated Scaleway IPv6 direct-routing development cluster using a static Pod CIDR, fail-closed KubeSpan, NAT64 resolvers, and no Talos CCM
+- Clarified that HCP Terraform may configure nodes within a phase concurrently and does not accept a custom `-parallelism` CLI argument
+
+### examples and documentation
+
+- Added [`talos-direct-routing.tf`](examples/talos-direct-routing.tf) with the required fail-closed KubeSpan and aggregate PodCIDR route patches
+- Removed redundant `cluster.network.cni.name: none` overrides from examples because the Talos cluster module already supplies them
+- Expanded Cilium documentation with routing, masquerading, MTU, CoreDNS, KubeSpan, and pod-to-node traffic guidance
+
+### compatibility
+
+- No public module inputs or outputs were removed in this release
+- Consumers applying the migrated Talos document patches should use Terraform Talos provider `0.12.0-alpha.5`; unsupported standalone `KubeNetworkConfig` and `KubeProxyConfig` documents are intentionally not used
+- Existing `cilium-ipv4` and tunneled `cilium-ipv6` deployments remain available; encrypted native routing is opt-in through `cilium-ipv6-direct`
+
 ## [v4.1.0](https://github.com/miran248/terraform-talos-modules/compare/v4.0.1...v4.1.0) — 2026-07-17
 
 ### networking

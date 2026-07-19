@@ -8,6 +8,7 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 | [argocd](argocd) | GitOps controller | no |
 | [cert-manager](cert-manager) | certificate management | no |
 | [cilium-ipv6](cilium-ipv6) | CNI for IPv6 clusters - tunnel mode (netkit), bandwidth manager, Gateway API | yes |
+| [cilium-ipv6-direct](cilium-ipv6-direct) | CNI for IPv6 clusters - native routing over KubeSpan WireGuard, no VXLAN | no |
 | [cilium-ipv4](cilium-ipv4) | CNI for IPv4 clusters - tunnel mode (netkit), bandwidth manager, Gateway API | yes |
 | [coredns-ipv6](coredns-ipv6) | CoreDNS with `hostNetwork: true` for IPv6 clusters (legacy workaround, no longer required) | no |
 | [coredns-ipv4](coredns-ipv4) | CoreDNS with `hostNetwork: true` for IPv4 clusters (legacy workaround, no longer required) | no |
@@ -23,6 +24,22 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 [namespaces.yaml](namespaces.yaml) creates the namespaces shared across components.
 
 > **Note:** The Cilium manifests use eBPF host routing (`bpf.hostLegacyRouting: false`) so pod traffic bypasses the host netfilter/iptables stack. Talos hostDNS remains enabled, but forwarding Kubernetes DNS to hostDNS is explicitly disabled in the cluster patches because that feature is incompatible with Cilium eBPF host routing. The `coredns-ipv4` / `coredns-ipv6` manifests (`hostNetwork: true` workaround) are kept for reference but are no longer required.
+
+`cilium-ipv6-direct` is the encrypted native-routing alternative. It requires
+KubeSpan `advertiseKubernetesNetworks: true` and `allowDownPeerBypass: false` on
+every node. It keeps eBPF host routing enabled, routes the predefined
+`fc00:1::/96` Pod CIDR natively, and applies BPF IPv6 masquerading only to
+off-cluster traffic. Cilium explicitly uses `kubespan` as its direct-routing
+device because eBPF host routing bypasses Talos' nftables route marking. Its
+1420-byte MTU assumes a 1500-byte physical underlay.
+
+Pod traffic must not address a remote node by its public IP in this profile.
+Cilium's eBPF host routing bypasses Talos' KubeSpan packet marking for that
+path, so it is not carried by WireGuard and may be unreachable. Use ClusterIP
+Services for workloads and `hostNetwork` DaemonSets or service proxies for
+node-local endpoints such as kubelet metrics. Do not add node public `/128`
+routes to `kubespan`: those routes can recursively capture WireGuard peer
+endpoints and break node-to-node traffic, including etcd.
 
 ## usage
 

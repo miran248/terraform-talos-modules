@@ -26,11 +26,13 @@ module "talos_cluster" {
         cluster:
           externalCloudProvider:
             enabled: true
-          controllerManager:
-            extraArgs:
-              cloud-provider: external
-              allocate-node-cidrs: false
-              controllers: "*,tokencleaner,-node-ipam-controller"
+        ---
+        apiVersion: v1alpha1
+        kind: KubeControllerManagerConfig
+        extraArgs:
+          cloud-provider: external
+          allocate-node-cidrs: "false"
+          controllers: "*,tokencleaner,-node-ipam-controller"
       EOF
       ,
     ]

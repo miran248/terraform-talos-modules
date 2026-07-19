@@ -4,31 +4,10 @@ cluster:
     extraArgs:
       advertise-address: "::"
       bind-address: "::"
-  controllerManager:
-    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
-    extraArgs:
-      # allocate-node-cidrs: false
-      allocate-node-cidrs: true
-      bind-address: "::"
-      # cloud-provider: external
-      # controllers: "*,tokencleaner,-node-ipam-controller"
-      node-cidr-mask-size-ipv6: 112
-  discovery:
-    enabled: true
-    registries:
-      service:
-        disabled: false
   etcd:
     # https://etcd.io/docs/v3.5/op-guide/configuration/
     extraArgs:
       listen-metrics-urls: "http://[::]:2381"
-  externalCloudProvider:
-    # enabled: true
-    enabled: false
-  scheduler:
-    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
-    extraArgs:
-      bind-address: "::"
 machine:
   features:
     kubernetesTalosAPIAccess:
@@ -37,3 +16,19 @@ machine:
         - "os:reader"
       allowedKubernetesNamespaces:
         - kube-system
+---
+apiVersion: v1alpha1
+kind: KubeControllerManagerConfig
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
+extraArgs:
+  allocate-node-cidrs: "true"
+  bind-address: "::"
+  # cloud-provider: external
+  # controllers: "*,tokencleaner,-node-ipam-controller"
+  node-cidr-mask-size-ipv6: "112"
+---
+apiVersion: v1alpha1
+kind: KubeSchedulerConfig
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
+extraArgs:
+  bind-address: "::"

@@ -13,6 +13,7 @@ Generate provider-neutral Talos secrets, per-node patches, machine configuration
 
 - Reject mixed address-family pools; select one complete family-specific patch set.
 - Preserve patch precedence from built-in through cluster, pool, role, and node scopes.
+- Use Talos document resources for settings migrated out of the legacy machine config; do not set the same subsystem in both formats.
 - Never expose machine secrets or Talos client configuration as non-sensitive outputs.
 - Keep outputs provider-neutral for both cloud apply modules.
 
@@ -26,4 +27,3 @@ Generate provider-neutral Talos secrets, per-node patches, machine configuration
 - Validate all YAML documents under `patches/` when changing machine configuration.
 
 ## Child DOX Index
-

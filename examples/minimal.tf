@@ -32,9 +32,6 @@ module "talos_cluster" {
     common = [
       <<-EOF
         cluster:
-          network:
-            cni:
-              name: none
           inlineManifests:
             - name: hcloud-secret
               contents: |

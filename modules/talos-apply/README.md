@@ -1,11 +1,10 @@
 # talos-apply
 Applies Talos machine configurations, bootstraps the cluster and retrieves the kubeconfig. Collects actual node IPs from apply module outputs to inject `StaticHostConfig` entries into each node's config.
 
-Control planes are configured before workers, enabling rolling upgrades when `kubernetes_version` or `talos_version` changes on `talos-cluster`. Run with `-parallelism=1` to enforce ordering:
-
-```shell
-> terraform apply -parallelism=1
-```
+Control planes are configured before workers when `kubernetes_version` or
+`talos_version` changes on `talos-cluster`. Individual nodes within each group
+may be configured concurrently by Terraform; HCP Terraform does not support a
+custom CLI parallelism value.
 
 ## inputs
 

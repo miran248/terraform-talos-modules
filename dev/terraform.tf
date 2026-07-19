@@ -18,7 +18,7 @@ terraform {
     }
     talos = {
       source  = "siderolabs/talos"
-      version = "0.12.0-alpha.4"
+      version = "0.12.0-alpha.5"
     }
   }
   required_version = ">= 1"

@@ -5,7 +5,7 @@ resources:
 helmCharts:
   - name: coroot-operator
     repo: https://coroot.github.io/helm-charts
-    version: 0.9.4
+    version: 0.9.7
     releaseName: coroot-operator
     namespace: coroot
     includeCRDs: true

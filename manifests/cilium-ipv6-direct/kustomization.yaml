@@ -1,0 +1,159 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml
+helmCharts:
+  - name: cilium
+    repo: https://helm.cilium.io
+    version: v1.19.6
+    releaseName: cilium
+    namespace: kube-system
+    includeCRDs: true
+    apiVersions:
+      - gateway.networking.k8s.io/v1/GatewayClass
+    valuesInline:
+      defs:
+        hubble: &hubble false
+        ipv6: &ipv6 true
+        ipv4: &ipv4 false
+        rollout: &rollout true
+        serviceMonitor: &serviceMonitor
+          serviceMonitor:
+            enabled: false
+            interval: 60s
+
+      k8sServiceHost: localhost
+      k8sServicePort: 7445
+      kubeProxyReplacement: true
+      kubeProxyReplacementHealthzBindAddr: "[::]:10256"
+
+      ipam:
+        mode: kubernetes
+      ipv6:
+        enabled: *ipv6
+      ipv4:
+        enabled: *ipv4
+      k8s:
+        requireIPv6PodCIDR: *ipv6
+        requireIPv4PodCIDR: *ipv4
+      underlayProtocol: ipv6
+      preferIpv6: *ipv6
+      enableIPv6Masquerade: true
+      ipv6NativeRoutingCIDR: fc00:1::/96
+
+      routingMode: native
+      autoDirectNodeRoutes: false
+      MTU: 1420
+      bpf:
+        datapathMode: netkit
+        hostLegacyRouting: false
+        masquerade: true
+        distributedLRU:
+          enabled: true
+        mapDynamicSizeRatio: 0.08
+      bpfClockProbe: true
+      bandwidthManager:
+        enabled: true
+        bbr: true
+
+      externalIPs:
+        enabled: true
+      nodePort:
+        enabled: true
+        bindProtection: false
+        # eBPF host routing bypasses Talos' KubeSpan nftables marking, so send
+        # native off-node traffic directly into the WireGuard interface.
+        directRoutingDevice: kubespan
+      hostPort:
+        enabled: true
+      socketLB:
+        enabled: true
+      l7Proxy: true
+
+      gatewayAPI:
+        enabled: true
+        enableAlpn: true
+        enableAppProtocol: true
+        hostNetwork:
+          enabled: true
+
+      rollOutCiliumPods: *rollout
+      operator:
+        replicas: 1
+        rollOutPods: *rollout
+        prometheus:
+          enabled: true
+          <<: *serviceMonitor
+
+      hubble:
+        enabled: *hubble
+        enableOpenMetrics: true
+        preferIpv6: *ipv6
+        metrics:
+          enabled:
+            - dns
+            - drop
+            - tcp
+            - flow
+            - icmp
+            - port-distribution
+            - http
+          <<: *serviceMonitor
+        relay:
+          enabled: *hubble
+          rollOutPods: *rollout
+          prometheus:
+            <<: *serviceMonitor
+        ui:
+          enabled: *hubble
+          rollOutPods: *rollout
+          service:
+            annotations:
+              omni-kube-service-exposer.sidero.dev/port: "50080"
+              omni-kube-service-exposer.sidero.dev/label: Hubble
+          frontend:
+            server:
+              ipv6:
+                enabled: *ipv6
+
+      envoy:
+        enabled: true
+        rollOutPods: *rollout
+        prometheus:
+          <<: *serviceMonitor
+        securityContext:
+          capabilities:
+            keepCapNetBindService: true
+            envoy:
+              - NET_BIND_SERVICE
+              - NET_ADMIN
+              - SYS_ADMIN
+              - BPF
+
+      prometheus:
+        enabled: true
+        <<: *serviceMonitor
+
+      securityContext:
+        privileged: true
+        capabilities:
+          ciliumAgent:
+            - CHOWN
+            - KILL
+            - NET_ADMIN
+            - NET_RAW
+            - IPC_LOCK
+            - SYS_ADMIN
+            - SYS_RESOURCE
+            - DAC_OVERRIDE
+            - FOWNER
+            - SETGID
+            - SETUID
+          cleanCiliumState:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - SYS_RESOURCE
+      cgroup:
+        autoMount:
+          enabled: false
+        hostRoot: /sys/fs/cgroup

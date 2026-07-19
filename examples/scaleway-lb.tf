@@ -121,13 +121,6 @@ module "talos_cluster" {
   patches = {
     common = [
       <<-EOF
-        cluster:
-          network:
-            cni:
-              name: none
-      EOF
-      ,
-      <<-EOF
         apiVersion: v1alpha1
         kind: ResolverConfig
         nameservers:

@@ -4,9 +4,9 @@ cluster:
       name: none
     dnsDomain: cluster.local
     podSubnets:
-      - "fc00:1::/96" # ensures the correct ip family is selected, unused otherwise!
-    # 108 is the largest supported 128b range
-    # 20 bits is hardcoded here https://github.com/kubernetes/kubernetes/blob/ec16c90aaf5d1f0606747c421c8680bb2b243d4e/cmd/kube-apiserver/app/options/validation.go#L40
+      - "fc00:1::/96" # ensures the correct IP family is selected
+    # /108 is the largest supported IPv6 service range; this module uses /112.
+    # 20 address bits are hardcoded here: https://github.com/kubernetes/kubernetes/blob/ec16c90aaf5d1f0606747c421c8680bb2b243d4e/cmd/kube-apiserver/app/options/validation.go#L40
     serviceSubnets:
       - "fc00::/112"
   proxy:

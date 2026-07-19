@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provide copyable Terraform compositions for minimal, multi-region, multi-cloud, Scaleway load-balancer, and Talos CCM deployments.
+Provide copyable Terraform compositions for minimal, multi-region, multi-cloud, Scaleway load-balancer, Talos CCM, and encrypted direct-routing deployments.
 
 ## Ownership
 
@@ -23,4 +23,3 @@ Provide copyable Terraform compositions for minimal, multi-region, multi-cloud, 
 - Run `terraform fmt -check` in this directory.
 
 ## Child DOX Index
-

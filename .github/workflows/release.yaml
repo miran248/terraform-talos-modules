@@ -6,10 +6,6 @@ on:
       version:
         description: "version to release (e.g. 3.3.0)"
         required: true
-      notes:
-        description: "release notes (markdown)"
-        required: true
-        type: string
 
 jobs:
   release:
@@ -44,5 +40,4 @@ jobs:
           TAG="v${{ github.event.inputs.version }}"
           gh release create "$TAG" \
             --title "$TAG" \
-            --notes "${{ github.event.inputs.notes }}" \
             --generate-notes
