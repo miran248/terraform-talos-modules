@@ -78,6 +78,16 @@ Default section order:
 
 When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
 
+Root-owned files include project documentation, release history, the root `justfile`, repository ignores, licensing, and `.github/workflows`. `.build/`, Terraform working directories/state, downloaded Helm charts, generated client configuration, and local editor metadata are derived or local artifacts; do not treat them as authored project contracts.
+
+## Release Preparation
+
+- Prepare releases on `main` before creating the tag.
+- Choose a stable `vMAJOR.MINOR.PATCH` version or a SemVer prerelease such as `vMAJOR.MINOR.PATCH-rc.1`, then update every repository-owned reference pinned to an older tag of this repository, including references under `modules/` and `examples/`. Search the full authored tree so references outside those directories are not missed.
+- Update `CHANGELOG.md` with every user-visible change since the previous release tag and use a compare link from that tag to the new tag.
+- Commit all release-preparation changes, then create an annotated tag whose annotation is suitable for the GitHub release notes.
+- Push the release-preparation commit before pushing the tag. Pushing an annotated `v*` tag triggers `.github/workflows/release.yaml`, which publishes the annotation as the GitHub release notes; tags containing a SemVer prerelease suffix are published as GitHub prereleases.
+
 ## Child DOX Index
 
 - [modules/AGENTS.md](modules/AGENTS.md) — reusable Terraform modules and their public interfaces
@@ -86,5 +96,3 @@ When the user requests a durable behavior change, record it here or in the relev
 - [examples/AGENTS.md](examples/AGENTS.md) — copyable Terraform compositions
 - [local/AGENTS.md](local/AGENTS.md) — disposable local Talos cluster workflow
 - [packer/AGENTS.md](packer/AGENTS.md) — Talos cloud image builds and publication
-
-Root-owned files include project documentation, release history, the root `justfile`, repository ignores, licensing, and `.github/workflows`. `.build/`, Terraform working directories/state, downloaded Helm charts, generated client configuration, and local editor metadata are derived or local artifacts; do not treat them as authored project contracts.
