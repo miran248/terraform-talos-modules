@@ -68,6 +68,10 @@ helmCharts:
         enabled: true
       socketLB:
         enabled: true
+      # Cilium reconciles proxy iptables rules even when L7 proxying is disabled;
+      # that reconciliation fails on this Talos build and breaks the agent.
+      extraConfig:
+        install-iptables-rules: "false"
       l7Proxy: false
 
       gatewayAPI:
