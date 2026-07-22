@@ -48,7 +48,7 @@ data "hcloud_image" "talos" {
 }
 
 module "nuremberg_pool" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-pool?ref=v4.2.3" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-pool?ref=v4.2.4" # x-release-please-version
 
   prefix   = "nbg"
   location = "nbg1"

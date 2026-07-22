@@ -22,7 +22,7 @@ Registers a Talos qcow2 image stored in a Scaleway Object Storage bucket as a bo
 ```hcl
 module "scaleway_image" {
   for_each = toset(["fr-par-1", "fr-par-2"])
-  source   = "github.com/miran248/terraform-talos-modules//modules/scaleway-image?ref=v4.2.3" # x-release-please-version
+  source   = "github.com/miran248/terraform-talos-modules//modules/scaleway-image?ref=v4.2.4" # x-release-please-version
 
   zone   = each.key
   bucket = "my-talos-images"
@@ -31,7 +31,7 @@ module "scaleway_image" {
 }
 
 module "paris_pool" {
-  source = "github.com/miran248/terraform-talos-modules//modules/scaleway-pool?ref=v4.2.3" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/scaleway-pool?ref=v4.2.4" # x-release-please-version
 
   prefix = "par1"
   zone   = "fr-par-1"
