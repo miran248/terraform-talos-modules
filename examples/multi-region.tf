@@ -3,7 +3,7 @@ data "hcloud_image" "talos" {
 }
 
 module "nuremberg_pool" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-pool?ref=v4.2.4" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-pool?ref=v4.2.5" # x-release-please-version
 
   prefix   = "nbg"
   location = "nbg1"
@@ -19,7 +19,7 @@ module "nuremberg_pool" {
 }
 
 module "helsinki_pool" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-pool?ref=v4.2.4" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-pool?ref=v4.2.5" # x-release-please-version
 
   prefix   = "hel"
   location = "hel1"
@@ -30,7 +30,7 @@ module "helsinki_pool" {
 }
 
 module "talos_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.4" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.5" # x-release-please-version
 
   name               = "example"
   endpoint           = "example.example.com"
@@ -66,21 +66,21 @@ module "talos_cluster" {
 }
 
 module "nuremberg_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v4.2.4" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v4.2.5" # x-release-please-version
 
   pool    = module.nuremberg_pool
   cluster = module.talos_cluster
 }
 
 module "helsinki_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v4.2.4" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/hcloud-apply?ref=v4.2.5" # x-release-please-version
 
   pool    = module.helsinki_pool
   cluster = module.talos_cluster
 }
 
 module "talos_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v4.2.4" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v4.2.5" # x-release-please-version
 
   cluster = module.talos_cluster
   applies = [module.nuremberg_apply, module.helsinki_apply]
