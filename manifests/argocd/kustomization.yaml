@@ -10,6 +10,9 @@ helmCharts:
     namespace: argocd
     includeCRDs: true
     valuesInline:
+      global:
+        networkPolicy:
+          create: false
       dex:
         enabled: false
       configs:

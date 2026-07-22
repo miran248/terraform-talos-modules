@@ -17,8 +17,10 @@ Maintain Kustomize overlays and Helm values for required and optional Kubernetes
 - Keep `cilium-ipv6-direct` native routing scoped to `fc00:1::/96` and enable BPF IPv6 masquerading for off-cluster traffic.
 - Keep remote-node masquerading disabled in `cilium-ipv6-direct`; with IPv6 BPF masquerading it drops pod-to-node traffic as an invalid source before Talos policy routing can select KubeSpan.
 - Keep `cilium-ipv6-direct` on eBPF host routing and explicitly select `kubespan` as Cilium's direct-routing device.
+- Keep L7 proxying, Gateway API, and Envoy disabled in `cilium-ipv6-direct` while its Talos kernel lacks the legacy IPv4/IPv6 iptables compatibility required by Cilium's proxy-rule reconciliation.
 - Require destination-scoped Talos policy-routing rules from the Pod CIDR to every node public allocation through KubeSpan table `180` when pods must reach remote node addresses. Never add node public `/128` routes to the main table, because they recursively capture WireGuard peer endpoints.
 - Cilium must remain compatible with kube-proxy-disabled Talos patches and the selected DNS/KubeSpan behavior.
+- Keep Argo CD chart-managed NetworkPolicies disabled where cluster networking policy is managed separately.
 - Rendered output belongs in `.build/manifests/` and must not become the source of truth.
 - Keep chart and remote resource versions explicit and reproducible.
 

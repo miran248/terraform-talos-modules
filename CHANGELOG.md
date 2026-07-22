@@ -1,5 +1,21 @@
 # Changelog
 
+## [v4.2.2](https://github.com/miran248/terraform-talos-modules/compare/v4.2.1...v4.2.2) — 2026-07-22
+
+### networking
+
+- Disabled Cilium L7 proxying, Gateway API, and Envoy in the IPv6 direct-routing profile to avoid proxy-rule reconciliation failures on Talos kernels without legacy IPv4/IPv6 iptables compatibility
+- Disabled Argo CD chart-managed NetworkPolicies so repository-server traffic is not constrained by policies that are incompatible with the current cluster networking
+
+### compatibility
+
+- Existing tunneled `cilium-ipv4` and `cilium-ipv6` profiles are unchanged
+
+### release tooling
+
+- Verify annotated release tags against the GitHub tag object instead of the checkout's dereferenced commit
+- Updated every repository-owned example and module README self-reference from `v4.2.1` to `v4.2.2`
+
 ## [v4.2.1](https://github.com/miran248/terraform-talos-modules/compare/v4.2.0...v4.2.1) — 2026-07-19
 
 ### networking

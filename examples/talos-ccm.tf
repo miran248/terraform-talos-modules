@@ -6,7 +6,7 @@
 #   - Hetzner Cloud / Scaleway node metadata
 
 module "talos_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.1"
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.2"
 
   # ... other inputs ...
 

@@ -68,10 +68,10 @@ helmCharts:
         enabled: true
       socketLB:
         enabled: true
-      l7Proxy: true
+      l7Proxy: false
 
       gatewayAPI:
-        enabled: true
+        enabled: false
         enableAlpn: true
         enableAppProtocol: true
         hostNetwork:
@@ -117,7 +117,7 @@ helmCharts:
                 enabled: *ipv6
 
       envoy:
-        enabled: true
+        enabled: false
         rollOutPods: *rollout
         prometheus:
           <<: *serviceMonitor

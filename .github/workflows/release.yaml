@@ -17,8 +17,13 @@ jobs:
           fetch-depth: 0
 
       - name: verify annotated tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          test "$(git cat-file -t "${GITHUB_REF_NAME}")" = "tag" || {
+          tag_type="$(gh api \
+            "repos/${GITHUB_REPOSITORY}/git/ref/tags/${GITHUB_REF_NAME}" \
+            --jq '.object.type')"
+          test "${tag_type}" = "tag" || {
             echo "${GITHUB_REF_NAME} must be an annotated tag" >&2
             exit 1
           }
