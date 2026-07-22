@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "terraform-module",
+  "include-v-in-tag": true,
+  "include-component-in-tag": false,
+  "packages": {
+    ".": {
+      "component": "terraform-talos-modules",
+      "extra-files": [
+        { "type": "generic", "path": "examples/minimal.tf" },
+        { "type": "generic", "path": "examples/multi-cloud.tf" },
+        { "type": "generic", "path": "examples/multi-region.tf" },
+        { "type": "generic", "path": "examples/scaleway-lb.tf" },
+        { "type": "generic", "path": "examples/talos-ccm.tf" },
+        { "type": "generic", "path": "examples/talos-direct-routing.tf" },
+        { "type": "generic", "path": "modules/gcp-wif-apply/README.md" },
+        { "type": "generic", "path": "modules/gcp-wif/README.md" },
+        { "type": "generic", "path": "modules/hcloud-apply/README.md" },
+        { "type": "generic", "path": "modules/hcloud-pool/README.md" },
+        { "type": "generic", "path": "modules/scaleway-apply/README.md" },
+        { "type": "generic", "path": "modules/scaleway-image/README.md" },
+        { "type": "generic", "path": "modules/scaleway-pool/README.md" },
+        { "type": "generic", "path": "modules/talos-apply/README.md" },
+        { "type": "generic", "path": "modules/talos-cluster/README.md" }
+      ]
+    }
+  }
+}

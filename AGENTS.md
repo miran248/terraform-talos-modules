@@ -82,11 +82,10 @@ Root-owned files include project documentation, release history, the root `justf
 
 ## Release Preparation
 
-- Prepare releases on `main` before creating the tag.
-- Choose a stable `vMAJOR.MINOR.PATCH` version or a SemVer prerelease such as `vMAJOR.MINOR.PATCH-rc.1`, then update every repository-owned reference pinned to an older tag of this repository, including references under `modules/` and `examples/`. Search the full authored tree so references outside those directories are not missed.
-- Update `CHANGELOG.md` with every user-visible change since the previous release tag and use a compare link from that tag to the new tag.
-- Commit all release-preparation changes, then create an annotated tag whose annotation is suitable for the GitHub release notes.
-- Push the release-preparation commit before pushing the tag. Pushing an annotated `v*` tag triggers `.github/workflows/release.yaml`, which publishes the annotation as the GitHub release notes; tags containing a SemVer prerelease suffix are published as GitHub prereleases.
+- `.github/workflows/release.yaml` runs Release Please on `main` using the repository manifest and the `terraform-module` strategy.
+- Use Conventional Commit subjects (`fix:`, `feat:`, and `type!:` for breaking changes); Release Please derives the next semantic version and maintains the release PR and `CHANGELOG.md`.
+- Every repository-owned module source reference must carry an `x-release-please-version` annotation and be listed as a generic `extra-file` in `.github/release-please-config.json`.
+- Review and merge the Release Please PR to publish its generated `vMAJOR.MINOR.PATCH` tag and GitHub Release. Do not create or push release tags manually.
 
 ## Child DOX Index
 

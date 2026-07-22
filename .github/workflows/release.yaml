@@ -2,43 +2,19 @@ name: release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: googleapis/release-please-action@v4
         with:
-          fetch-depth: 0
-
-      - name: verify annotated tag
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag_type="$(gh api \
-            "repos/${GITHUB_REPOSITORY}/git/ref/tags/${GITHUB_REF_NAME}" \
-            --jq '.object.type')"
-          test "${tag_type}" = "tag" || {
-            echo "${GITHUB_REF_NAME} must be an annotated tag" >&2
-            exit 1
-          }
-
-      - name: create github release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          release_flags=()
-          if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
-            release_flags+=(--prerelease)
-          fi
-
-          gh release create "${GITHUB_REF_NAME}" \
-            --verify-tag \
-            --title "${GITHUB_REF_NAME}" \
-            --notes-from-tag \
-            "${release_flags[@]}"
+          config-file: .github/release-please-config.json
+          manifest-file: .github/release-please-manifest.json
