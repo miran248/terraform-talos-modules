@@ -19,6 +19,11 @@ module "talos_direct_routing_cluster" {
         allowDownPeerBypass: false
         harvestExtraEndpoints: false
         mtu: 1420
+        # Keep provider IPv4/CGNAT addresses host-accessible without allowing
+        # KubeSpan to advertise or select them as WireGuard peer endpoints.
+        filters:
+          endpoints:
+            - ::/0
         ---
         apiVersion: v1alpha1
         kind: LinkConfig

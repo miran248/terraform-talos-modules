@@ -61,6 +61,10 @@ helmCharts:
       nodePort:
         enabled: true
         bindProtection: false
+        # Keep provider CGNAT addresses available to the host without exposing
+        # them through Cilium's IPv6-only NodePort datapath.
+        addresses:
+          - ::/0
         # eBPF host routing bypasses Talos' KubeSpan nftables marking, so send
         # native off-node traffic directly into the WireGuard interface.
         directRoutingDevice: kubespan

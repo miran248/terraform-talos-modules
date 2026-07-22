@@ -76,9 +76,10 @@ Default section order:
 
 ## User Preferences
 
-When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
-
-Root-owned files include project documentation, release history, the root `justfile`, repository ignores, licensing, and `.github/workflows`. `.build/`, Terraform working directories/state, downloaded Helm charts, generated client configuration, and local editor metadata are derived or local artifacts; do not treat them as authored project contracts.
+- When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
+- Root-owned files include project documentation, release history, the root `justfile`, repository ignores, licensing, and `.github/workflows`. `.build/`, Terraform working directories/state, downloaded Helm charts, generated client configuration, and local editor metadata are derived or local artifacts; do not treat them as authored project contracts.
+- Run repository-cluster Kubernetes commands with `KUBECONFIG=kube-config kubectl ...`; do not rely on the process's default kubectl context
+- Run repository-cluster Talos commands with `TALOSCONFIG=talos-config talosctl ...`; do not rely on the process's default Talos config
 
 ## Release Preparation
 

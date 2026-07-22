@@ -49,6 +49,6 @@ advertiseKubernetesNetworks: false
 allowDownPeerBypass: false
 harvestExtraEndpoints: false
 mtu: 1420
-# filters:
-#   endpoints:
-#     - "::/0"
+filters:
+  endpoints:
+    - "::/0"

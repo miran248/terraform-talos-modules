@@ -52,7 +52,9 @@ Provision servers. One apply module per pool.
 | [talos-direct-routing.tf](examples/talos-direct-routing.tf) | IPv6 Cilium native routing with PodCIDRs and node traffic carried by KubeSpan WireGuard |
 
 The direct-routing profile uses `fc00:1::/96` for PodCIDRs and advertises them
-through KubeSpan. Because Cilium eBPF host routing bypasses Talos packet marks,
+through KubeSpan. KubeSpan peer endpoints and Cilium NodePort addresses are
+restricted to IPv6, so provider IPv4/CGNAT addresses remain available to the
+host without entering the cluster datapath.
 pod-to-node traffic also requires destination-scoped `RoutingRuleConfig`
 documents: match `fc00:1::/96` as the source, each node public allocation as
 the destination, and select KubeSpan routing table `180`. This keeps node-bound

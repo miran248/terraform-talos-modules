@@ -27,10 +27,13 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 
 `cilium-ipv6-direct` is the encrypted native-routing alternative. It requires
 KubeSpan `advertiseKubernetesNetworks: true` and `allowDownPeerBypass: false` on
-every node. It keeps eBPF host routing enabled, routes the predefined
+every node, with `filters.endpoints: [::/0]` so provider IPv4/CGNAT addresses
+remain available to host-network processes without becoming WireGuard peer
+endpoints. It keeps eBPF host routing enabled, routes the predefined
 `fc00:1::/96` Pod CIDR natively, and applies BPF IPv6 masquerading only to
 off-cluster traffic. Cilium explicitly uses `kubespan` as its direct-routing
-device because eBPF host routing bypasses Talos' nftables route marking. Its
+device and restricts NodePort addresses to `::/0`, while retaining `eth0` for
+off-cluster masquerading. Its
 1420-byte MTU assumes a 1500-byte physical underlay. Remote-node masquerading
 is deliberately disabled: with IPv6 BPF masquerading it drops pod-to-node
 traffic before Talos policy routing can select KubeSpan.

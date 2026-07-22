@@ -40,7 +40,9 @@ Run `just` from the repo root to render manifests, then apply CNI and namespaces
 ```
 
 The IPv6 development composition enables the KubeSpan patches required by
-native routing. It also installs source-and-destination policy rules that send
+native routing and advertises only IPv6 WireGuard endpoints, leaving any
+provider IPv4/CGNAT addresses available only to the host. It also installs
+source-and-destination policy rules that send
 pod traffic for every node public allocation through KubeSpan table `180`.
 Apply `.build/manifests/cilium-ipv6-direct.yaml` instead of `cilium-ipv6.yaml`
 to test encrypted direct pod and pod-to-node routing without VXLAN.

@@ -92,6 +92,9 @@ module "dev1_ipv6_talos_cluster" {
         allowDownPeerBypass: false
         harvestExtraEndpoints: false
         mtu: 1420
+        filters:
+          endpoints:
+            - ::/0
         ---
         apiVersion: v1alpha1
         kind: LinkConfig
