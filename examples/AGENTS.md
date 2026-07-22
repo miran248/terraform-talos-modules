@@ -14,6 +14,7 @@ Provide copyable Terraform compositions for minimal, multi-region, multi-cloud, 
 - Keep credentials and generated client configuration out of source control.
 - Prefer realistic complete compositions over test-only shortcuts.
 - Keep the encrypted direct-routing example aligned with the tested IPv6-only KubeSpan endpoint filter, PodCIDR route, and pod-to-node-pool policy-routing rules.
+- Keep its KubeSpan and PodCIDR route MTUs at 1400, aligned with `cilium-ipv6-direct` and below the measured 1410-byte netkit/BPF FIB boundary.
 
 ## Work Guidance
 

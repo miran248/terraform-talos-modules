@@ -17,6 +17,7 @@ Maintain Kustomize overlays and Helm values for required and optional Kubernetes
 - Keep `cilium-ipv6-direct` native routing scoped to `fc00:1::/96` and enable BPF IPv6 masquerading for off-cluster traffic.
 - Keep remote-node masquerading disabled in `cilium-ipv6-direct`; with IPv6 BPF masquerading it drops pod-to-node traffic as an invalid source before Talos policy routing can select KubeSpan.
 - Keep `cilium-ipv6-direct` on eBPF host routing and explicitly select `kubespan` as Cilium's direct-routing device.
+- Keep the Cilium, KubeSpan, and aggregate PodCIDR route MTUs aligned at 1400 for `cilium-ipv6-direct`. A 1500-byte underlay minus 80 bytes of IPv6 WireGuard overhead nominally permits 1420, but netkit/BPF testing observed 1410-byte packets pass and 1411-byte packets drop as `FIB lookup failed` before KubeSpan.
 - Restrict `cilium-ipv6-direct` NodePort addresses to `::/0`; provider IPv4/CGNAT addresses may remain available to host-network processes but must not enter the IPv6-only service datapath.
 - Keep Cilium iptables rule installation, L7 proxying, Gateway API, and Envoy disabled in `cilium-ipv6-direct` while Cilium's proxy-rule reconciliation fails on this Talos build even with L7 proxying disabled.
 - Require destination-scoped Talos policy-routing rules from the Pod CIDR to every node public allocation through KubeSpan table `180` when pods must reach remote node addresses. Never add node public `/128` routes to the main table, because they recursively capture WireGuard peer endpoints.
