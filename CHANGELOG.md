@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.5](https://github.com/miran248/terraform-talos-modules/compare/v4.2.4...v4.2.5) (2026-07-22)
+
+
+### Bug Fixes
+
+* lower ipv6 direct mtu ([2fdd5b5](https://github.com/miran248/terraform-talos-modules/commit/2fdd5b55c3068c4aa3000d53f10640bdcb41a81e))
+
 ## [4.2.4](https://github.com/miran248/terraform-talos-modules/compare/v4.2.3...v4.2.4) (2026-07-22)
 
 

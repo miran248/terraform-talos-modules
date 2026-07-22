@@ -28,7 +28,7 @@ custom CLI parallelism value.
 
 ```hcl
 module "talos_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v4.2.4" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v4.2.5" # x-release-please-version
 
   cluster = module.talos_cluster
   applies = [module.nuremberg_apply, module.helsinki_apply]
