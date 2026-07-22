@@ -43,7 +43,7 @@ EndpointSlice.
 
 ```hcl
 module "talos_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.3" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.4" # x-release-please-version
 
   name               = "prod"
   endpoint           = "prod.example.com"

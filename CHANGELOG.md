@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.4](https://github.com/miran248/terraform-talos-modules/compare/v4.2.3...v4.2.4) (2026-07-22)
+
+
+### Bug Fixes
+
+* restrict ipv6 direct routing endpoints ([646a96b](https://github.com/miran248/terraform-talos-modules/commit/646a96b547bf929158a0802ace4052ae5a8674cd))
+
 ## [4.2.3](https://github.com/miran248/terraform-talos-modules/compare/v4.2.2...v4.2.3) (2026-07-22)
 
 

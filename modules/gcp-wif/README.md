@@ -33,7 +33,7 @@ Use with [gcp-wif-apply](../gcp-wif-apply) to upload OIDC documents after the cl
 
 ```hcl
 module "gcp_wif" {
-  source = "github.com/miran248/terraform-talos-modules//modules/gcp-wif?ref=v4.2.3" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/gcp-wif?ref=v4.2.4" # x-release-please-version
 
   name            = "my-cluster"
   bucket_name     = "my-cluster-oidc"
@@ -45,7 +45,7 @@ module "gcp_wif" {
 }
 
 module "talos_cluster" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.3" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-cluster?ref=v4.2.4" # x-release-please-version
 
   name               = "prod"
   endpoint           = "prod.example.com"
