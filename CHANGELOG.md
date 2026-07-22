@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.3](https://github.com/miran248/terraform-talos-modules/compare/v4.2.2...v4.2.3) (2026-07-22)
+
+
+### Bug Fixes
+
+* disable cilium iptables rules on ipv6 direct ([b7932f0](https://github.com/miran248/terraform-talos-modules/commit/b7932f0ef3b7761e5b0f593b1ae851b08bd13019))
+
 ## [v4.2.2](https://github.com/miran248/terraform-talos-modules/compare/v4.2.1...v4.2.2) — 2026-07-22
 
 ### networking
