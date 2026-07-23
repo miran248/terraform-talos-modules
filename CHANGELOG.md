@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.6](https://github.com/miran248/terraform-talos-modules/compare/v4.2.5...v4.2.6) (2026-07-23)
+
+
+### Bug Fixes
+
+* split cilium and kubespan mtu ([d06db6c](https://github.com/miran248/terraform-talos-modules/commit/d06db6c79df4e012ac1e27298248392e1b3d390c))
+
 ## [4.2.5](https://github.com/miran248/terraform-talos-modules/compare/v4.2.4...v4.2.5) (2026-07-22)
 
 
