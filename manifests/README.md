@@ -33,11 +33,12 @@ endpoints. It keeps eBPF host routing enabled, routes the predefined
 `fc00:1::/96` Pod CIDR natively, and applies BPF IPv6 masquerading only to
 off-cluster traffic. Cilium explicitly uses `kubespan` as its direct-routing
 device and restricts NodePort addresses to `::/0`, while retaining `eth0` for
-off-cluster masquerading. Although a 1500-byte physical underlay minus the
-80-byte IPv6 WireGuard overhead nominally permits an MTU of 1420, this profile
-uses 1400. Live netkit/BPF testing found that 1410-byte IPv6 packets passed but
-1411-byte packets were dropped by Cilium as `FIB lookup failed` before reaching
-KubeSpan; 1400 leaves ten bytes of headroom below that observed boundary.
+off-cluster masquerading. The KubeSpan interface and aggregate PodCIDR route
+use the 1420-byte inner-packet ceiling left by IPv6 WireGuard on the 1500-byte
+physical underlay. Cilium independently limits pod traffic to 1400: live
+netkit/BPF testing found that 1410-byte IPv6 packets passed but 1411-byte
+packets were dropped as `FIB lookup failed` before reaching KubeSpan, so 1400
+leaves ten bytes of headroom below that observed boundary.
 Remote-node masquerading is deliberately disabled: with IPv6 BPF masquerading
 it drops pod-to-node traffic before Talos policy routing can select KubeSpan.
 

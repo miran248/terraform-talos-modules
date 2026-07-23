@@ -18,9 +18,9 @@ module "talos_direct_routing_cluster" {
         advertiseKubernetesNetworks: true
         allowDownPeerBypass: false
         harvestExtraEndpoints: false
-        # Leave headroom below Cilium netkit/BPF's measured 1410-byte FIB
-        # boundary on a 1500-byte IPv6 WireGuard underlay.
-        mtu: 1400
+        # The 1500-byte IPv6 underlay leaves 1420 bytes after WireGuard
+        # overhead; Cilium independently keeps pod traffic at MTU 1400.
+        mtu: 1420
         # Keep provider IPv4/CGNAT addresses host-accessible without allowing
         # KubeSpan to advertise or select them as WireGuard peer endpoints.
         filters:
@@ -32,7 +32,7 @@ module "talos_direct_routing_cluster" {
         name: kubespan
         routes:
           - destination: fc00:1::/96
-            mtu: 1400
+            mtu: 1420
       EOF
       ,
       ], [

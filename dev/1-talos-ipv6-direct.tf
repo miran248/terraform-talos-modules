@@ -91,9 +91,9 @@ module "dev1_ipv6_talos_cluster" {
         advertiseKubernetesNetworks: true
         allowDownPeerBypass: false
         harvestExtraEndpoints: false
-        # Leave headroom below Cilium netkit/BPF's measured 1410-byte FIB
-        # boundary on a 1500-byte IPv6 WireGuard underlay.
-        mtu: 1400
+        # The 1500-byte IPv6 underlay leaves 1420 bytes after WireGuard
+        # overhead; Cilium independently keeps pod traffic at MTU 1400.
+        mtu: 1420
         filters:
           endpoints:
             - ::/0
@@ -103,7 +103,7 @@ module "dev1_ipv6_talos_cluster" {
         name: kubespan
         routes:
           - destination: fc00:1::/96
-            mtu: 1400
+            mtu: 1420
         ---
         apiVersion: v1alpha1
         kind: ResolverConfig

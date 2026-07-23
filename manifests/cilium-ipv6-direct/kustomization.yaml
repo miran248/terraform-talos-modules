@@ -43,8 +43,8 @@ helmCharts:
 
       routingMode: native
       autoDirectNodeRoutes: false
-      # The 1500-byte underlay and IPv6 WireGuard overhead nominally allow
-      # 1420, but Cilium netkit/BPF drops packets above 1410 at FIB lookup.
+      # KubeSpan uses its 1420-byte WireGuard ceiling, but Cilium stays below
+      # the netkit/BPF path's measured 1410-byte FIB lookup boundary.
       MTU: 1400
       bpf:
         datapathMode: netkit

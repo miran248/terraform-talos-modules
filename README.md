@@ -55,7 +55,9 @@ The direct-routing profile uses `fc00:1::/96` for PodCIDRs and advertises them
 through KubeSpan. KubeSpan peer endpoints and Cilium NodePort addresses are
 restricted to IPv6, so provider IPv4/CGNAT addresses remain available to the
 host without entering the cluster datapath.
-pod-to-node traffic also requires destination-scoped `RoutingRuleConfig`
+KubeSpan and the aggregate PodCIDR route use the 1420-byte IPv6 WireGuard
+ceiling, while Cilium independently limits pod traffic to MTU 1400.
+Pod-to-node traffic also requires destination-scoped `RoutingRuleConfig`
 documents: match `fc00:1::/96` as the source, each node public allocation as
 the destination, and select KubeSpan routing table `180`. This keeps node-bound
 pod traffic, including Kubernetes API Service backends, inside WireGuard while
