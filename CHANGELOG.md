@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.7](https://github.com/miran248/terraform-talos-modules/compare/v4.2.6...v4.2.7) (2026-08-12)
+
+
+### Bug Fixes
+
+* **scaleway-pool:** drop deprecated placement group policy_mode ([4678c42](https://github.com/miran248/terraform-talos-modules/commit/4678c42b43b41e426762f35dad68d42ed2bdb010))
+
 ## [4.2.6](https://github.com/miran248/terraform-talos-modules/compare/v4.2.5...v4.2.6) (2026-07-23)
 
 
