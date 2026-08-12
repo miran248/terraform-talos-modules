@@ -60,7 +60,5 @@ resource "scaleway_instance_ip" "this" {
 resource "scaleway_instance_placement_group" "this" {
   name        = var.prefix
   policy_type = "max_availability"
-  # policy_mode = "enforced"
-  policy_mode = "optional"
   zone        = var.zone
 }
