@@ -162,7 +162,7 @@ module "dev1_ipv6_talos_apply" {
 
   cluster         = module.dev1_ipv6_talos_cluster
   applies         = [module.dev1_ipv6_paris_apply]
-  installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-alpha.1-dev.7"
+  installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-beta.1-dev.1"
 }
 
 module "dev1_ipv6_gcp_wif_apply" {
