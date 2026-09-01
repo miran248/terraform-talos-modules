@@ -21,15 +21,20 @@ locals {
   patches = {
     control_planes = [
       <<-EOF
-        cluster:
-          apiServer:
-            extraArgs:
-              api-audiences: "https://kubernetes.default.svc.cluster.local,iam.googleapis.com/${google_iam_workload_identity_pool_provider.oidc.name}"
-              service-account-issuer: "${local.oidc_bucket_url}"
-              service-account-jwks-uri: "${local.oidc_bucket_url}/openid/v1/jwks"
-          serviceAccount:
-            key: "${base64encode(tls_private_key.this.private_key_pem)}"
+        apiVersion: v1alpha1
+        kind: KubeAPIServerConfig
+        extraArgs:
+          api-audiences: "https://kubernetes.default.svc.cluster.local,iam.googleapis.com/${google_iam_workload_identity_pool_provider.oidc.name}"
+          service-account-jwks-uri: "${local.oidc_bucket_url}/openid/v1/jwks"
+        ---
+        apiVersion: v1alpha1
+        kind: KubeServiceAccountConfig
+        issuer:
+          issuerURL: "${local.oidc_bucket_url}"
+          privateKey: |-
+            ${indent(4, tls_private_key.this.private_key_pem)}
       EOF
+      ,
     ]
   }
 }

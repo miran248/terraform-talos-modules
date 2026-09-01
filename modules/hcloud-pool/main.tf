@@ -2,11 +2,12 @@ locals {
   patches = {
     common = [
       <<-EOF
-        machine:
-          nodeLabels:
-            provider: hcloud
-            topology.kubernetes.io/zone: ${var.location}
-            topology.kubernetes.io/region: ${var.location}
+        apiVersion: v1alpha1
+        kind: KubeNodeConfig
+        labels:
+          provider: hcloud
+          topology.kubernetes.io/zone: ${var.location}
+          topology.kubernetes.io/region: ${var.location}
       EOF
     ]
   }

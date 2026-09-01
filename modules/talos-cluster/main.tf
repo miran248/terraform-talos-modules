@@ -18,16 +18,20 @@ locals {
   patches = {
     common = flatten([
       file("${path.module}/patches/common-${local.mode}.yaml"),
+      # Talos API certificate SANs have no document-resource replacement in Talos 1.14.
       yamlencode({ machine = { certSANs = local.cert_sans } }),
       var.patches.common,
     ])
     control_planes = flatten([
       file("${path.module}/patches/control-planes-${local.mode}.yaml"),
       yamlencode({
-        cluster = {
-          apiServer = { certSANs = local.cert_sans }
-          etcd      = { advertisedSubnets = [for _, node in local.pool_nodes : node.ip_cidr] }
-        }
+        apiVersion    = "v1alpha1"
+        kind          = "KubeAPIServerConfig"
+        certExtraSANs = local.cert_sans
+      }),
+      # Etcd advertised subnets have no document-resource replacement in Talos 1.14.
+      yamlencode({
+        cluster = { etcd = { advertisedSubnets = [for _, node in local.pool_nodes : node.ip_cidr] } }
       }),
       var.patches.control_planes,
     ])

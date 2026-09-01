@@ -14,14 +14,15 @@ module "talos_cluster" {
     common = [
       # ... other common patches ...
       <<-EOF
-        machine:
-          kubelet:
-            extraArgs:
-              cloud-provider: external
+        apiVersion: v1alpha1
+        kind: KubeletConfig
+        extraArgs:
+          cloud-provider: external
       EOF
       ,
     ]
     control_planes = [
+      # Talos 1.14 has no document resource for enabling an external cloud provider.
       <<-EOF
         cluster:
           externalCloudProvider:

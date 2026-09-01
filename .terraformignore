@@ -1,3 +1,4 @@
 *
 !dev/
 !modules/
+dev/.terraform/

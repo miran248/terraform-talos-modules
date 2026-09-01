@@ -81,7 +81,7 @@ Edit the following variables at the top of `justfile` to match your environment:
 | variable | description |
 |---|---|
 | `TALOS_SRC` | path to local Talos source tree |
-| `DEV_IMAGE_TAG` | tag for the dev build (e.g. `v1.14.0-beta.1-dev.1`) |
+| `DEV_IMAGE_TAG` | tag for the dev build (e.g. `v1.14.0-rc.2-dev.5`) |
 | `USERNAME` | GitHub username for pushing to `ghcr.io/<username>/talos-*` |
 | `SCALEWAY_BUCKET` | Scaleway Object Storage bucket name for qcow2 uploads |
 | `SCALEWAY_VERSION` | Talos version for the official Scaleway image |

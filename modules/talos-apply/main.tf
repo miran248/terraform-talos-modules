@@ -12,6 +12,7 @@ locals {
       })]
     }
     cert_sans = { for key, n in local.nodes :
+      # Talos API certificate SANs have no document-resource replacement in Talos 1.14.
       key => yamlencode({ machine = { certSANs = [n.ip] } })
     }
   }
@@ -42,25 +43,27 @@ ephemeral "talos_cluster_kubeconfig" "drain" {
 resource "talos_machine" "control_planes" {
   for_each = { for k, n in local.nodes : k => n if n.kind == "control-plane" }
 
-  client_configuration  = var.cluster.machine_secrets.client_configuration
-  endpoint              = var.cluster.endpoint
-  node                  = each.value.ip
-  image                 = local.installer_image
-  machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
-  drain_on_upgrade      = var.drain_on_upgrade
-  kubeconfig_wo         = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
+  client_configuration            = var.cluster.machine_secrets.client_configuration
+  endpoint                        = var.cluster.endpoint
+  node                            = each.value.ip
+  image                           = local.installer_image
+  machine_configuration           = data.talos_machine_configuration.this[each.key].machine_configuration
+  drain_on_upgrade                = var.drain_on_upgrade
+  ignore_kubernetes_upgrade_drift = true
+  kubeconfig_wo                   = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
 }
 
 resource "talos_machine" "workers" {
   for_each = { for k, n in local.nodes : k => n if n.kind == "worker" }
 
-  client_configuration  = var.cluster.machine_secrets.client_configuration
-  endpoint              = var.cluster.endpoint
-  node                  = each.value.ip
-  image                 = local.installer_image
-  machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
-  drain_on_upgrade      = var.drain_on_upgrade
-  kubeconfig_wo         = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
+  client_configuration            = var.cluster.machine_secrets.client_configuration
+  endpoint                        = var.cluster.endpoint
+  node                            = each.value.ip
+  image                           = local.installer_image
+  machine_configuration           = data.talos_machine_configuration.this[each.key].machine_configuration
+  drain_on_upgrade                = var.drain_on_upgrade
+  ignore_kubernetes_upgrade_drift = true
+  kubeconfig_wo                   = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
 
   depends_on = [talos_machine.control_planes]
 }

@@ -69,12 +69,13 @@ resource "scaleway_lb_frontend" "dev1_ipv6_k8s" {
   inbound_port = 6443
 }
 
+# Provider 0.12.0-beta.0 embeds matching Talos 1.14.0-rc.2 machinery.
 module "dev1_ipv6_talos_cluster" {
   source = "../modules/talos-cluster"
 
   name               = "dev1-ipv6"
   endpoint           = scaleway_lb_ip.dev1_ipv6.ip_address
-  talos_version      = "v1.14.0-alpha.1"
+  talos_version      = "v1.14.0-rc.2"
   kubernetes_version = "v1.36.1"
 
   pools = [module.dev1_ipv6_paris_pool]
@@ -137,9 +138,17 @@ module "dev1_ipv6_talos_cluster" {
     ])
     control_planes = flatten([
       module.gcp_wif.patches.control_planes,
+      # Replace the generated node document without its control-plane NoSchedule taint.
       <<-EOF
-        cluster:
-          allowSchedulingOnControlPlanes: true
+        apiVersion: v1alpha1
+        kind: KubeNodeConfig
+        $patch: delete
+        ---
+        apiVersion: v1alpha1
+        kind: KubeNodeConfig
+        labels:
+          node-role.kubernetes.io/control-plane: ""
+          node.kubernetes.io/exclude-from-external-load-balancers: ""
       EOF
     ])
   }
@@ -162,7 +171,7 @@ module "dev1_ipv6_talos_apply" {
 
   cluster         = module.dev1_ipv6_talos_cluster
   applies         = [module.dev1_ipv6_paris_apply]
-  installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-beta.1-dev.1"
+  installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-rc.2-dev.5"
 }
 
 module "dev1_ipv6_gcp_wif_apply" {

@@ -104,9 +104,7 @@
 #         ptp:
 #           devices:
 #             - /dev/ptp0
-#       EOF
-#       ,
-#       <<-EOF
+#         ---
 #         apiVersion: v1alpha1
 #         kind: ResolverConfig
 #         nameservers:
@@ -118,9 +116,17 @@
 #     ]
 #     control_planes = flatten([
 #       module.gcp_wif.patches.control_planes,
+#       # Replace the generated node document without its control-plane NoSchedule taint.
 #       <<-EOF
-#         cluster:
-#           allowSchedulingOnControlPlanes: true
+#         apiVersion: v1alpha1
+#         kind: KubeNodeConfig
+#         $patch: delete
+#         ---
+#         apiVersion: v1alpha1
+#         kind: KubeNodeConfig
+#         labels:
+#           node-role.kubernetes.io/control-plane: ""
+#           node.kubernetes.io/exclude-from-external-load-balancers: ""
 #       EOF
 #     ])
 #   }
@@ -151,7 +157,7 @@
 #   cluster = module.dev1_ipv6_talos_cluster
 #   # applies         = [module.dev1_ipv6_paris_apply, module.dev1_ipv6_falkenstein_apply]
 #   applies         = [module.dev1_ipv6_paris_apply]
-#   installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-beta.1-dev.1"
+#   installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-rc.2-dev.5"
 # }
 #
 # module "dev1_ipv6_gcp_wif_apply" {

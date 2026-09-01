@@ -127,9 +127,7 @@ module "talos_cluster" {
           - address: 2a00:1098:2b::1 # https://nat64.net
           - address: 2a00:1098:2c::1 # https://nat64.net
           - address: 2a01:4f8:c2c:123f::1 # https://nat64.net
-      EOF
-      ,
-      <<-EOF
+        ---
         apiVersion: v1alpha1
         kind: TimeSyncConfig
         ptp:
@@ -139,9 +137,17 @@ module "talos_cluster" {
       ,
     ]
     control_planes = [
+      # Replace the generated node document without its control-plane NoSchedule taint.
       <<-EOF
-        cluster:
-          allowSchedulingOnControlPlanes: true
+        apiVersion: v1alpha1
+        kind: KubeNodeConfig
+        $patch: delete
+        ---
+        apiVersion: v1alpha1
+        kind: KubeNodeConfig
+        labels:
+          node-role.kubernetes.io/control-plane: ""
+          node.kubernetes.io/exclude-from-external-load-balancers: ""
       EOF
       ,
     ]

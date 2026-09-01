@@ -1,27 +1,36 @@
+apiVersion: v1alpha1
+kind: KubeAPIServerConfig
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+extraArgs:
+  bind-address: "::"
+---
+apiVersion: v1alpha1
+kind: KubeProxyConfig
+enabled: false
+---
+# Talos 1.14 has no document resource for etcd runtime arguments.
 cluster:
-  apiServer:
-    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
-    extraArgs:
-      bind-address: "::"
-  controllerManager:
-    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
-    extraArgs:
-      allocate-node-cidrs: true
-      bind-address: "::"
-      node-cidr-mask-size-ipv6: 112
   etcd:
     # https://etcd.io/docs/v3.5/op-guide/configuration/
     extraArgs:
       listen-metrics-urls: "http://[::]:2381"
-  scheduler:
-    # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
-    extraArgs:
-      bind-address: "::"
-machine:
-  features:
-    kubernetesTalosAPIAccess:
-      enabled: true
-      allowedRoles:
-        - "os:reader"
-      allowedKubernetesNamespaces:
-        - kube-system
+---
+apiVersion: v1alpha1
+kind: KubeTalosAPIAccessConfig
+allowedRoles:
+  - "os:reader"
+allowedKubernetesNamespaces:
+  - kube-system
+---
+apiVersion: v1alpha1
+kind: KubeControllerManagerConfig
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
+extraArgs:
+  allocate-node-cidrs: "true"
+  bind-address: "::"
+---
+apiVersion: v1alpha1
+kind: KubeSchedulerConfig
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
+extraArgs:
+  bind-address: "::"

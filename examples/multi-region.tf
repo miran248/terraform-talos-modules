@@ -51,9 +51,7 @@ module "talos_cluster" {
           - address: 2a00:1098:2b::1 # https://nat64.net
           - address: 2a00:1098:2c::1 # https://nat64.net
           - address: 2a01:4f8:c2c:123f::1 # https://nat64.net
-      EOF
-      ,
-      <<-EOF
+        ---
         apiVersion: v1alpha1
         kind: TimeSyncConfig
         ptp:

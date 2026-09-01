@@ -2,17 +2,13 @@ locals {
   patches = {
     common = [
       <<-EOF
-        machine:
-          install:
-            disk: /dev/vdb
-            wipe: true
-          nodeLabels:
-            provider: scaleway
-            topology.kubernetes.io/zone: ${var.zone}
-            topology.kubernetes.io/region: ${replace(var.zone, "/-[0-9]+$/", "")}
-      EOF
-      ,
-      <<-EOF
+        apiVersion: v1alpha1
+        kind: UnattendedInstallConfig
+        provisioning:
+          diskSelector:
+            match: disk.dev_path == "/dev/vdb"
+          wipe: true
+        ---
         apiVersion: v1alpha1
         kind: VolumeConfig
         name: EPHEMERAL
@@ -21,6 +17,13 @@ locals {
             match: disk.dev_path == "/dev/vdb"
           maxSize: 40GiB
           minSize: 2GiB
+        ---
+        apiVersion: v1alpha1
+        kind: KubeNodeConfig
+        labels:
+          provider: scaleway
+          topology.kubernetes.io/zone: ${var.zone}
+          topology.kubernetes.io/region: ${replace(var.zone, "/-[0-9]+$/", "")}
       EOF
       ,
     ]
