@@ -1,31 +1,7 @@
 # Development deployment
 
-## Purpose
+Exercise public module interfaces in parallel IPv4/IPv6 multi-cloud clusters; do not hide module defaults. State, plans, Talos configs, and kubeconfigs are sensitive local artifacts.
 
-Exercise the modules in live IPv4 and IPv6 multi-cloud clusters spanning Scaleway control planes and Hetzner workers.
+`1-talos-ipv6-direct.tf` owns fail-closed IPv6-only KubeSpan endpoints, aggregate `fc00:1::/96` routing, and pod-to-node-pool table-`180` rules in `talos-cluster.patches.common`. Keep KubeSpan/route MTU 1420 and Cilium MTU 1400; use Talos 1.14 document resources and built-in node CIDR allocation.
 
-## Ownership
-
-- Own development provider configuration, cluster compositions, test-only manifests, lockfile, operational README, and lifecycle recipes.
-
-## Local Contracts
-
-- Keep the IPv4 and IPv6 compositions parallel unless testing a deliberate family-specific difference.
-- `1-talos-ipv6-direct.tf` owns the fail-closed, IPv6-endpoint-only KubeSpan configuration, aggregate PodCIDR route, and pod-to-node-pool policy-routing patches used with `cilium-ipv6-direct`; keep these global Talos settings in `talos-cluster.patches.common`, and use built-in node CIDR allocation instead of an external cloud controller.
-- Keep the development IPv6-direct KubeSpan interface and PodCIDR route MTUs at the 1420-byte WireGuard ceiling while the Cilium profile independently limits pod traffic to 1400, below its measured 1410-byte netkit/BPF FIB boundary.
-- Write Talos 1.14 patches with document resources for migrated network and Kubernetes component settings.
-- Generated Terraform state, plans, Talos configs, and kubeconfigs are local artifacts and may contain secrets.
-- Destructive `just apply`/`destroy` recipes affect real cloud infrastructure; do not run them merely for validation.
-- Keep the `verify-ipv6-direct` just recipe self-cleaning and use it to verify Cilium, KubeSpan policy routing, worker API/DNS/NAT64 access, and Gateway API before destroying the IPv6 direct-routing cluster.
-
-## Work Guidance
-
-- Use development configurations to exercise public module interfaces, not to hide module defaults.
-
-## Verification
-
-- Run `terraform fmt -check` in this directory.
-- Run `terraform validate` only after initialization and without applying infrastructure.
-- Run `just verify-ipv6-direct` against the live IPv6 direct-routing development cluster before release or teardown.
-
-## Child DOX Index
+Never run `just apply` or `just destroy` for validation. Run `terraform fmt -check`; validate only after initialization. When a live direct-routing cluster is intentionally available, `just verify-ipv6-direct` is the self-cleaning release/teardown check.

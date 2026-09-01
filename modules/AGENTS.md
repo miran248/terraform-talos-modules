@@ -1,40 +1,14 @@
 # Terraform modules
 
-## Purpose
+Modules own provider constraints, typed variables, resources/data sources, outputs, and READMEs. Their public interfaces and shared pool/node shapes are compatibility-sensitive; preserve secret and client-configuration sensitivity.
 
-Reusable modules provision cloud capacity, generate Talos configurations, create machines, bootstrap clusters, and configure optional workload identity.
+Keep `talos-cluster` provider-neutral. Cloud pools emit stable keys, address-family mode, and `removed` semantics; cloud apply modules return normalized nodes to `talos-apply`, which preserves control-plane-before-worker ordering.
 
-## Ownership
+Update callers, examples, documentation, validation, and release references with interface changes. Load `terraform-talos-modules` → `references/modules.md` for the complete module matrix and `references/verification.md` for safe checks.
 
-- Each immediate child module owns its Terraform provider constraints, variables, resources/data sources, outputs, and README.
-- Public module interfaces are the typed variables and outputs. Callers compose pool → cluster/apply → bootstrap flows.
+## Modules
 
-## Local Contracts
-
-- Keep input types and validations aligned with the shapes consumed across modules.
-- Treat renamed/removed variables, output fields, resources, and changed defaults as compatibility-sensitive changes.
-- Keep each module README synchronized with inputs, outputs, ordering constraints, and examples.
-- Preserve sensitive markings for credentials, machine secrets, and client configuration.
-
-## Work Guidance
-
-- Format changed Terraform with `terraform fmt`.
-- Avoid provider-specific assumptions in `talos-cluster`; encode them in pool/apply modules.
-- Update repository examples and release-reference links when a public interface changes.
-
-## Verification
-
-- Run `terraform fmt -check -recursive modules`.
-- Run `terraform validate` from an initialized caller or module directory when provider availability permits.
-
-## Child DOX Index
-
-- [hcloud-pool/AGENTS.md](hcloud-pool/AGENTS.md) — Hetzner capacity allocation
-- [hcloud-apply/AGENTS.md](hcloud-apply/AGENTS.md) — Hetzner servers and firewalls
-- [scaleway-pool/AGENTS.md](scaleway-pool/AGENTS.md) — Scaleway capacity allocation
-- [scaleway-apply/AGENTS.md](scaleway-apply/AGENTS.md) — Scaleway servers, volumes, and security groups
-- [scaleway-image/AGENTS.md](scaleway-image/AGENTS.md) — Scaleway image registration
-- [talos-cluster/AGENTS.md](talos-cluster/AGENTS.md) — provider-neutral Talos configuration generation
-- [talos-apply/AGENTS.md](talos-apply/AGENTS.md) — Talos application, bootstrap, and upgrades
-- [gcp-wif/AGENTS.md](gcp-wif/AGENTS.md) — GCP workload identity resources
-- [gcp-wif-apply/AGENTS.md](gcp-wif-apply/AGENTS.md) — cluster OIDC publication
+- [hcloud-pool/AGENTS.md](hcloud-pool/AGENTS.md) and [hcloud-apply/AGENTS.md](hcloud-apply/AGENTS.md)
+- [scaleway-pool/AGENTS.md](scaleway-pool/AGENTS.md), [scaleway-apply/AGENTS.md](scaleway-apply/AGENTS.md), and [scaleway-image/AGENTS.md](scaleway-image/AGENTS.md)
+- [talos-cluster/AGENTS.md](talos-cluster/AGENTS.md) and [talos-apply/AGENTS.md](talos-apply/AGENTS.md)
+- [gcp-wif/AGENTS.md](gcp-wif/AGENTS.md) and [gcp-wif-apply/AGENTS.md](gcp-wif-apply/AGENTS.md)

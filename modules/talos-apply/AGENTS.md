@@ -1,25 +1,5 @@
 # Talos apply
 
-## Purpose
+Apply machine configuration, bootstrap Talos, perform controlled upgrades, and retrieve sensitive Kubernetes credentials from normalized cloud nodes.
 
-Apply machine configurations, bootstrap Talos, perform controlled upgrades, and retrieve Kubernetes client credentials.
-
-## Ownership
-
-- Own the control-plane-before-worker lifecycle, static host patches from actual cloud IPs, bootstrap, and kubeconfig retrieval.
-
-## Local Contracts
-
-- Consume normalized nodes from every apply module without cloud-specific branching.
-- Maintain control-plane-before-worker phase ordering without relying on a custom Terraform CLI parallelism value.
-- Preserve drain and installer-image behavior during Talos upgrades.
-- Keep all Kubernetes credentials sensitive.
-
-## Work Guidance
-
-
-## Verification
-
-- Run `terraform fmt -check` in this directory.
-
-## Child DOX Index
+Preserve control-plane-before-worker phases without custom Terraform CLI parallelism, plus static host patches, drain behavior, and installer-image upgrades. Verify with `terraform fmt -check` in this directory.
