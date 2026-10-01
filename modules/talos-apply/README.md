@@ -10,6 +10,17 @@ custom CLI parallelism value.
 managed only when `installer_image` is explicitly supplied; changing the
 configuration contract does not select an OS upgrade image.
 
+Machine operations connect directly to each node IP, which must be reachable from
+the Terraform runner. The shared cluster endpoint remains in use for cluster
+bootstrap and kubeconfig retrieval. Talos maintenance mode ignores node-routing
+metadata, so applying through a load balancer can configure the wrong backend.
+The [provider client helper](https://github.com/siderolabs/terraform-provider-talos/blob/v0.12.0/pkg/talos/util.go#L517)
+probes maintenance mode before trying authenticated operation.
+
+Run `python3 tests/run.py` for the mocked endpoint regression test. The harness
+replaces only the ephemeral drain credential lookup in a temporary copy because
+Terraform does not support mocking ephemeral resources.
+
 ## inputs
 
 | name | type | required | description |

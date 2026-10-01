@@ -42,8 +42,9 @@ ephemeral "talos_cluster_kubeconfig" "drain" {
 resource "talos_machine" "control_planes" {
   for_each = { for k, n in local.nodes : k => n if n.kind == "control-plane" }
 
+  # Maintenance mode ignores node routing metadata; never apply through a load balancer.
   client_configuration            = var.cluster.machine_secrets.client_configuration
-  endpoint                        = var.cluster.endpoint
+  endpoint                        = each.value.ip
   node                            = each.value.ip
   image                           = var.installer_image
   machine_configuration           = data.talos_machine_configuration.this[each.key].machine_configuration
@@ -56,7 +57,7 @@ resource "talos_machine" "workers" {
   for_each = { for k, n in local.nodes : k => n if n.kind == "worker" }
 
   client_configuration            = var.cluster.machine_secrets.client_configuration
-  endpoint                        = var.cluster.endpoint
+  endpoint                        = each.value.ip
   node                            = each.value.ip
   image                           = var.installer_image
   machine_configuration           = data.talos_machine_configuration.this[each.key].machine_configuration

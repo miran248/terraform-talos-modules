@@ -22,6 +22,7 @@
 - Use Talos document resources for migrated settings; never configure one subsystem in both document and legacy machine formats.
 - Let Talos select API-server advertise addresses; wildcard values are only for bind addresses.
 - `talos-apply` consumes normalized nodes without cloud branching and preserves control-plane-before-worker phases, drain behavior, installer-image upgrades, bootstrap, and kubeconfig sensitivity. Do not rely on custom Terraform CLI parallelism.
+- Machine operations use the target node IP as both `endpoint` and `node`. Keep the shared endpoint for cluster operations only. Talos maintenance mode ignores routing metadata; the provider's insecure-first client can otherwise apply one node's configuration to another load-balancer backend. The Terraform runner must reach every node directly. Run `python3 modules/talos-apply/tests/run.py` to check this contract.
 - OS version management is opt-in through `installer_image`; a null image leaves the installed OS version unmanaged. `talos_version` selects the configuration contract independently.
 
 ## Workload identity
