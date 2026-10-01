@@ -32,6 +32,10 @@ _Avoid_: Worker pool when referring to an individual node.
 
 ### Configuration and lifecycle
 
+**Talos fork**:
+This project's maintained variant of upstream Talos, used to develop and test changes, including features not yet released upstream.
+_Avoid_: Custom image when referring to the source variant rather than an artifact built from it.
+
 **Machine configuration**:
 The desired Talos configuration for an individual node, including its cluster membership and role.
 _Avoid_: Client configuration, which configures access to the cluster rather than the node itself.
