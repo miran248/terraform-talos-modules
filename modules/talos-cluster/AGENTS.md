@@ -4,4 +4,4 @@ Generate provider-neutral secrets, patches, machine configurations, and sensitiv
 
 Use Talos document resources for migrated settings, never duplicate a subsystem in legacy configuration, and let Talos select API-server advertise addresses. Built-in IPv6 KubeSpan advertises only IPv6 peers.
 
-Load `terraform-talos-modules` → `references/networking.md` before network changes. Run `terraform fmt -check` here and parse changed YAML under `patches/`.
+Read [networking contracts](../../docs/maintenance/networking.md) before network changes. Run `terraform fmt -check` here and parse changed YAML under `patches/`.

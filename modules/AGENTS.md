@@ -4,7 +4,7 @@ Modules own provider constraints, typed variables, resources/data sources, outpu
 
 Keep `talos-cluster` provider-neutral. Cloud pools emit stable keys, address-family mode, and `removed` semantics; cloud apply modules return normalized nodes to `talos-apply`, which preserves control-plane-before-worker ordering.
 
-Update callers, examples, documentation, validation, and release references with interface changes. Load `terraform-talos-modules` → `references/modules.md` for the complete module matrix and `references/verification.md` for safe checks.
+Update callers, examples, documentation, validation, and release references with interface changes. Before changing modules, read [module contracts](../docs/maintenance/modules.md); select safe checks from [the verification matrix](../docs/maintenance/verification.md).
 
 ## Modules
 

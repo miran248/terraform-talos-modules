@@ -3,7 +3,7 @@
 ## Contract
 
 - Read this file and the nearest subtree `AGENTS.md` before editing.
-- Keep portable, scope-specific constraints in `AGENTS.md`; load detailed procedures on demand from the project skill `terraform-talos-modules` at `.agents/skills/terraform-talos-modules/SKILL.md`.
+- Keep mandatory, scope-specific constraints and documentation pointers in `AGENTS.md`; keep detailed procedures in `docs/maintenance/`.
 - Preserve public Terraform interfaces, sensitive outputs, provider-neutral Talos composition, explicit release references, and reproducible Kubernetes manifests.
 - Generated state, plans, credentials, rendered manifests, fetched charts, image payloads, and local editor metadata are not authored source.
 - Do not apply/destroy infrastructure, mutate clusters, build/publish images, create tags, or push unless explicitly requested.
@@ -11,9 +11,9 @@
 ## Workflow
 
 1. Identify changed scopes and read every `AGENTS.md` on their repository path.
-2. Load the project skill reference for modules, networking, operations, release, or verification.
-3. Implement with tests for behavior changes and run safe checks from `references/verification.md`.
-4. Update the nearest context/reference when a durable contract changes; remove stale duplication.
+2. Read the maintenance guides relevant to the changed scopes below.
+3. Implement with tests for behavior changes and run safe checks from [the verification matrix](docs/maintenance/verification.md); report unavailable checks.
+4. Update the nearest `AGENTS.md` and affected maintenance guides when a durable contract changes; remove stale duplication.
 5. Use Conventional Commits and leave a clean worktree.
 
 For repository-cluster commands, set `KUBECONFIG=kube-config` for `kubectl` and `TALOSCONFIG=talos-config` for `talosctl`; never rely on default contexts.
@@ -29,7 +29,15 @@ For repository-cluster commands, set `KUBECONFIG=kube-config` for `kubectl` and 
 
 Release Please owns version PRs, changelog updates, tags, and releases. Repository module source references require `x-release-please-version` annotations and matching generic `extra-file` entries.
 
-## Agent skills
+## Maintenance guides
+
+- Before changing module interfaces or caller compositions, read [module contracts](docs/maintenance/modules.md).
+- Before changing Talos, Cilium, KubeSpan, DNS, routing, or MTU, read [networking contracts](docs/maintenance/networking.md).
+- Before changing development/local workflows, manifests, or image recipes, read [operations contracts](docs/maintenance/operations.md).
+- Before rebasing the Talos fork, addressing upstream review, or rebuilding custom images, read [the Talos fork guide](docs/maintenance/talos-fork.md).
+- Before changing release automation or version references, read [release contracts](docs/maintenance/release.md).
+
+## Agent documentation
 
 ### Issue tracker
 

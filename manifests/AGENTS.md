@@ -8,4 +8,4 @@ Keep direct-routing Cilium MTU 1400; KubeSpan and aggregate PodCIDR routes use 1
 
 Cilium profiles must remain compatible with kube-proxy-disabled Talos patches and the selected DNS/KubeSpan behavior.
 
-Load `terraform-talos-modules` → `references/networking.md` for rationale. Render one affected component with `kustomize build --enable-helm manifests/<component>`; run `just build` for cross-component changes.
+Before changing manifests, read [operations contracts](../docs/maintenance/operations.md); for network changes, also read [networking contracts](../docs/maintenance/networking.md). Render one affected component with `kustomize build --enable-helm manifests/<component>`; run `just build` for cross-component changes.

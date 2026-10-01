@@ -6,7 +6,7 @@ Keep Talos-specific contribution, platform, and build quirks in this repository.
 
 1. Inspect the Talos checkout's instructions, staged/unstaged work, PR review threads, and linked issue. Preserve its original commit and uncommitted work before rebasing; keep local tool configuration out of the upstream patch.
 2. Fetch upstream before measuring divergence. Confirm the requested baseline: current PR base branch or a stable backport. Rebase the feature commits, restore saved work, and map every reviewer concern to code, a regression test, or a sourced explanation.
-3. Run focused tests and repository lint checks, then commit the source used for the build. Check Docker, available disk space, and registry access before invoking the recipes in [packer/README.md](../../../../packer/README.md). Override `TALOS_SRC` when the checkout is not the sibling `talos` directory.
+3. Run focused tests and repository lint checks, then commit the source used for the build. Check Docker, available disk space, and registry access before invoking the recipes in [packer/README.md](../../packer/README.md). Override `TALOS_SRC` when the checkout is not the sibling `talos` directory.
 4. Use a fresh image tag and align installer-base, imager, installer, Scaleway object name, and both dev installer references. Record the source revision and published digests; check the qcow2 and verify the uploaded object before handing off dev configuration.
 5. Treat Git push, image publication, and live deployment as separate actions, honoring the session's authorization for each. Prepare both address-family configurations and report build/check results separately from live cluster results.
 
