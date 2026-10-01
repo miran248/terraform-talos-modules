@@ -43,7 +43,7 @@ Terraform does not support mocking ephemeral resources.
 
 ```hcl
 module "talos_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v4.3.0" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/talos-apply?ref=v5.0.0" # x-release-please-version
 
   cluster = module.talos_cluster
   applies = [module.nuremberg_apply, module.helsinki_apply]

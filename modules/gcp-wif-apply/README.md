@@ -22,7 +22,7 @@ Terraform and OpenSSL; Google resources are mocked.
 
 ```hcl
 module "gcp_wif_apply" {
-  source = "github.com/miran248/terraform-talos-modules//modules/gcp-wif-apply?ref=v4.3.0" # x-release-please-version
+  source = "github.com/miran248/terraform-talos-modules//modules/gcp-wif-apply?ref=v5.0.0" # x-release-please-version
 
   identities = module.gcp_wif
   cluster    = module.talos_cluster
