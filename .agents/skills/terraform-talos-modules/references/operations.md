@@ -29,6 +29,8 @@
 - Cloud/registry tokens, image payloads, and build output must not be committed.
 - Build and publication recipes are billable external side effects; never run them as routine verification.
 
+For rebasing the Talos fork, addressing upstream review, or rebuilding custom images, read [talos-fork.md](talos-fork.md). It owns Talos-specific contribution checks, Scaleway quirks, and build recovery.
+
 ## Cluster commands
 
 - Use `KUBECONFIG=kube-config kubectl ...` for repository-cluster Kubernetes commands.

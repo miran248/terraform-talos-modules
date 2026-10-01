@@ -18,8 +18,8 @@ scaleway:
   rclone copy {{ TMP_PATH }}/talos-{{ SCALEWAY_VERSION }}-amd64.qcow2 scaleway:{{ SCALEWAY_BUCKET }}
   rm -Rf {{ TMP_PATH }}
 
-TALOS_SRC := "/Users/miran/projects/github/talos"
-DEV_IMAGE_TAG := "v1.14.0-rc.2-dev.5"
+TALOS_SRC := justfile_directory() + "/../../talos"
+DEV_IMAGE_TAG := "v1.15.0-alpha.0-dev.1"
 USERNAME := "miran248"
 
 TALOS_INSTALLER_BASE := "ghcr.io/" + USERNAME + "/talos-installer-base:" + DEV_IMAGE_TAG
@@ -50,5 +50,6 @@ scaleway-dev:
   docker run --rm -v /dev:/dev -v {{ TMP_PATH }}:/out --privileged {{ TALOS_IMAGER }} scaleway --arch amd64
   zstd -d {{ TMP_PATH }}/scaleway-amd64.raw.zst -o {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.raw
   qemu-img convert -f raw -O qcow2 {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.raw {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2
+  qemu-img check {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2
   rclone copy {{ TMP_PATH }}/talos-{{ DEV_IMAGE_TAG }}-amd64.qcow2 scaleway:{{ SCALEWAY_BUCKET }}
   rm -Rf {{ TMP_PATH }}

@@ -59,11 +59,13 @@ To build from source and push a new tag:
 ```
 
 1. Runs the imager to produce `scaleway-amd64.raw.zst`
-2. Converts to qcow2 and uploads to the Scaleway bucket
+2. Converts to qcow2, checks the image for errors, and uploads to the Scaleway bucket
 
 ## dev recipes
 
 The dev recipes build from a local Talos source tree. Run them in order:
+
+`TALOS_SRC` defaults to the sibling `talos` checkout. It can be overridden without editing the recipes, for example `just TALOS_SRC=/path/to/talos DEV_IMAGE_TAG=<fresh-tag> imager-dev`. Build from a tested commit and record its revision with the image digests. Keep the tag aligned with the Scaleway object and installer references in `dev/`.
 
 ```shell
 > just imager-dev           # builds and publishes talos-installer-base and talos-imager
@@ -81,7 +83,7 @@ Edit the following variables at the top of `justfile` to match your environment:
 | variable | description |
 |---|---|
 | `TALOS_SRC` | path to local Talos source tree |
-| `DEV_IMAGE_TAG` | tag for the dev build (e.g. `v1.14.0-rc.2-dev.5`) |
+| `DEV_IMAGE_TAG` | tag for the dev build (e.g. `v1.15.0-alpha.0-dev.1`) |
 | `USERNAME` | GitHub username for pushing to `ghcr.io/<username>/talos-*` |
 | `SCALEWAY_BUCKET` | Scaleway Object Storage bucket name for qcow2 uploads |
 | `SCALEWAY_VERSION` | Talos version for the official Scaleway image |

@@ -27,6 +27,7 @@ Load only the material relevant to the change:
 - `references/modules.md` — module interfaces, ownership, and compatibility.
 - `references/networking.md` — Talos, Cilium, KubeSpan, DNS, routing, and MTU contracts.
 - `references/operations.md` — development, local-cluster, manifest, and image workflows.
+- `references/talos-fork.md` — rebasing the Talos fork, upstream review, custom builds, and Talos-specific quirks.
 - `references/release.md` — Release Please and version-reference contracts.
 - `references/verification.md` — safe checks by changed area.
 

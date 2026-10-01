@@ -74,7 +74,7 @@ module "dev1_ipv6_talos_cluster" {
 
   name               = "dev1-ipv6"
   endpoint           = scaleway_lb_ip.dev1_ipv6.ip_address
-  talos_version      = "v1.14.0-rc.2"
+  talos_version      = "v1.15.0-alpha.0"
   kubernetes_version = "v1.36.1"
 
   pools = [module.dev1_ipv6_paris_pool]
@@ -170,7 +170,7 @@ module "dev1_ipv6_talos_apply" {
 
   cluster         = module.dev1_ipv6_talos_cluster
   applies         = [module.dev1_ipv6_paris_apply]
-  installer_image = "ghcr.io/miran248/talos-installer:v1.14.0-rc.2-dev.5"
+  installer_image = "ghcr.io/miran248/talos-installer:v1.15.0-alpha.0-dev.1"
 }
 
 module "dev1_ipv6_gcp_wif_apply" {
