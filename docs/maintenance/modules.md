@@ -29,4 +29,4 @@
 
 - `gcp-wif` owns identity pool/provider, OIDC bucket access, signing key, service accounts, IAM bindings, and Talos issuer patches.
 - Kubernetes subjects use `namespace:name`; keep mappings, provider conditions, IAM membership, issuer URLs, and exported identifiers aligned.
-- `gcp-wif-apply` runs after a reachable bootstrapped API exists, handles temporary TLS client material as sensitive, and publishes matching JWKS and OpenID configuration documents.
+- `gcp-wif-apply` follows Talos bootstrap and publishes matching JWKS and OpenID configuration documents. Its [local contract](../../modules/gcp-wif-apply/AGENTS.md) covers concurrent TLS file isolation and API-readiness retries; Talos bootstrap completion alone does not establish load-balancer readiness.

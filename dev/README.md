@@ -49,6 +49,12 @@ Run `just` from the repo root to render manifests, then apply CNI and namespaces
 > KUBECONFIG=kube-config-ipv4 kubectl apply --server-side=true -f manifests/namespaces.yaml
 ```
 
+On a fresh cluster, the first apply can report that `GatewayClass` is not yet
+recognized while its CRD is being established. Wait for the CRD with
+`KUBECONFIG=kube-config-ipv4 kubectl wait --for=condition=Established crd/gatewayclasses.gateway.networking.k8s.io --timeout=60s`,
+then repeat that cluster's Cilium apply command. Use the corresponding IPv6
+kubeconfig if the IPv6 installation reports the same error.
+
 The IPv6 development composition enables the KubeSpan patches required by
 native routing and advertises only IPv6 WireGuard endpoints, leaving any
 provider IPv4/CGNAT addresses available only to the host. It also installs

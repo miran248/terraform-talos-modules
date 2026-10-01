@@ -8,6 +8,7 @@ Choose checks from the changed area. Validation must not apply infrastructure or
 - Modules only: `terraform fmt -check -recursive modules`
 - One module/caller: run `terraform fmt -check` in that directory.
 - Talos machine endpoint changes: `python3 modules/talos-apply/tests/run.py` (mocked plans; no live infrastructure).
+- Workload identity discovery changes: `python3 modules/gcp-wif-apply/tests/run.py` (real local TLS/HTTP requests, mocked Google; requires OpenSSL).
 - Run `terraform validate` only from an initialized module or caller and only when provider availability permits. Never substitute `apply` for validation.
 
 ## Talos YAML and local recipes
