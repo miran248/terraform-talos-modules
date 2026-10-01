@@ -1,5 +1,26 @@
 # Changelog
 
+## [5.0.0](https://github.com/miran248/terraform-talos-modules/compare/v4.3.0...v5.0.0) (2026-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* talos-apply no longer derives an installer image from talos_version. Set installer_image explicitly to manage OS upgrades.
+
+### Features
+
+* **manifests:** enable Gateway API for IPv6 direct routing ([93c84c5](https://github.com/miran248/terraform-talos-modules/commit/93c84c554dda0171b917b110236acf88e12a5baf))
+
+
+### Bug Fixes
+
+* **deps:** upgrade Talos provider to stable 0.12.0 ([8741511](https://github.com/miran248/terraform-talos-modules/commit/8741511222cfeff4e3cc1b76b3d77fcd6882802a))
+* **dev:** validate netkit networking with current dependencies ([6ee2a6b](https://github.com/miran248/terraform-talos-modules/commit/6ee2a6b445dbcc8695e8725803d7bb8f960b5fba))
+* **examples:** document and scope KubeSpan pod-to-node routing ([e65b3d5](https://github.com/miran248/terraform-talos-modules/commit/e65b3d53ef72e92ff6917ee560c0d5ac6f0ad378))
+* **gcp-wif-apply:** isolate credentials and retry API discovery ([5681beb](https://github.com/miran248/terraform-talos-modules/commit/5681bebdbedac5958ce8b802c09c83e1d8738168))
+* make Talos OS image management opt-in ([591b2af](https://github.com/miran248/terraform-talos-modules/commit/591b2af845861833e54d69e973b079a5674281fb))
+* **talos-apply:** target nodes directly during maintenance boot ([945879f](https://github.com/miran248/terraform-talos-modules/commit/945879f1d4e201cef286381dde08d5814d7daf3a))
+
 ## [4.3.0](https://github.com/miran248/terraform-talos-modules/compare/v4.2.7...v4.3.0) (2026-09-01)
 
 
