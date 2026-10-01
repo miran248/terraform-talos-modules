@@ -28,3 +28,17 @@ For repository-cluster commands, set `KUBECONFIG=kube-config` for `kubectl` and 
 - [packer/AGENTS.md](packer/AGENTS.md) — cloud image registration/build workflows.
 
 Release Please owns version PRs, changelog updates, tags, and releases. Repository module source references require `x-release-please-version` annotations and matching generic `extra-file` entries.
+
+## Agent skills
+
+### Issue tracker
+
+Track issues and specs in GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five default triage labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Use a single-context glossary and ADR layout. See `docs/agents/domain.md`.
