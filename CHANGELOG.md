@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.0](https://github.com/miran248/terraform-talos-modules/compare/v4.2.7...v4.3.0) (2026-09-01)
+
+
+### Features
+
+* migrate configuration to Talos 1.14 API ([3d7e3d5](https://github.com/miran248/terraform-talos-modules/commit/3d7e3d5da2a0231f96d71549c14e12a3112818ac))
+
 ## [4.2.7](https://github.com/miran248/terraform-talos-modules/compare/v4.2.6...v4.2.7) (2026-08-12)
 
 
