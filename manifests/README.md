@@ -23,6 +23,18 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 
 [namespaces.yaml](namespaces.yaml) creates the namespaces shared across components.
 
+The Cilium profiles pin Cilium 1.20.2 with Gateway API 1.6.1 experimental CRDs.
+For an existing cluster, install those CRDs before upgrading Cilium from 1.19;
+the experimental bundle preserves older TLSRoute API versions. See the
+[Cilium upgrade notes](https://github.com/cilium/cilium/blob/v1.20.2/Documentation/operations/upgrade-current.inc)
+and the [dependency upgrade procedure](../docs/maintenance/operations.md#dependency-upgrade-follow-up).
+
+These profiles select netkit, which Cilium 1.20.2 rejects with legacy host
+routing. The development compositions retain BPF host routing and supply
+scoped KubeSpan policy rules for pod-to-node traffic. This differs from the
+upstream default Cilium installation; see the [tested combinations and change
+procedure](../docs/maintenance/networking.md#routing-mode-versus-host-routing).
+
 > **Note:** The Cilium manifests use eBPF host routing (`bpf.hostLegacyRouting: false`) so pod traffic bypasses the host netfilter/iptables stack. Talos hostDNS remains enabled, but forwarding Kubernetes DNS to hostDNS is explicitly disabled in the cluster patches because that feature is incompatible with Cilium eBPF host routing. The `coredns-ipv4` / `coredns-ipv6` manifests (`hostNetwork: true` workaround) are kept for reference but are no longer required.
 
 `cilium-ipv6-direct` is the encrypted native-routing alternative. It requires

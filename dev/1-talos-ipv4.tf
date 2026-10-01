@@ -92,7 +92,7 @@ module "dev1_ipv4_talos_cluster" {
   name               = "dev1-ipv4"
   endpoint           = scaleway_lb_ip.dev1_ipv4.ip_address
   talos_version      = "v1.15.0-alpha.0"
-  kubernetes_version = "v1.36.1"
+  kubernetes_version = "v1.36.5"
 
   pools = [
     module.dev1_ipv4_paris_pool,
@@ -100,7 +100,7 @@ module "dev1_ipv4_talos_cluster" {
   ]
 
   patches = {
-    common = [
+    common = concat([
       <<-EOF
         apiVersion: v1alpha1
         kind: TimeSyncConfig
@@ -109,7 +109,22 @@ module "dev1_ipv4_talos_cluster" {
             - /dev/ptp0
       EOF
       ,
-    ]
+      ], [
+      # Netkit/BPF host routing bypasses KubeSpan's netfilter marking even in
+      # VXLAN mode. Keep pod-to-node traffic on KubeSpan in both directions;
+      # the pod-source match excludes WireGuard's host-originated outer packets.
+      for index, cidr in sort(distinct([
+        for _, node in module.dev1_ipv4_paris_pool.nodes : node.ip_cidr
+      ])) : <<-EOF
+          apiVersion: v1alpha1
+          kind: RoutingRuleConfig
+          name: "${1000 + index}"
+          src: 10.244.0.0/16
+          dst: ${cidr}
+          table: "180"
+          action: unicast
+        EOF
+    ])
     control_planes = flatten([
       module.gcp_wif.patches.control_planes,
       # Replace the generated node document without its control-plane NoSchedule taint.

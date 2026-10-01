@@ -20,7 +20,7 @@ Choose checks from the changed area. Validation must not apply infrastructure or
 
 - One component: `kustomize build --enable-helm manifests/<component>`.
 - Cross-component/root build: `just build`.
-- Live IPv6 direct-routing release check, only against the intended development cluster: run `just verify-ipv6-direct` in `dev/`.
+- Live networking/Gateway release checks, only against the intended development clusters: run `just verify-ipv6-direct` and `just verify-ipv4` in `dev/`.
 
 ## Packer
 

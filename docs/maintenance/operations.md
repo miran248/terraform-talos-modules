@@ -14,7 +14,28 @@
 - Talos 1.14 migrated settings use document resources.
 - Terraform state/plans, Talos configs, and kubeconfigs are sensitive local artifacts.
 - `just apply` and `just destroy` affect real cloud infrastructure. Do not run them for validation.
-- `just verify-ipv6-direct` is a live, self-cleaning verification required before release or teardown when that cluster is available.
+- `just verify-ipv6-direct` and `just verify-ipv4` are live, self-cleaning verifications required before release or teardown when their clusters are available.
+
+### Dependency upgrade follow-up
+
+The 2026-10-01 development test started with Cilium 1.19.6 and Kubernetes 1.36.1.
+Cilium's [1.19 compatibility matrix](https://github.com/cilium/cilium/blob/v1.19.8/Documentation/network/kubernetes/compatibility.rst)
+lists Kubernetes through 1.35; its [1.20 matrix](https://github.com/cilium/cilium/blob/v1.20.2/Documentation/network/kubernetes/compatibility.rst)
+includes 1.36. Development now selects Cilium 1.20.2, Gateway API 1.6.1, and
+Kubernetes 1.36.5. Upgrade existing Cilium installations through the latest
+patch of the preceding minor (1.19.8 in this test), and install Gateway API
+1.6.1 CRDs before Cilium 1.20. Both Cilium upgrades left the IPv4 pod-to-API
+failure reproducible; the routing experiment and upstream guidance are documented in
+[networking contracts](networking.md#ipv4-bpfkubespan-investigation). The newer versions
+alone did not fix it. See [client compatibility](talos-fork.md#client-compatibility-during-development)
+for the development Talos/provider limitation on in-place Kubernetes upgrades.
+
+Review Cilium, Gateway API CRDs, Kubernetes, Talos, and Terraform providers as
+a compatibility set, then test one upgrade at a time. Keep a failing baseline
+and record the effective routing/masquerading settings and convergence time.
+Run both networking/Gateway suites and a fresh development iteration before
+accepting the new versions. Review the remaining Helm components separately
+so unrelated updates do not obscure a networking regression.
 
 ### Development iterations
 
@@ -23,7 +44,7 @@ Use a fresh development iteration to test first boot and cluster bootstrap after
 1. Inspect the selected Terraform workspace, current state, and worktree before choosing the next iteration. Record which iteration is live and preserve unrelated local work. A clean checkout alone does not establish which iteration is deployed.
 2. Prepare temporary changes to cluster-specific names, node prefixes, and Terraform addresses. Keep the tested installer tag and instance types such as `DEV1-M` unchanged unless those are independently under test. Preserve shared image registration and GCP identity resources; inspect ownership of shared OIDC objects before renaming their publishing modules.
 3. Review a saved Terraform plan. Confirm that the intended clusters receive fresh nodes and Talos secrets, and inspect every deletion and replacement. Renaming display names or moving state alone does not establish a fresh bootstrap. Decide explicitly whether the old iteration is retired first or overlaps with the new one; account for shared resources and concurrent cloud capacity. Apply or teardown requires authorization for those live actions.
-4. Provision the new iteration, regenerate its client configs, install the Cilium profiles with Gateway API enabled, and run the checks in [dev/README.md](../../dev/README.md). Verify stable node identities, three healthy etcd members per cluster, all nodes Ready, and the complete IPv6 direct-routing suite. Record the iteration and tested image version with the results; identify any manual repair separately from an uninterrupted first-boot pass.
+4. Provision the new iteration, regenerate its client configs, install the Cilium profiles with Gateway API enabled, and run both address-family suites in [dev/README.md](../../dev/README.md). Verify stable node identities, three healthy etcd members per cluster, and all nodes Ready. Record the iteration and tested image version with the results; identify any manual repair separately from an uninterrupted first-boot pass.
 5. After testing, prefer a targeted destroy when its reviewed plan removes exactly the intended iteration. Enumerate addresses from the current configuration and `terraform state list`: include the cluster-specific pool, cloud-apply, Talos-cluster, Talos-apply, and workload-identity publishing modules, plus the root load-balancer IPs, load balancers, backends, and frontends for both address families. Use the actual live iteration's addresses, not a hard-coded `dev1` list. Targeting accepts resource/module addresses, not filenames or shell-style wildcards. Prepare a saved plan with `terraform plan -destroy` and explicit `-target` arguments, review it, then execute it with `terraform apply` against that saved plan. This avoids temporary commenting; `terraform destroy -target=...` is also available, but does not consume a previously reviewed saved plan.
    - Inspect all planned actions, including any resources included through dependencies. Preserve shared image registration and GCP identity resources; targeting alone is not an isolation guarantee. Confirm which OIDC publications are owned by the retiring clusters. If the target set produces an unsafe or incomplete teardown, use the configuration-driven alternative below. See [Terraform resource targeting](https://developer.hashicorp.com/terraform/cli/commands/plan#resource-targeting) for its limitations.
    - Alternative: comment out all active declarations in `dev/1-talos-*.tf`, including cluster-specific outputs and workload-identity publishing modules. Leave inactive alternatives commented out and shared image/identity configuration enabled. Review and apply a normal saved plan that removes only the intended resources.

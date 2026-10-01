@@ -89,7 +89,7 @@
 #   name               = "dev1-ipv6"
 #   endpoint           = scaleway_lb_ip.dev1_ipv6.ip_address
 #   talos_version      = "v1.14.0-alpha.4"
-#   kubernetes_version = "v1.36.1"
+#   kubernetes_version = "v1.36.5"
 #
 #   pools = [
 #     module.dev1_ipv6_paris_pool,

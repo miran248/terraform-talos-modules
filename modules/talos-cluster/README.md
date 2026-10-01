@@ -13,7 +13,7 @@ EndpointSlice.
 | `name` | `string` | yes | cluster name |
 | `endpoint` | `string` | yes | cluster DNS endpoint or IP (e.g. `prod.example.com`) |
 | `talos_version` | `string` | yes | Talos version (e.g. `v1.14.0`) |
-| `kubernetes_version` | `string` | yes | Kubernetes version (e.g. `v1.36.1`) |
+| `kubernetes_version` | `string` | yes | Kubernetes version (e.g. `v1.36.5`) |
 | `pools` | `list(`[hcloud-pool](../hcloud-pool) or [scaleway-pool](../scaleway-pool) outputs`)` | yes | all pools must have the same `mode` |
 | `patches` | `patches` | no | cluster-wide config patches |
 
@@ -48,7 +48,7 @@ module "talos_cluster" {
   name               = "prod"
   endpoint           = "prod.example.com"
   talos_version      = "v1.14.0"
-  kubernetes_version = "v1.36.1"
+  kubernetes_version = "v1.36.5"
 
   pools = [
     module.nuremberg_pool,

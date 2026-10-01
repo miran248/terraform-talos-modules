@@ -65,6 +65,13 @@ independently limits pod traffic to MTU 1400 for netkit/BPF headroom.
 Use `.build/manifests/cilium-ipv6-direct.yaml` for this composition to test
 encrypted direct pod and pod-to-node routing without VXLAN.
 
+The IPv4 composition retains VXLAN, netkit, BPF host routing, and BPF masquerading.
+It also installs pod-source (`10.244.0.0/16`), node-destination rules selecting
+KubeSpan table `180` to avoid asymmetric pod-to-node API traffic. These rules
+are specific to this composition, not a general Cilium tunnel-mode requirement.
+Cilium 1.20.2 rejects legacy host routing with netkit. See the
+[recorded comparison](../docs/maintenance/networking.md#ipv4-bpfkubespan-investigation).
+
 Gateway API is an acceptance requirement after dev provisioning and installation
 of `manifests/cilium-ipv6-direct`; Terraform provisioning alone does not install
 Cilium or make Gateway API available. The profile includes Gateway API CRDs.
@@ -74,17 +81,24 @@ The older proxy-reconciliation workaround has been removed. See the
 the validated Talos/Cilium combination. The full suite checks cluster
 networking as well as Gateway traffic; rerun it after deployment or changes.
 
-Run the repeatable direct-routing smoke suite before destroying the cluster:
+Run both repeatable smoke suites before destroying the clusters:
 
 ```shell
 > cd dev
 > just verify-ipv6-direct
+> just verify-ipv4
 ```
 
-The inline just recipe checks Cilium health from every node, KubeSpan peers and
-policy rules, worker-pod access to DNS, every API backend, public IPv6 and
-NAT64, plus a temporary Gateway API HTTP route. Temporary resources are removed
-on exit.
+Both recipes call `verify-networking.sh` to check Cilium health from every node,
+KubeSpan peers, pod-to-node policy rules, worker-pod DNS and API access, public
+egress, and a temporary Gateway API HTTP route. IPv6 additionally checks NAT64.
+Each failing Cilium-health, pod-connectivity, and Gateway data-plane check gets
+at least 15 minutes to converge (`NETWORK_READY_TIMEOUT`, minimum 900 seconds).
+Retries report agent pods and Cilium endpoint-state counts once per minute.
+Successful checks can finish sooner; agent readiness alone is not a pass.
+Temporary resources are removed on exit. For configuration changes, follow
+[Cilium change validation](../docs/maintenance/networking.md#cilium-change-validation)
+to distinguish in-place experiments from fresh-node acceptance.
 
 ## remove test clusters
 

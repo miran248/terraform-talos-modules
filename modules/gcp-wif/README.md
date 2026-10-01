@@ -50,7 +50,7 @@ module "talos_cluster" {
   name               = "prod"
   endpoint           = "prod.example.com"
   talos_version      = "v1.14.0"
-  kubernetes_version = "v1.36.1"
+  kubernetes_version = "v1.36.5"
 
   pools = [
     module.nuremberg_pool,

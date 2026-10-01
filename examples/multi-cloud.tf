@@ -87,7 +87,7 @@ module "talos_cluster" {
   name               = "example"
   endpoint           = scaleway_lb_ip.this.ip_address
   talos_version      = "v1.14.0"
-  kubernetes_version = "v1.36.1"
+  kubernetes_version = "v1.36.5"
 
   pools = [
     module.paris_pool,

@@ -65,6 +65,14 @@ unrelated public traffic continues through the normal underlay. Do not add node
 public routes to the main table because they can recursively capture KubeSpan's
 WireGuard endpoints.
 
+The [development compositions](dev/README.md) test both IPv4 VXLAN and IPv6
+native routing with netkit/BPF host routing. Their scoped KubeSpan pod-to-node
+rules are an integration choice, not a general requirement of Cilium tunnel
+mode. See the [networking findings](docs/maintenance/networking.md#routing-mode-versus-host-routing)
+before changing routing modes, and run both networking/Gateway suites before
+accepting a fresh development iteration. Committed configuration always uses
+`dev1`; later iteration names are temporary local changes.
+
 ## diagram
 The following [Mermaid](https://github.com/mermaid-js/mermaid) flowchart outlines the order of operations between modules for a cluster spanning two regions.
 

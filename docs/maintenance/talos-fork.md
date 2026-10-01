@@ -37,6 +37,26 @@ The reuse review of Talos fork commit `a28c4aa448df89d2c03e457498a9dc835dae7073`
 
 Any later consolidation should retain the existing Scaleway metadata fixtures and HTTP-server tests as its verification seams: malformed-mask rejection, preservation of valid entries, endpoint failover and successful-family reuse, bounded attempts, cancellation, actual-URL diagnostics, and immediate missing/empty-user-data handling. The focused Scaleway package tests passed during the review; that does not establish live boot behavior or full lint/conformance results.
 
+## Client compatibility during development
+
+The Talos 0.12.0 Terraform provider rejects an in-place Kubernetes upgrade on
+Talos `1.15.0-alpha.0-dev.1` with `compatibility with version ... is not supported`.
+Its [Talos libraries are pinned to 1.14.0](https://github.com/siderolabs/terraform-provider-talos/blob/v0.12.0/go.mod),
+whose compatibility table predates Talos 1.15. A client built from the
+current fork recognizes that version; check its upgrade plan with
+`talosctl upgrade-k8s --dry-run --to <version>` using the explicit development
+Talos and Kubernetes configs. Record a client-driven upgrade separately from
+provider-driven provisioning. Fresh bootstrap and in-place upgrade exercise
+different paths; a successful bootstrap does not establish provider upgrade support.
+
+The provider's cluster `Read` operation retains the recorded Kubernetes version
+instead of discovering it from the cluster. A client-driven upgrade therefore
+does not reconcile that Terraform attribute, and a normal apply can retry the
+unsupported upgrade. For a disposable iteration, record the discrepancy and
+validate the desired version in the next fresh bootstrap; do not treat a refresh
+as proof that provider state matches the running version. Targeted machine-only
+changes may be tested separately after reviewing their complete plan.
+
 ## Build recovery
 
 - Docker Desktop can report filesystem I/O errors when the host disk fills. Check host free space as well as `docker system df`; an unresponsive API does not alone establish a source/build failure.
