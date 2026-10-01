@@ -32,6 +32,10 @@ _Avoid_: Worker pool when referring to an individual node.
 
 ### Configuration and lifecycle
 
+**Development iteration**:
+A fresh deployment of the development clusters used to validate provisioning, bootstrap, and networking from start to finish. It is distinct from an update or repair of an existing deployment.
+_Avoid_: Release, image version, upgrade when referring to a fresh development deployment.
+
 **Talos fork**:
 This project's maintained variant of upstream Talos, used to develop and test changes, including features not yet released upstream.
 _Avoid_: Custom image when referring to the source variant rather than an artifact built from it.

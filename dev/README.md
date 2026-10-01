@@ -1,6 +1,15 @@
 # dev
 Development clusters used for testing. The active composition deploys two Scaleway Paris clusters, one IPv6 and one IPv4, each with three control planes and one worker. The Hetzner pool is currently commented out.
 
+## fresh development iterations
+
+The committed configuration always uses `dev1`. For a fresh end-to-end deployment,
+use a temporary local iteration such as `dev2` or `dev3`, following the
+[development iteration procedure](../docs/maintenance/operations.md#development-iterations).
+Commit durable fixes with the `dev1` baseline, never the temporary rename.
+Restoring the files to `dev1` does not restore live resources or Terraform state;
+the procedure covers teardown and retaining a running iteration safely.
+
 ## prerequisites
 - [Terraform](https://developer.hashicorp.com/terraform)
 - [just](https://github.com/casey/just)
