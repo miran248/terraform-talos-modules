@@ -51,7 +51,7 @@ _Avoid_: Server provisioning, configuration update, upgrade.
 ### Connectivity
 
 **Node address family**:
-The IPv4 or IPv6 family selected for cluster node connectivity, shared by all pools in a cluster. This choice does not imply that a host has no addresses from the other family.
+The single IPv4 or IPv6 family selected for cluster node connectivity, shared by all pools in a cluster. In IPv6 mode, incidental provider-assigned IPv4 addresses are outside the intended cluster connectivity.
 _Avoid_: Dual-stack cluster merely because a host also has an address from the other family.
 
 **Cluster endpoint**:
