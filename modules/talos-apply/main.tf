@@ -1,6 +1,5 @@
 locals {
-  nodes           = merge([for a in var.applies : a.nodes]...)
-  installer_image = coalesce(var.installer_image, "ghcr.io/siderolabs/installer:${var.cluster.talos_version}")
+  nodes = merge([for a in var.applies : a.nodes]...)
 
   patches = {
     static_hosts = { for key in keys(local.nodes) :
@@ -46,7 +45,7 @@ resource "talos_machine" "control_planes" {
   client_configuration            = var.cluster.machine_secrets.client_configuration
   endpoint                        = var.cluster.endpoint
   node                            = each.value.ip
-  image                           = local.installer_image
+  image                           = var.installer_image
   machine_configuration           = data.talos_machine_configuration.this[each.key].machine_configuration
   drain_on_upgrade                = var.drain_on_upgrade
   ignore_kubernetes_upgrade_drift = true
@@ -59,7 +58,7 @@ resource "talos_machine" "workers" {
   client_configuration            = var.cluster.machine_secrets.client_configuration
   endpoint                        = var.cluster.endpoint
   node                            = each.value.ip
-  image                           = local.installer_image
+  image                           = var.installer_image
   machine_configuration           = data.talos_machine_configuration.this[each.key].machine_configuration
   drain_on_upgrade                = var.drain_on_upgrade
   ignore_kubernetes_upgrade_drift = true

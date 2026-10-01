@@ -22,6 +22,7 @@
 - Use Talos document resources for migrated settings; never configure one subsystem in both document and legacy machine formats.
 - Let Talos select API-server advertise addresses; wildcard values are only for bind addresses.
 - `talos-apply` consumes normalized nodes without cloud branching and preserves control-plane-before-worker phases, drain behavior, installer-image upgrades, bootstrap, and kubeconfig sensitivity. Do not rely on custom Terraform CLI parallelism.
+- OS version management is opt-in through `installer_image`; a null image leaves the installed OS version unmanaged. `talos_version` selects the configuration contract independently.
 
 ## Workload identity
 

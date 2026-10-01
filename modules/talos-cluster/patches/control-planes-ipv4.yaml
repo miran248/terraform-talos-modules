@@ -30,7 +30,6 @@ extraArgs:
   bind-address: "0.0.0.0"
   # cloud-provider: external
   # controllers: "*,tokencleaner,-node-ipam-controller"
-  node-cidr-mask-size-ipv4: "24"
 ---
 apiVersion: v1alpha1
 kind: KubeSchedulerConfig

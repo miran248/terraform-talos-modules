@@ -6,6 +6,10 @@ Control planes are configured before workers when `kubernetes_version` or
 may be configured concurrently by Terraform; HCP Terraform does not support a
 custom CLI parallelism value.
 
+`talos_version` selects the machine configuration contract. OS upgrades are
+managed only when `installer_image` is explicitly supplied; changing the
+configuration contract does not select an OS upgrade image.
+
 ## inputs
 
 | name | type | required | description |
@@ -13,7 +17,7 @@ custom CLI parallelism value.
 | `cluster` | [talos-cluster](../talos-cluster) outputs | yes | |
 | `applies` | `list(`[hcloud-apply](../hcloud-apply) or [scaleway-apply](../scaleway-apply) outputs`)` | yes | |
 | `drain_on_upgrade` | `bool` | no | drain nodes before upgrading (default: `true`) |
-| `installer_image` | `string` | no | Talos installer image for OS upgrades. Defaults to `ghcr.io/siderolabs/installer:<talos_version>`. Override for custom schematics or dev builds. |
+| `installer_image` | `string` | no | Optional Talos installer image for OS upgrades, such as a custom image or dev build. Defaults to `null`, leaving the installed OS version unmanaged. |
 
 ## outputs
 

@@ -41,5 +41,5 @@ variable "drain_on_upgrade" {
 variable "installer_image" {
   type        = string
   default     = null
-  description = "Talos installer image for OS version management via talos_machine. Defaults to ghcr.io/siderolabs/installer:<talos_version>. Override for dev builds or custom schematics."
+  description = "Optional Talos installer image for OS version management via talos_machine, such as a custom image or dev build. When null, the installed OS version is not managed."
 }

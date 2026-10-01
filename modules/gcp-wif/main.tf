@@ -24,7 +24,6 @@ locals {
         apiVersion: v1alpha1
         kind: KubeAPIServerConfig
         extraArgs:
-          api-audiences: "https://kubernetes.default.svc.cluster.local,iam.googleapis.com/${google_iam_workload_identity_pool_provider.oidc.name}"
           service-account-jwks-uri: "${local.oidc_bucket_url}/openid/v1/jwks"
         ---
         apiVersion: v1alpha1
@@ -33,6 +32,10 @@ locals {
           issuerURL: "${local.oidc_bucket_url}"
           privateKey: |-
             ${indent(4, tls_private_key.this.private_key_pem)}
+        accepted:
+          audiences:
+            - "https://kubernetes.default.svc.cluster.local"
+            - "iam.googleapis.com/${google_iam_workload_identity_pool_provider.oidc.name}"
       EOF
       ,
     ]
