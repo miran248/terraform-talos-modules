@@ -37,6 +37,54 @@ The reuse review of Talos fork commit `a28c4aa448df89d2c03e457498a9dc835dae7073`
 
 Any later consolidation should retain the existing Scaleway metadata fixtures and HTTP-server tests as its verification seams: malformed-mask rejection, preservation of valid entries, endpoint failover and successful-family reuse, bounded attempts, cancellation, actual-URL diagnostics, and immediate missing/empty-user-data handling. The focused Scaleway package tests passed during the review; that does not establish live boot behavior or full lint/conformance results.
 
+## Fresh-cluster validation — 2026-10-01
+
+The temporary `dev4` iteration bootstrapped two fresh Scaleway `fr-par-1`
+clusters, each with three control planes and one worker on `DEV1-M` instances.
+The image was built from Talos revision
+`544478c120aa1fd3b30dbeadf456f9a383c9cfb0`, rebased onto upstream
+`e1386c60db3c687ff2c90f1a4e80308a22d83c6e`, with tag
+`v1.15.0-alpha.0-dev.2`.
+
+| Published image | SHA-256 digest |
+| --- | --- |
+| `ghcr.io/miran248/talos-installer-base` | `c7b91304531d976c7a465c874c75a6efe7a9944de036eceef381f9192c6b3b08` |
+| `ghcr.io/miran248/talos-imager` | `e427299db52ce373eb9879aa3f8257f589a6db287449959328123e85d37badcc` |
+| `ghcr.io/miran248/talos-installer` | `99e4e954f49b54259642016f63ecd8f5f22629002ff9969970ecad4d5ed0811c` |
+
+The Scaleway object `talos-v1.15.0-alpha.0-dev.2-amd64.qcow2` passed
+`qemu-img check` and was verified after upload to the development image bucket
+(228,327,424 bytes). The [creation run](https://app.terraform.io/app/miran248/dev/runs/run-GiKLYGFfM61D56wN)
+created 68 cluster resources and replaced only the two shared image-registration
+resources; GCP identity resources were unchanged.
+
+All eight nodes reported source `544478c1`, Kubernetes `v1.36.5`, stable
+Kubernetes node UIDs, and the expected hostname at HostnameStatus version 1.
+Both clusters had three healthy voting etcd members. After installing Cilium
+`1.20.2` and Gateway API `1.6.1`, both networking suites passed: per-node Cilium
+health, KubeSpan peers, policy rules, pod API/DNS/egress, IPv6 NAT64, and Gateway
+HTTP traffic. Initial health sweeps converged without repairs. The IPv4 Cilium
+apply needed the documented GatewayClass CRD establishment/reapply step.
+
+Metadata was collected through each family's metadata endpoint on all eight
+nodes. Each IPv4 instance advertised one `dhcp` address with netmask `"32"`;
+each IPv6 instance advertised one `slaac` address with netmask `"64"` and a
+link-local gateway. `public_ip` repeated the sole modern-list entry. Both
+families returned `ipv6: null`, `private_ip: null`, `routed_ip_enabled: true`,
+and `enable_ipv6: false`; the last flag does not indicate whether modern IPv6
+addresses exist.
+
+Talos commit `e2401f684` adds sanitized networking fixtures named
+`metadata-routed-ipv4.json` and `metadata-routed-ipv6.json` with expected
+configuration snapshots. It changes tests only, after the image build.
+The fixtures preserve provider field shapes while replacing identifiers,
+hostnames, addresses, and gateways and omitting unrelated account metadata.
+Focused race tests and custom platform lint passed after their addition.
+This single instance type/zone sample supports the current address-list parsing;
+it does not establish that legacy metadata, alternate masks, or multiple-address
+configurations can be removed. No further production-code simplification was
+made from this evidence.
+
 ## Client compatibility during development
 
 The Talos 0.12.0 Terraform provider rejects an in-place Kubernetes upgrade on
