@@ -51,6 +51,12 @@ Provision servers. One apply module per pool.
 | [talos-ccm.tf](examples/talos-ccm.tf) | talos-ccm integration with node IPAM and cloud metadata |
 | [talos-direct-routing.tf](examples/talos-direct-routing.tf) | IPv6 Cilium native routing with PodCIDRs and node traffic carried by KubeSpan WireGuard |
 
+The full cluster examples include commented, pod-source/node-destination
+`RoutingRuleConfig` patches for KubeSpan with Cilium BPF host routing, covering
+every participating pool. These can be needed with VXLAN as well as native
+routing; they are not a general Cilium prerequisite. Match the source CIDR to
+the cluster PodCIDR when adapting an example.
+
 The direct-routing profile uses `fc00:1::/96` for PodCIDRs and advertises them
 through KubeSpan. KubeSpan peer endpoints and Cilium NodePort addresses are
 restricted to IPv6, so provider IPv4/CGNAT addresses remain available to the

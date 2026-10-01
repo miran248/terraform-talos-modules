@@ -1,6 +1,8 @@
 # Use with manifests/cilium-ipv6-direct. Kubernetes allocates per-node /112
 # PodCIDRs from fc00:1::/96, while KubeSpan advertises and carries them over
 # WireGuard without VXLAN or an external cloud controller.
+# BPF host routing can bypass KubeSpan's netfilter marking. The source-scoped
+# rules exclude host-originated WireGuard packets and avoid asymmetric paths.
 # The policy rules send pod traffic for node public allocations through
 # KubeSpan table 180. Do not add node public routes to the main table; doing so
 # can recursively capture WireGuard endpoints.

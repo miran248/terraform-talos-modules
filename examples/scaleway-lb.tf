@@ -119,7 +119,7 @@ module "talos_cluster" {
   ]
 
   patches = {
-    common = [
+    common = concat([
       <<-EOF
         apiVersion: v1alpha1
         kind: ResolverConfig
@@ -135,7 +135,27 @@ module "talos_cluster" {
             - /dev/ptp0
       EOF
       ,
-    ]
+      ], [
+      # With KubeSpan + Cilium BPF host routing, pod-to-node traffic can bypass
+      # KubeSpan's netfilter marking even in VXLAN mode, causing asymmetric paths.
+      # Select table 180 for every pool's node allocations; the pod-source match
+      # excludes host-originated WireGuard packets. This is not a universal CNI
+      # requirement: see docs/maintenance/networking.md before removing the rules.
+      # Match the cluster PodCIDR; use 10.244.0.0/16 for an IPv4 composition.
+      for index, cidr in sort(distinct(flatten([
+        for pool in [module.paris_pool] : [
+          for _, node in pool.nodes : node.ip_cidr
+        ]
+      ]))) : <<-EOF
+          apiVersion: v1alpha1
+          kind: RoutingRuleConfig
+          name: "${1000 + index}"
+          src: fc00:1::/96
+          dst: ${cidr}
+          table: "180"
+          action: unicast
+        EOF
+    ])
     control_planes = [
       # Replace the generated node document without its control-plane NoSchedule taint.
       <<-EOF

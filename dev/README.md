@@ -72,9 +72,10 @@ are specific to this composition, not a general Cilium tunnel-mode requirement.
 Cilium 1.20.2 rejects legacy host routing with netkit. See the
 [recorded comparison](../docs/maintenance/networking.md#ipv4-bpfkubespan-investigation).
 
-Gateway API is an acceptance requirement after dev provisioning and installation
-of `manifests/cilium-ipv6-direct`; Terraform provisioning alone does not install
-Cilium or make Gateway API available. The profile includes Gateway API CRDs.
+All three Cilium profiles install Gateway API CRDs and enable Gateway support.
+Gateway API is optional for basic networking, but both dev acceptance suites
+exercise it after Cilium installation. Terraform provisioning alone does not
+install Cilium or make Gateway API available.
 Gateway API, Envoy, L7 proxying, and the required iptables rules are enabled.
 The older proxy-reconciliation workaround has been removed. See the
 [networking contract](../docs/maintenance/networking.md#cilium-profiles) for

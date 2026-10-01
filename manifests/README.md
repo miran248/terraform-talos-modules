@@ -63,9 +63,10 @@ the Kubernetes API, through WireGuard. Do not add node public `/128` routes to
 the main table: those routes can recursively capture WireGuard peer endpoints
 and break node-to-node traffic, including etcd.
 
-Gateway API becomes available after provisioning the cluster and installing
-`cilium-ipv6-direct`. The profile enables Gateway API, Envoy, L7 proxying, and
-its required iptables rules alongside BPF IPv6 masquerading. The older
+All three Cilium profiles install Gateway API CRDs and enable Gateway support,
+Envoy, L7 proxying, and the required iptables rules. Gateway API is optional
+for basic cluster networking; our dev acceptance suites test it because our
+profiles enable it. BPF masquerading is enabled independently. The older
 proxy-reconciliation workaround has been removed. See
 [development verification](../dev/README.md#apply-manifests) for the full suite.
 
