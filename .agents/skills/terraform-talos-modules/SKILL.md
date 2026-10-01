@@ -2,13 +2,9 @@
 name: terraform-talos-modules
 description: Maintain this repo's Terraform, Talos, and Kubernetes.
 version: 1.0.0
-author: Miran (miran248), Hermes Agent
+author: Miran (miran248)
 license: MIT
 platforms: [linux, macos, windows]
-metadata:
-  hermes:
-    tags: [terraform, talos, kubernetes, modules, release]
-    related_skills: []
 ---
 
 # Terraform Talos Modules

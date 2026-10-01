@@ -5,7 +5,6 @@ Choose checks from the changed area. Validation must not apply infrastructure or
 ## Agent assets
 
 - `python3 -m unittest discover -s .agents/tests -p 'test_*.py' -v`
-- Start a fresh trusted Hermes session in the repository and preload the exact project skill name `terraform-talos-modules`; aliases are not supported.
 
 ## Terraform
 

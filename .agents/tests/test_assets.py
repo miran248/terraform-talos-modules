@@ -17,7 +17,6 @@ ALTERNATE_AGENT_ROOTS = (
     ".continue",
     ".cursor",
     ".gemini",
-    ".hermes",
     ".roo",
     ".windsurf",
     "agent",
