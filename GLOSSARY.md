@@ -36,6 +36,14 @@ _Avoid_: Worker pool when referring to an individual node.
 This project's maintained variant of upstream Talos, used to develop and test changes, including features not yet released upstream.
 _Avoid_: Custom image when referring to the source variant rather than an artifact built from it.
 
+**Provider image**:
+A bootable Talos image registered with a cloud provider for provisioning cloud servers.
+_Avoid_: Custom image when referring specifically to the provider's provisioning artifact.
+
+**Talos installer image**:
+A container image containing the Talos version installed on a node during installation or upgrade.
+_Avoid_: Custom image when referring specifically to the installation or upgrade artifact.
+
 **Machine configuration**:
 The desired Talos configuration for an individual node, including its cluster membership and role.
 _Avoid_: Client configuration, which configures access to the cluster rather than the node itself.
