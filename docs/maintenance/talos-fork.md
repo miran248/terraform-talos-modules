@@ -85,6 +85,14 @@ it does not establish that legacy metadata, alternate masks, or multiple-address
 configurations can be removed. No further production-code simplification was
 made from this evidence.
 
+After acceptance, the [targeted teardown](https://app.terraform.io/app/miran248/dev/runs/run-sB6X3DZ2KuRVwo24)
+destroyed all 62 remaining cluster resources. Scaleway confirmed removal of the
+eight instances and their volumes, addresses, security groups, placement groups,
+and both load balancers and their addresses. Terraform state returned to its
+24 shared-resource/data addresses, preserving the new image registration and
+GCP identity resources. Temporary client configs were removed and the local
+`dev1` baseline restored without applying it.
+
 ## Client compatibility during development
 
 The Talos 0.12.0 Terraform provider rejects an in-place Kubernetes upgrade on
