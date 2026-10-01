@@ -13,7 +13,7 @@ module "scaleway_image_dev" {
 
   zone   = each.key
   bucket = "miran248-terraform-talos-modules-dev-images"
-  object = "talos-v1.15.0-alpha.0-dev.1-amd64.qcow2"
-  name   = "talos-v1.15.0-alpha.0-dev.1-amd64"
+  object = "talos-v1.15.0-alpha.0-dev.2-amd64.qcow2"
+  name   = "talos-v1.15.0-alpha.0-dev.2-amd64"
 
 }

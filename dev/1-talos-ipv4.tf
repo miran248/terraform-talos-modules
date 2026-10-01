@@ -168,7 +168,7 @@ module "dev1_ipv4_talos_apply" {
   cluster = module.dev1_ipv4_talos_cluster
   # applies         = [module.dev1_ipv4_paris_apply, module.dev1_ipv4_falkenstein_apply]
   applies         = [module.dev1_ipv4_paris_apply]
-  installer_image = "ghcr.io/miran248/talos-installer:v1.15.0-alpha.0-dev.1"
+  installer_image = "ghcr.io/miran248/talos-installer:v1.15.0-alpha.0-dev.2"
 }
 
 module "dev1_ipv4_gcp_wif_apply" {

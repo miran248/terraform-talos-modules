@@ -19,7 +19,7 @@ scaleway:
   rm -Rf {{ TMP_PATH }}
 
 TALOS_SRC := justfile_directory() + "/../../talos"
-DEV_IMAGE_TAG := "v1.15.0-alpha.0-dev.1"
+DEV_IMAGE_TAG := "v1.15.0-alpha.0-dev.2"
 USERNAME := "miran248"
 
 TALOS_INSTALLER_BASE := "ghcr.io/" + USERNAME + "/talos-installer-base:" + DEV_IMAGE_TAG
