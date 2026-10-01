@@ -8,7 +8,7 @@ Kustomize + Helm chart configurations for cluster components. Run `just build` f
 | [argocd](argocd) | GitOps controller | no |
 | [cert-manager](cert-manager) | certificate management | no |
 | [cilium-ipv6](cilium-ipv6) | CNI for IPv6 clusters - tunnel mode (netkit), bandwidth manager, Gateway API | yes |
-| [cilium-ipv6-direct](cilium-ipv6-direct) | CNI for IPv6 clusters - native routing over KubeSpan WireGuard, no VXLAN | no |
+| [cilium-ipv6-direct](cilium-ipv6-direct) | CNI for IPv6 clusters - native routing over KubeSpan WireGuard, no VXLAN, Gateway API | no |
 | [cilium-ipv4](cilium-ipv4) | CNI for IPv4 clusters - tunnel mode (netkit), bandwidth manager, Gateway API | yes |
 | [coredns-ipv6](coredns-ipv6) | CoreDNS with `hostNetwork: true` for IPv6 clusters (legacy workaround, no longer required) | no |
 | [coredns-ipv4](coredns-ipv4) | CoreDNS with `hostNetwork: true` for IPv4 clusters (legacy workaround, no longer required) | no |
@@ -51,6 +51,12 @@ the Kubernetes API, through WireGuard. Do not add node public `/128` routes to
 the main table: those routes can recursively capture WireGuard peer endpoints
 and break node-to-node traffic, including etcd.
 
+Gateway API becomes available after provisioning the cluster and installing
+`cilium-ipv6-direct`. The profile enables Gateway API, Envoy, L7 proxying, and
+its required iptables rules alongside BPF IPv6 masquerading. The older
+proxy-reconciliation workaround has been removed. See
+[development verification](../dev/README.md#apply-manifests) for the full suite.
+
 ## usage
 
 ```shell
@@ -59,5 +65,5 @@ and break node-to-node traffic, including etcd.
 
 # apply required components (use cilium-ipv4 for IPv4 clusters)
 > KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/cilium-ipv6.yaml
-> KUBECONFIG=kube-config kubectl apply --server-side=true -f .build/manifests/namespaces.yaml
+> KUBECONFIG=kube-config kubectl apply --server-side=true -f manifests/namespaces.yaml
 ```

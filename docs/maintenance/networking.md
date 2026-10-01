@@ -14,7 +14,7 @@
 - Keep eBPF host routing enabled and select `kubespan` as the direct-routing device.
 - Restrict NodePort addresses to `::/0`; provider IPv4/CGNAT addresses must not enter the IPv6-only service datapath.
 - Keep remote-node masquerading disabled. With IPv6 BPF masquerading it drops pod-to-node traffic as an invalid source before Talos policy routing.
-- Keep Cilium iptables rule installation, L7 proxying, Gateway API, and Envoy disabled while proxy-rule reconciliation fails on this Talos build.
+- Gateway API is required after provisioning dev and installing `manifests/cilium-ipv6-direct`; Terraform alone does not install Cilium. Keep Gateway API, Envoy, L7 proxying, and iptables rule installation enabled together: Cilium refuses L7 startup without iptables rules. The earlier proxy-reconciliation workaround was removed after the complete direct-routing suite, including the Gateway HTTP-route test, passed with Talos `v1.15.0-alpha.0-dev.1` and Cilium `v1.19.6` on 2026-10-01. BPF IPv6 masquerading remains enabled independently.
 - Keep Argo CD chart-managed NetworkPolicies disabled where networking policy is managed separately.
 
 ## Routing and MTU
