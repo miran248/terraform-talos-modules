@@ -2,10 +2,6 @@
 
 Choose checks from the changed area. Validation must not apply infrastructure or mutate a cluster unless explicitly requested.
 
-## Agent assets
-
-- `python3 -m unittest discover -s .agents/tests -p 'test_*.py' -v`
-
 ## Terraform
 
 - All Terraform: `terraform fmt -check -recursive .`

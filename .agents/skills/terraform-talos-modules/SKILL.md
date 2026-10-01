@@ -44,7 +44,3 @@ Load only the material relevant to the change:
 - Generated Terraform state, plans, kubeconfigs, Talos configs, rendered manifests, charts, and image payloads are not source.
 - A formatting check does not prove provider initialization, rendered YAML validity, or live networking behavior.
 - IPv6 direct routing has coupled Talos, KubeSpan, Cilium, DNS, policy-routing, and MTU requirements; load `references/networking.md` before changing any part.
-
-## Verification
-
-Run `python3 -m unittest discover -s .agents/tests -p 'test_*.py' -v`, then the relevant repository checks in `references/verification.md`.
