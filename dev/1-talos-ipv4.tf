@@ -89,9 +89,8 @@ resource "scaleway_lb_frontend" "dev1_ipv4_k8s" {
 module "dev1_ipv4_talos_cluster" {
   source = "../modules/talos-cluster"
 
-  name     = "dev1-ipv4"
-  endpoint = scaleway_lb_ip.dev1_ipv4.ip_address
-  # Provider 0.12.0-beta.0 embeds matching Talos 1.14.0-rc.2 machinery.
+  name               = "dev1-ipv4"
+  endpoint           = scaleway_lb_ip.dev1_ipv4.ip_address
   talos_version      = "v1.14.0-rc.2"
   kubernetes_version = "v1.36.1"
 

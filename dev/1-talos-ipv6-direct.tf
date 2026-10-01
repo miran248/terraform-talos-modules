@@ -69,7 +69,6 @@ resource "scaleway_lb_frontend" "dev1_ipv6_k8s" {
   inbound_port = 6443
 }
 
-# Provider 0.12.0-beta.0 embeds matching Talos 1.14.0-rc.2 machinery.
 module "dev1_ipv6_talos_cluster" {
   source = "../modules/talos-cluster"
 
