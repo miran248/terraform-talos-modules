@@ -7,8 +7,8 @@ The committed configuration always uses `dev1`. For a fresh end-to-end deploymen
 use a temporary local iteration such as `dev2` or `dev3`, following the
 [development iteration procedure](../docs/maintenance/operations.md#development-iterations).
 Commit durable fixes with the `dev1` baseline, never the temporary rename.
-After testing, comment out the active `1-talos-*.tf` declarations and apply a
-reviewed teardown plan, preserving shared resources. Restore the committed
+After testing, use a reviewed targeted destroy plan, or temporarily comment out
+the active `1-talos-*.tf` declarations and apply, preserving shared resources. Restore the committed
 `dev1` baseline only after cleanup; applying it again would recreate the clusters.
 
 ## prerequisites
@@ -83,6 +83,8 @@ on exit.
 ## remove test clusters
 
 Follow the [iteration cleanup procedure](../docs/maintenance/operations.md#development-iterations):
-comment out the active `1-talos-*.tf` declarations, review a Terraform plan, and
-apply it to remove the clusters while retaining shared image and identity resources.
+prefer a saved targeted destroy plan covering the live iteration's cluster modules
+and load-balancer resources. Inspect the complete plan to preserve shared image
+and identity resources. Temporarily commenting out the active `1-talos-*.tf`
+declarations and applying a normal plan remains an alternative.
 `just destroy` tears down the entire workspace and is not the iteration cleanup command.
